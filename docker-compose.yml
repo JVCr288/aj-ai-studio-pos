@@ -1,0 +1,27 @@
+# DEVELOPMENT-ONLY POSTGRESQL DOCKER COMPOSE SETUP
+# This setup is strictly for local development and testing.
+# DO NOT deploy or use in production environments.
+
+version: '3.8'
+
+services:
+  postgres_dev:
+    image: postgres:16-alpine
+    container_name: akk_nocturne_dev_db
+    environment:
+      POSTGRES_DB: akk_nocturne_dev
+      POSTGRES_USER: akk_dev
+      POSTGRES_PASSWORD: akk_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U akk_dev -d akk_nocturne_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata_dev:
+    driver: local

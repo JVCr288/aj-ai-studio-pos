@@ -1,0 +1,6 @@
+{
+  "name": "AJ AI Studio Platform",
+  "description": "Dark aesthetic photography studio reservation, payment gateway, cryptographic slip verification, digital bay pass, and deliverables archive vault.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
