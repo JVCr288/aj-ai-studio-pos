@@ -121,16 +121,16 @@ export interface CreateBookingPayload {
 const bookingStore = new Map<string, CustomerBookingRecord>();
 const bookingEventsStore = new Map<string, BookingEventRecord[]>();
 
-// Seed initial pilot bookings for AKK Photo Studio
+// Seed initial pilot bookings for AJ AI Studio
 function seedPilotBookings() {
   if (bookingStore.size > 0) return;
   const now = new Date().toISOString();
 
   const pilot1: CustomerBookingRecord = {
-    id: 'bk-akk-001',
-    bookingReference: '#AKK-BK-2026-8801',
-    tenantId: 'akk-photo-studio',
-    idempotencyKey: 'idemp-seed-akk-001',
+    id: 'bk-aj-001',
+    bookingReference: '#AJ-BK-2026-8801',
+    tenantId: 'aj-ai-studio',
+    idempotencyKey: 'idemp-seed-aj-001',
     customerName: 'Elena Rostova',
     customerPhone: '+95 9 792 108 421',
     customerEmail: 'elena@fashionatelier.mm',
@@ -169,10 +169,10 @@ function seedPilotBookings() {
   };
 
   const pilot2: CustomerBookingRecord = {
-    id: 'bk-akk-002',
-    bookingReference: '#AKK-BK-2026-8802',
-    tenantId: 'akk-photo-studio',
-    idempotencyKey: 'idemp-seed-akk-002',
+    id: 'bk-aj-002',
+    bookingReference: '#AJ-BK-2026-8802',
+    tenantId: 'aj-ai-studio',
+    idempotencyKey: 'idemp-seed-aj-002',
     customerName: 'Kyaw Zayar',
     customerPhone: '+95 9 450 112 334',
     customerEmail: 'kyaw.zayar@agency.mm',
@@ -216,9 +216,9 @@ function seedPilotBookings() {
 
   bookingEventsStore.set(pilot1.id, [
     {
-      id: 'evt-akk-001-1',
+      id: 'evt-aj-001-1',
       bookingId: pilot1.id,
-      tenantId: 'akk-photo-studio',
+      tenantId: 'aj-ai-studio',
       eventType: 'SUBMITTED',
       toStatus: 'AWAITING_PAYMENT_REVIEW',
       actorId: 'customer',
@@ -230,9 +230,9 @@ function seedPilotBookings() {
 
   bookingEventsStore.set(pilot2.id, [
     {
-      id: 'evt-akk-002-1',
+      id: 'evt-aj-002-1',
       bookingId: pilot2.id,
-      tenantId: 'akk-photo-studio',
+      tenantId: 'aj-ai-studio',
       eventType: 'SUBMITTED',
       toStatus: 'AWAITING_PAYMENT_REVIEW',
       actorId: 'customer',
@@ -241,9 +241,9 @@ function seedPilotBookings() {
       createdAt: now,
     },
     {
-      id: 'evt-akk-002-2',
+      id: 'evt-aj-002-2',
       bookingId: pilot2.id,
-      tenantId: 'akk-photo-studio',
+      tenantId: 'aj-ai-studio',
       eventType: 'PAYMENT_VERIFIED',
       fromStatus: 'AWAITING_PAYMENT_REVIEW',
       toStatus: 'CONFIRMED',
@@ -269,7 +269,7 @@ export class ServerBookingService {
    * Create customer booking with idempotency key and double-booking conflict protection.
    */
   public async createCustomerBooking(payload: CreateBookingPayload): Promise<CustomerBookingRecord> {
-    const tenantId = payload.tenantId || 'akk-photo-studio';
+    const tenantId = payload.tenantId || 'aj-ai-studio';
     const idempotencyKey = payload.idempotencyKey || `idemp-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
 
     // 1. Idempotency Check: return existing booking if key matches
@@ -298,7 +298,7 @@ export class ServerBookingService {
     }
 
     const now = new Date().toISOString();
-    const prefix = tenantId.includes('akk') ? 'AKK' : 'STUDIO';
+    const prefix = tenantId.includes('neutral') ? 'STUDIO' : 'AJ';
     const bookingRef = `#${prefix}-BK-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
     const bookingId = `bk-${tenantId}-${Date.now()}`;
 

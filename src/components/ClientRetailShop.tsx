@@ -34,8 +34,8 @@ interface ClientRetailShopProps {
   workspaceView?: WorkspaceView;
 }
 
-const STORAGE_KEY = 'akk_client_retail_products_v1';
-const CART_STORAGE_KEY = 'akk_client_cart_v1';
+const STORAGE_KEY = 'aj_client_retail_products_v1';
+const CART_STORAGE_KEY = 'aj_client_cart_v1';
 
 export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
   bookingState,
@@ -224,12 +224,12 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
       priceMMK: Number(newProdPrice) || 50000,
       stockCount: Number(newProdStock) || 5,
       availability: Number(newProdStock) > 0 ? 'in_stock' : 'pre_order',
-      sku: newProdSku.trim() || `AKK-RET-${Math.floor(1000 + Math.random() * 9000)}`,
+      sku: newProdSku.trim() || `AJ-RET-${Math.floor(1000 + Math.random() * 9000)}`,
       leadTime: newProdLeadTime.trim() || '2 to 3 Days',
       dimensions: newProdDimensions.trim() || undefined,
       imageUrl: newProdImageUrl.trim() || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80',
       description: newProdDescription.trim() || 'Studio archival fine art retail item.',
-      myanmarDescription: newProdMyanmarDesc.trim() || 'စတူဒီယို သီးသန့် အဆင့်မြင့် ပစ္စည်း ဖြစ်ပါသည်။',
+      myanmarDescription: newProdMyanmarDesc.trim() || 'Premium studio client deliverable edition.',
       features: newProdFeatures
         .split('\n')
         .map((f) => f.trim())
@@ -310,7 +310,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
             <span className="text-[#7E8F9F] font-ui">STORE</span>
             <span className="text-[#1E3A4F]">/</span>
             <span className="text-[#38BDF8] font-ui font-semibold tracking-wide">
-              Client Retail Boutique (ရောင်းချသော ပစ္စည်းများ)
+              Client Retail Boutique
             </span>
             <span className="text-[#1E3A4F]">•</span>
             <span className="text-[#7E8F9F] text-[11px] font-ui">
@@ -327,7 +327,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                 title="Switch to Studio Gear / Equipment Inventory"
               >
                 <Package className="w-3.5 h-3.5 text-[#38BDF8]" />
-                <span>စတူဒီယိုသုံး ပစ္စည်းများ (Studio Gear)</span>
+                <span>Studio Equipment &amp; Gear</span>
               </button>
             )}
 
@@ -339,7 +339,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
               title="View Client Order Bag"
             >
               <ShoppingBag className="w-3.5 h-3.5" />
-              <span>မှာယူမည့် စာရင်း</span>
+              <span>Client Order Bag</span>
               {totalCartItemsCount > 0 && (
                 <span className="ml-1 px-1.5 py-0.2 rounded-full bg-[#38BDF8] text-[#071423] text-[10px] font-bold">
                   {totalCartItemsCount}
@@ -363,15 +363,13 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
             <div className="space-y-2 max-w-2xl">
               <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#38BDF8]/10 border border-[#38BDF8]/20 text-[#38BDF8] text-xs font-ui font-medium">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>AKK Studio Atelier Store &amp; Add-ons</span>
+                <span>AJ Studio Atelier Store &amp; Add-ons</span>
               </div>
               <h1 className="font-ui font-bold text-2xl sm:text-3xl text-[#F1F5F9] tracking-tight">
-                Client ကို ရောင်းချ ပေးသော ပစ္စည်းများ
+                Client Deliverables &amp; Memorabilia
               </h1>
               <p className="text-[#7E8F9F] text-sm font-ui leading-relaxed">
-                ပြတိုက်အဆင့် ဖလိုတင်း ကင်းဗတ်စ် မှန်ဘောင်များ၊ အီတလီ သားရေချုပ်
-                အယ်လ်ဘမ်များ၊ လေဆာထွင်း သစ်သား USB Drive များနှင့် 35mm ဖလင်လိပ်
-                များကို ဈေးနှုန်း MMK ဖြင့် စနစ်တကျ ရွေးချယ် မှာယူနိုင်ပါသည်။
+                Archival floating canvas frames, genuine Italian leather albums, laser-engraved wooden USB drives, and curated 35mm analog film rolls.
               </p>
             </div>
 
@@ -383,7 +381,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                 className="px-4 py-2.5 rounded-xl bg-[#38BDF8] hover:bg-[#0EA5E9] text-[#071423] font-ui font-semibold text-xs flex items-center space-x-2 transition-all cursor-pointer shadow-md focus:outline-none focus:ring-1 focus:ring-[#38BDF8]"
               >
                 <Plus className="w-4 h-4 stroke-[2.5]" />
-                <span>ပစ္စည်းအသစ် ထည့်သွင်းမည်</span>
+                <span>+ Add Retail Product</span>
               </button>
 
               <button
@@ -445,7 +443,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="ရှာဖွေရန်... (Search product, Myanmar name, or SKU like AKK-CAN-1624)"
+                placeholder="Search product, SKU (e.g. AJ-CAN-1624), or category..."
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#030F1E] border border-[#1E3A4F] text-[#F1F5F9] placeholder-[#7E8F9F] text-xs font-ui focus:outline-none focus:border-[#38BDF8] focus:ring-1 focus:ring-[#38BDF8] transition-colors"
               />
               {searchQuery && (
@@ -468,7 +466,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                   onChange={(e) => setOnlyInStock(e.target.checked)}
                   className="rounded border-[#1E3A4F] text-[#38BDF8] focus:ring-0 bg-[#030F1E]"
                 />
-                <span>လက်ကျန်ရှိသော ပစ္စည်းများသာ (In Stock Only)</span>
+                <span>In Stock Only</span>
               </label>
             </div>
           </div>
@@ -488,8 +486,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                       : 'bg-[#102538] hover:bg-[#1E3A4F] text-[#7E8F9F] hover:text-[#F1F5F9] border border-[#1E3A4F]'
                   }`}
                 >
-                  <span>{cat.myanmarLabel}</span>
-                  <span className="text-[10px] opacity-75">({cat.label})</span>
+                  <span>{cat.label}</span>
                 </button>
               );
             })}
@@ -532,17 +529,17 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                   <div className="absolute top-3 right-3">
                     {product.availability === 'in_stock' && (
                       <span className="font-ui text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#34D399]/20 border border-[#34D399]/40 text-[#34D399]">
-                        လက်ကျန် {product.stockCount} ခု
+                        In Stock ({product.stockCount})
                       </span>
                     )}
                     {product.availability === 'made_to_order' && (
                       <span className="font-ui text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#38BDF8]/20 border border-[#38BDF8]/40 text-[#38BDF8]">
-                        မှာယူလုပ်ဆောင်
+                        Made to Order
                       </span>
                     )}
                     {product.availability === 'out_of_stock' && (
                       <span className="font-ui text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#FB7185]/20 border border-[#FB7185]/40 text-[#FB7185]">
-                        ပစ္စည်းကုန်
+                        Sold Out
                       </span>
                     )}
                   </div>
@@ -563,12 +560,8 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                     <h3 className="font-ui font-bold text-base text-[#F1F5F9] group-hover:text-[#38BDF8] transition-colors line-clamp-1">
                       {product.name}
                     </h3>
-                    <div className="font-ui font-medium text-xs text-[#94A3B8] line-clamp-1">
-                      {product.myanmarName}
-                    </div>
-
                     <p className="text-[#7E8F9F] text-xs font-ui leading-relaxed line-clamp-2">
-                      {product.myanmarDescription || product.description}
+                      {product.description}
                     </p>
 
                     {/* Features Snippet */}
@@ -671,11 +664,10 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
           <div className="bg-[#0B1B2B] border border-[#1E3A4F] rounded-2xl p-12 text-center space-y-3">
             <Package className="w-10 h-10 text-[#7E8F9F] mx-auto" />
             <h3 className="font-ui font-bold text-lg text-[#F1F5F9]">
-              ရှာဖွေထားသော ပစ္စည်း မတွေ့ရှိပါ
+              No Products Found
             </h3>
             <p className="font-ui text-xs text-[#7E8F9F] max-w-md mx-auto">
-              "{searchQuery}" နှင့် ကိုက်ညီသော ပစ္စည်းမရှိပါ။ အမည် သို့မဟုတ်
-              အမျိုးအစား ပြန်လည်ရွေးချယ်ပေးပါ။
+              No retail products match &quot;{searchQuery}&quot;. Try adjusting your search query or selected category.
             </p>
             <button
               type="button"
@@ -700,7 +692,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
               <div className="flex items-center space-x-2">
                 <ShoppingBag className="w-5 h-5 text-[#38BDF8]" />
                 <h2 className="font-ui font-bold text-lg text-[#F1F5F9]">
-                  Client မှာယူမည့် စာရင်း (Cart)
+                  Client Order Bag
                 </h2>
               </div>
               <button
@@ -717,9 +709,9 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
               {cart.length === 0 ? (
                 <div className="text-center py-16 text-[#7E8F9F] font-ui space-y-2">
                   <ShoppingBag className="w-8 h-8 mx-auto stroke-[1.5] text-[#7E8F9F]" />
-                  <p className="text-sm">စာရင်းတွင် ပစ္စည်း မရှိသေးပါ</p>
+                  <p className="text-sm">Your order bag is currently empty</p>
                   <span className="text-xs text-[#7E8F9F]">
-                    လိုချင်သော ပစ္စည်းများကို 'မှာယူမည်' နှိပ်၍ ထည့်နိုင်ပါသည်။
+                    Click &apos;Add to Bag&apos; on any product above to include prints and albums.
                   </span>
                 </div>
               ) : (
@@ -782,11 +774,11 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
               >
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs text-[#7E8F9F]">
-                    <span>စုစုပေါင်း ပစ္စည်းအရေအတွက်:</span>
-                    <span className="text-[#F1F5F9] font-medium tabular-nums">{totalCartItemsCount} ခု</span>
+                    <span>Total Quantity:</span>
+                    <span className="text-[#F1F5F9] font-medium tabular-nums">{totalCartItemsCount} items</span>
                   </div>
                   <div className="flex justify-between text-sm font-bold pt-1">
-                    <span className="text-[#F1F5F9]">ကျသင့်ငွေ စုစုပေါင်း:</span>
+                    <span className="text-[#F1F5F9]">Grand Total:</span>
                     <span className="text-[#38BDF8] text-base tabular-nums">
                       {cartTotalMMK.toLocaleString()} MMK
                     </span>
@@ -802,7 +794,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                       required
                       value={checkoutName}
                       onChange={(e) => setCheckoutName(e.target.value)}
-                      placeholder="Client အမည် (Guest Name)"
+                      placeholder="Client Full Name (Guest Name)"
                       className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#030F1E] border border-[#1E3A4F] text-xs text-[#F1F5F9] placeholder-[#7E8F9F] font-ui focus:outline-none focus:border-[#38BDF8] focus:ring-1 focus:ring-[#38BDF8]"
                     />
                   </div>
@@ -814,7 +806,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                       required
                       value={checkoutPhone}
                       onChange={(e) => setCheckoutPhone(e.target.value)}
-                      placeholder="ဖုန်းနံပါတ် (KBZPay / WavePay)"
+                      placeholder="Phone Number (KBZPay / WavePay)"
                       className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#030F1E] border border-[#1E3A4F] text-xs text-[#F1F5F9] placeholder-[#7E8F9F] font-ui focus:outline-none focus:border-[#38BDF8] focus:ring-1 focus:ring-[#38BDF8]"
                     />
                   </div>
@@ -825,7 +817,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                   className="w-full py-3 rounded-xl bg-[#38BDF8] hover:bg-[#0EA5E9] text-[#071423] font-ui font-semibold text-xs flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-md focus:outline-none focus:ring-1 focus:ring-[#38BDF8]"
                 >
                   <Receipt className="w-4 h-4" />
-                  <span>အော်ဒါ အတည်ပြုမည် (Generate Slip)</span>
+                  <span>Confirm Order &amp; Generate Slip</span>
                 </button>
               </form>
             )}
@@ -845,7 +837,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                 Client Order Confirmed!
               </h3>
               <p className="text-[#7E8F9F] text-xs font-ui">
-                ပစ္စည်းများ မှာယူမှု အောင်မြင်ပါသည်။ စတူဒီယိုမှ ပြင်ဆင်ဆောင်ရွက်ပေးပါမည်။
+                Your order has been recorded successfully. Our atelier team will prepare your custom deliverables.
               </p>
             </div>
 
@@ -904,8 +896,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                 <span>Payment Notice:</span>
               </span>
               <p>
-                ငွေပေးချေမှုကို စတူဒီယို ကောင်တာတွင် KBZPay / WavePay သို့မဟုတ် Cash
-                ဖြင့် ပေးချေနိုင်ပါသည်။
+                Payment can be settled at the studio reception counter via KBZPay, WavePay, or Cash.
               </p>
             </div>
 
@@ -955,9 +946,11 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                 <h2 className="font-ui font-bold text-xl text-[#F1F5F9]">
                   {selectedProductForDetail.name}
                 </h2>
-                <div className="font-ui text-sm text-[#94A3B8]">
-                  {selectedProductForDetail.myanmarName}
-                </div>
+                {selectedProductForDetail.dimensions && (
+                  <div className="font-ui text-xs text-[#94A3B8]">
+                    {selectedProductForDetail.dimensions}
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center space-x-4 font-ui text-sm">
@@ -975,9 +968,6 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
               </div>
 
               <p className="text-[#94A3B8] text-xs font-ui leading-relaxed">
-                {selectedProductForDetail.myanmarDescription}
-              </p>
-              <p className="text-[#7E8F9F] text-xs font-ui leading-relaxed">
                 {selectedProductForDetail.description}
               </p>
 
@@ -1015,7 +1005,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                   className="px-5 py-2.5 rounded-xl bg-[#38BDF8] hover:bg-[#0EA5E9] text-[#071423] font-ui font-semibold text-xs flex items-center space-x-2 cursor-pointer shadow-md focus:outline-none focus:ring-1 focus:ring-[#38BDF8]"
                 >
                   <ShoppingBag className="w-4 h-4" />
-                  <span>Add to Order Bag (မှာယူမည်)</span>
+                  <span>Add to Order Bag</span>
                 </button>
               </div>
             </div>
@@ -1031,7 +1021,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
               <div className="flex items-center space-x-2">
                 <Plus className="w-5 h-5 text-[#38BDF8]" />
                 <h3 className="font-ui font-bold text-lg text-[#F1F5F9]">
-                  ပစ္စည်းအသစ် ထည့်သွင်းမည် (Add Client Retail Item)
+                  Add Client Retail Product
                 </h3>
               </div>
               <button
@@ -1061,14 +1051,13 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
 
                 <div>
                   <label className="block text-[#94A3B8] text-[11px] mb-1">
-                    မြန်မာအမည် (Myanmar Title) *
+                    Secondary Title / Notes
                   </label>
                   <input
                     type="text"
-                    required
                     value={newProdMyanmarName}
                     onChange={(e) => setNewProdMyanmarName(e.target.value)}
-                    placeholder="ဥပမာ- သစ်သားဘောင် ပန်းချီချပ် (12 x 18)"
+                    placeholder="e.g. Floating Wood Canvas (12 x 18)"
                     className="w-full px-3 py-2 rounded-xl bg-[#030F1E] border border-[#1E3A4F] text-[#F1F5F9] placeholder-[#7E8F9F] font-ui focus:outline-none focus:border-[#38BDF8] focus:ring-1 focus:ring-[#38BDF8]"
                   />
                 </div>
@@ -1077,7 +1066,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-[#94A3B8] text-[11px] mb-1">
-                    အမျိုးအစား (Category)
+                    Category
                   </label>
                   <select
                     value={newProdCategory}
@@ -1132,7 +1121,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                     type="text"
                     value={newProdSku}
                     onChange={(e) => setNewProdSku(e.target.value)}
-                    placeholder="AKK-NEW-01"
+                    placeholder="AJ-NEW-01"
                     className="w-full px-3 py-2 rounded-xl bg-[#030F1E] border border-[#1E3A4F] text-[#F1F5F9] font-mono focus:outline-none focus:border-[#38BDF8] focus:ring-1 focus:ring-[#38BDF8]"
                   />
                 </div>
@@ -1178,13 +1167,13 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
 
               <div>
                 <label className="block text-[#94A3B8] text-[11px] mb-1">
-                  မြန်မာလို ဖော်ပြချက် (Myanmar Description)
+                  Product Description
                 </label>
                 <textarea
                   rows={2}
                   value={newProdMyanmarDesc}
                   onChange={(e) => setNewProdMyanmarDesc(e.target.value)}
-                  placeholder="ပစ္စည်း၏ အကျဉ်းချုပ် အချက်အလက်များ..."
+                  placeholder="Summary of product specifications and archival details..."
                   className="w-full px-3 py-2 rounded-xl bg-[#030F1E] border border-[#1E3A4F] text-[#F1F5F9] placeholder-[#7E8F9F] font-ui focus:outline-none focus:border-[#38BDF8] focus:ring-1 focus:ring-[#38BDF8]"
                 />
               </div>
@@ -1213,7 +1202,7 @@ export const ClientRetailShop: React.FC<ClientRetailShopProps> = ({
                   type="submit"
                   className="px-5 py-2 rounded-xl bg-[#38BDF8] hover:bg-[#0EA5E9] text-[#071423] font-ui font-semibold text-xs shadow-md focus:outline-none focus:ring-1 focus:ring-[#38BDF8]"
                 >
-                  Add Product (စာရင်းသွင်းမည်)
+                  Add Product
                 </button>
               </div>
             </form>

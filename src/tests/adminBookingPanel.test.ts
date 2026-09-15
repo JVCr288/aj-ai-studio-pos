@@ -24,7 +24,7 @@ import { submitCustomerBookingToServer } from '../services/adminBookingClientSer
  * 16. Payment evidence asset reference requires authorization.
  * 17. Existing Customer Booking/Payment/Verify/Pass/Vault flows preserved.
  * 18. Admin routes are isolated (/admin/bookings has PUBLIC_ADMIN_EXPOSURE=0).
- * 19. Neutral tenant rendering has zero AKK branding leaks.
+ * 19. Neutral tenant rendering has zero master tenant branding leaks.
  * 20. Production mode fails closed without database/admin credentials.
  * 21. Main UI shell exposes Booking Operations Desk ONLY for step > 0, never on Step 0 public landing or /setup.
  * 22. Customer submission and Admin list query read the same canonical repository.
@@ -35,7 +35,7 @@ async function runAdminBookingPanelTests() {
   console.log('\n=== RUNNING STUDIO ADMIN BOOKING OPERATIONS PANEL & MAIN UI INTEGRATION TESTS ===\n');
 
   const bookingService = new ServerBookingService();
-  const tenantA = 'akk-photo-studio';
+  const tenantA = 'aj-ai-studio';
   const tenantB = 'neutral-studio-tenant';
 
   // ---------------------------------------------------------------------------
@@ -59,7 +59,7 @@ async function runAdminBookingPanelTests() {
 
   const booking1 = await bookingService.createCustomerBooking(booking1Payload);
   assert.ok(booking1.id, 'Booking ID must be generated');
-  assert.ok(booking1.bookingReference.startsWith('#AKK-BK-'), 'Reference must use AKK tenant prefix');
+  assert.ok(booking1.bookingReference.startsWith('#AJ-BK-'), 'Reference must use AJ tenant prefix');
   assert.strictEqual(booking1.customerName, 'Daw Su Su');
   assert.strictEqual(booking1.bookingStatus, 'AWAITING_PAYMENT_REVIEW');
   assert.strictEqual(booking1.paymentStatus, 'EVIDENCE_RECEIVED');
@@ -259,11 +259,11 @@ async function runAdminBookingPanelTests() {
   console.log('  ✅ Test 18: Admin route isolated (/admin/bookings hidden from public/owner UI)');
 
   // ---------------------------------------------------------------------------
-  // Criterion 19: Neutral tenant rendering has zero AKK identity leaks
+  // Criterion 19: Neutral tenant rendering has zero master tenant identity leaks
   // ---------------------------------------------------------------------------
   assert.strictEqual(booking2.tenantId, 'neutral-studio-tenant');
-  assert.strictEqual(booking2.bookingReference.includes('AKK'), false, 'Neutral tenant booking reference must contain zero AKK branding');
-  console.log('  ✅ Test 19: Neutral tenant rendering verified (Zero AKK branding leaks)');
+  assert.strictEqual(booking2.bookingReference.includes('AJ'), false, 'Neutral tenant booking reference must contain zero AJ branding');
+  console.log('  ✅ Test 19: Neutral tenant rendering verified (Zero master tenant branding leaks)');
 
   // ---------------------------------------------------------------------------
   // Criterion 20: Production mode fails closed without database/admin credentials

@@ -1,7 +1,7 @@
 /**
  * Legacy Local Storage Key Compatibility & Migration Utility
  * 
- * Provides dual-read fallback support for legacy storage keys (akk_..., nocturne-...)
+ * Provides dual-read fallback support for legacy storage keys
  * while writing to clean, versioned platform/tenant keys (aj_...).
  */
 

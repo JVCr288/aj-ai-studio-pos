@@ -28,6 +28,7 @@ interface SettingsModalProps {
   onLaunchDeveloperReview?: () => void;
   onLaunchMapperPreview?: () => void;
   onLaunchAdminBookings?: () => void;
+  onLaunchPosDesk?: () => void;
 }
 
 type SettingsTab = 'appearance' | 'workstation' | 'security' | 'payment';
@@ -43,6 +44,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onLaunchDeveloperReview,
   onLaunchMapperPreview,
   onLaunchAdminBookings,
+  onLaunchPosDesk,
 }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('appearance');
   const [isMounted, setIsMounted] = useState(false);
@@ -406,6 +408,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           Admin Booking Operations
                         </button>
                       )}
+
+                      {onLaunchPosDesk && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onClose();
+                            onLaunchPosDesk();
+                          }}
+                          className="px-3 py-1.5 rounded-lg bg-[#34D399] hover:bg-[#059669] text-[#071423] font-bold text-xs transition-colors cursor-pointer"
+                        >
+                          Studio POS Desk Terminal
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
@@ -483,7 +498,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="flex justify-between text-[#7E8F9F]">
                   <span>Studio Facility:</span>
                   <span className="text-[#F1F5F9] font-medium">
-                    AKK Photo Studio • Yangon Flagship (Pilot Tenant)
+                    AJ AI Studio POS • Flagship Edition
                   </span>
                 </div>
                 <div className="flex justify-between text-[#7E8F9F]">

@@ -49,6 +49,16 @@ export interface EquipmentItem {
   rentalRateMMK?: number;
 }
 
+export type PhotographyCategory =
+  | 'PRE_BORN'
+  | 'PRE_WEDDING'
+  | 'FASHION'
+  | 'SOLO'
+  | 'PORTFOLIO'
+  | 'PORTRAIT'
+  | 'COMMERCIAL'
+  | 'CREATIVE';
+
 export interface PhotographyPackage {
   id: string;
   name: string;
@@ -58,6 +68,8 @@ export interface PhotographyPackage {
   description: string;
   suiteAllocation: string;
   features: string[];
+  category?: PhotographyCategory | string;
+  heroImage?: string;
 }
 
 export interface TimeSlot {
@@ -766,6 +778,80 @@ export interface IntegrationReceipt {
   error?: IntegrationError;
 }
 
+// ============================================================================
+// AJ AI STUDIO — STUDIO POS DESK DATA CONTRACTS
+// ============================================================================
 
+export type PosItemCategory =
+  | 'BOOKING_BALANCE'
+  | 'WALK_IN_PACKAGE'
+  | 'OVERTIME'
+  | 'ADDON_SERVICE'
+  | 'GEAR_RENTAL'
+  | 'RETAIL_PRODUCT';
 
+export interface PosCartLineItem {
+  id: string;
+  category: PosItemCategory;
+  title: string;
+  myanmarTitle?: string;
+  unitPriceMMK: number;
+  quantity: number;
+  referenceId?: string; // packageId, gearId, productId, or bookingRef
+  notes?: string;
+  bayAllocation?: string;
+}
 
+export type PosPaymentMethod =
+  | 'CASH'
+  | 'KBZPAY'
+  | 'WAVEPAY'
+  | 'AYA_PAY'
+  | 'SPLIT';
+
+export interface PosSplitBreakdown {
+  cashAmountMMK: number;
+  digitalAmountMMK: number;
+  digitalGateway: 'KBZPay' | 'WavePay' | 'AYA Pay';
+}
+
+export interface PosTransaction {
+  id: string;
+  orderReference: string;
+  tenantId: string;
+  bookingReference?: string;
+  customerName: string;
+  customerPhone: string;
+  bayAllocation?: string;
+  items: PosCartLineItem[];
+  subtotalMMK: number;
+  depositCreditedMMK: number;
+  discountMMK: number;
+  taxMMK: number;
+  totalDueMMK: number;
+  tenderedCashMMK?: number;
+  changeDueMMK?: number;
+  paymentMethod: PosPaymentMethod;
+  splitDetails?: PosSplitBreakdown;
+  transactionStatus: 'PAID' | 'COMPLETED' | 'REFUNDED';
+  receiptNumber: string;
+  cashierName: string;
+  terminalId: string;
+  timestamp: string;
+  notes?: string;
+  slipVerificationStatus?: 'ocr_extracted' | 'manual_review_required' | 'unverified';
+}
+
+export interface PosShiftRecord {
+  shiftId: string;
+  terminalId: string;
+  staffName: string;
+  openedAt: string;
+  closedAt?: string;
+  startingCashMMK: number;
+  cashInDrawerMMK: number;
+  totalCashSalesMMK: number;
+  totalDigitalSalesMMK: number;
+  totalTransactionsCount: number;
+  status: 'OPEN' | 'CLOSED';
+}

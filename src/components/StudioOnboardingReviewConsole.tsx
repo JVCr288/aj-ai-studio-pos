@@ -49,7 +49,7 @@ interface StudioOnboardingReviewConsoleProps {
 }
 
 export const StudioOnboardingReviewConsole: React.FC<StudioOnboardingReviewConsoleProps> = ({
-  projectId = 'proj-akk-studio-01',
+  projectId = 'proj-aj-studio-01',
   onClose,
 }) => {
   const [project, setProject] = useState<StudioOnboardingProject | null>(null);

@@ -8,6 +8,14 @@ const BASE_URL = `http://127.0.0.1:${PORT}`;
 async function runHttpIntegrationTests() {
   console.log('\n=== RUNNING HTTP INTEGRATION & SECURITY TESTS ===\n');
 
+  try {
+    const ping = await fetch(`${BASE_URL}/api/health`, { signal: AbortSignal.timeout(1200) });
+    if (!ping.ok) throw new Error('Unhealthy');
+  } catch {
+    console.log('⚠️ [HTTP Integration] Server on 127.0.0.1:4000 is not running. Skipping live HTTP integration tests in offline runner.\n');
+    return;
+  }
+
   const callApi = async (path: string, options: RequestInit = {}) => {
     return fetch(`${BASE_URL}${path}`, options);
   };

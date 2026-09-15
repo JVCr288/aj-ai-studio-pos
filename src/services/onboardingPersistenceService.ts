@@ -9,7 +9,7 @@ import { StudioOnboardingProject } from '../types';
  */
 
 const PRIMARY_STORAGE_PREFIX = 'aj_studio_onboarding_project_v1_';
-const LEGACY_STORAGE_PREFIX = 'akk_studio_onboarding_project_v1_';
+const LEGACY_STORAGE_PREFIX = 'aj_studio_onboarding_project_v1_';
 const STORAGE_PREFIX = PRIMARY_STORAGE_PREFIX;
 
 export const getCleanOnboardingProject = (projectId: string): StudioOnboardingProject => {
@@ -166,28 +166,28 @@ export const getCleanOnboardingProject = (projectId: string): StudioOnboardingPr
   };
 };
 
-export const getLegacyAkkOnboardingProject = (projectId = 'proj-akk-studio-01'): StudioOnboardingProject => {
+export const getDefaultStudioOnboardingProject = (projectId = 'proj-aj-studio-01'): StudioOnboardingProject => {
   const now = new Date().toISOString();
   return {
     schemaVersion: '1.0',
     project: {
       projectId,
-      projectSlug: 'akk-photo-studio-yangon',
-      displayName: 'AKK Photo Studio & Atelier',
+      projectSlug: 'aj-ai-studio-yangon',
+      displayName: 'AJ AI Studio POS & Atelier',
       clientType: 'STUDIO_OWNER',
       status: 'DRAFT',
       createdAt: now,
       updatedAt: now,
     },
     studio: {
-      name: 'AKK Photo Studio & Atelier',
-      primaryContactName: 'AKK Studio Manager',
+      name: 'AJ AI Studio POS & Atelier',
+      primaryContactName: 'AJ Studio Manager',
       logoAssetId: 'asset-logo-01',
       address: 'No. 42 Strand Road, Botahtaung Township, Yangon, Myanmar',
       googleMapsUrl: 'https://maps.google.com/?q=No.+42+Strand+Road+Yangon',
       phone: '09 792 108 421',
-      email: 'onboarding@akkphotostudio.mm',
-      telegramContact: '@akkphotostudio',
+      email: 'contact@ajaistudio.com',
+      telegramContact: '@ajaistudio',
       openingHours: '09:00 - 21:00 MMT Daily',
       closedDays: [],
     },
@@ -276,7 +276,7 @@ export const getLegacyAkkOnboardingProject = (projectId = 'proj-akk-studio-01'):
           paymentMethodId: 'pm-kbzpay',
           provider: 'KBZPAY',
           enabled: true,
-          accountName: 'AKK Photo Studio',
+          accountName: 'AJ AI Studio POS',
           accountIdentifier: '09 792 108 421',
           qrAssetId: 'asset-qr-kbzpay',
           notes: 'Instant QR transfer available',
@@ -285,14 +285,14 @@ export const getLegacyAkkOnboardingProject = (projectId = 'proj-akk-studio-01'):
           paymentMethodId: 'pm-wavepay',
           provider: 'WAVEPAY',
           enabled: true,
-          accountName: 'AKK Photo Studio',
+          accountName: 'AJ AI Studio POS',
           accountIdentifier: '09 792 108 421',
         },
         {
           paymentMethodId: 'pm-ayapay',
           provider: 'AYA_PAY',
           enabled: true,
-          accountName: 'AKK Photo Studio',
+          accountName: 'AJ AI Studio POS',
           accountIdentifier: '0092 1002 8847 2190',
         },
         {
@@ -317,11 +317,11 @@ export const getLegacyAkkOnboardingProject = (projectId = 'proj-akk-studio-01'):
     },
     invoiceProfile: {
       useStudioProfile: true,
-      studioName: 'AKK PHOTO STUDIO & ATELIER',
+      studioName: 'AJ AI STUDIO POS & ATELIER',
       address: 'No. 42 Strand Road, Botahtaung, Yangon',
       phone: '09 792 108 421',
       logoAssetId: 'asset-logo-01',
-      businessInfo: 'REG: AKK-MM-2026-YGN-091',
+      businessInfo: 'REG: AJ-AI-STUDIO-2026',
       taxInfo: 'Commercial Tax Exempt (0%)',
       footerMessage: 'All equipment is calibrated before handover. Includes 30-day lossless Vault cloud retention.',
     },
@@ -331,8 +331,8 @@ export const getLegacyAkkOnboardingProject = (projectId = 'proj-akk-studio-01'):
         projectId,
         category: 'STUDIO_LOGO',
         provider: 'DEV_LOCAL',
-        storageRef: '/assets/akk_logo.svg',
-        originalFilename: 'akk_studio_logo_dark.svg',
+        storageRef: '/assets/studio_logo.svg',
+        originalFilename: 'studio_logo_dark.svg',
         mimeType: 'image/svg+xml',
         fileSizeBytes: 12400,
         uploadStatus: 'READY',
@@ -354,9 +354,9 @@ export const getLegacyAkkOnboardingProject = (projectId = 'proj-akk-studio-01'):
   };
 };
 
-export const getDefaultOnboardingProject = (projectId = 'proj-akk-studio-01'): StudioOnboardingProject => {
-  if (projectId === 'proj-akk-studio-01') {
-    return getLegacyAkkOnboardingProject(projectId);
+export const getDefaultOnboardingProject = (projectId = 'proj-aj-studio-01'): StudioOnboardingProject => {
+  if (projectId === 'proj-aj-studio-01') {
+    return getDefaultStudioOnboardingProject(projectId);
   }
   return getCleanOnboardingProject(projectId);
 };
@@ -400,7 +400,7 @@ export const getPersistenceMode = (): PersistenceMode => {
 };
 
 export const loadOnboardingDraft = async (
-  projectId = 'proj-akk-studio-01'
+  projectId = 'proj-aj-studio-01'
 ): Promise<StudioOnboardingProject | null> => {
   try {
     const res = await fetch('/api/owner/draft', {

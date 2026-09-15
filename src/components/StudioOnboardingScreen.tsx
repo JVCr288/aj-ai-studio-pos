@@ -70,7 +70,7 @@ interface StudioOnboardingScreenProps {
 }
 
 export const StudioOnboardingScreen: React.FC<StudioOnboardingScreenProps> = ({
-  projectId = 'proj-akk-studio-01',
+  projectId = 'proj-aj-studio-01',
   onClosePortal,
 }) => {
   const [project, setProject] = useState<StudioOnboardingProject>(() =>
@@ -364,7 +364,7 @@ export const StudioOnboardingScreen: React.FC<StudioOnboardingScreenProps> = ({
       paymentMethodId: `pm-custom-${Date.now()}`,
       provider: 'BANK_TRANSFER',
       enabled: true,
-      accountName: 'AKK Photo Studio Bank Account',
+      accountName: 'AJ AI Studio Bank Account',
       accountIdentifier: '0012 3456 7890',
     };
     setProject((prev) => ({
@@ -891,7 +891,7 @@ export const StudioOnboardingScreen: React.FC<StudioOnboardingScreenProps> = ({
                     type="text"
                     value={project.studio.name}
                     onChange={(e) => updateStudioField('name', e.target.value)}
-                    placeholder="e.g. AKK Photo Studio"
+                    placeholder="e.g. AJ AI Studio"
                     className="w-full px-3 py-2 rounded-lg bg-[#030F1E] border border-[#1E3A4F] text-[#F1F5F9] focus:outline-none focus:border-[#38BDF8]"
                   />
                 </div>
@@ -957,7 +957,7 @@ export const StudioOnboardingScreen: React.FC<StudioOnboardingScreenProps> = ({
                     type="text"
                     value={project.studio.telegramContact || ''}
                     onChange={(e) => updateStudioField('telegramContact', e.target.value)}
-                    placeholder="@akkphotostudio"
+                    placeholder="@ajaistudio"
                     className="w-full px-3 py-2 rounded-lg bg-[#030F1E] border border-[#1E3A4F] text-[#F1F5F9] focus:outline-none focus:border-[#38BDF8]"
                   />
                 </div>

@@ -53,7 +53,7 @@ interface StudioAdminBookingPanelProps {
 
 export type ConnectionStatusType = 'CONNECTED' | 'RECONNECTING' | 'LOCAL_DEV_PERSISTENCE' | 'DATABASE_UNAVAILABLE' | 'UNAUTHORIZED';
 
-export function StudioAdminBookingPanel({ onClose, defaultTenantId = 'akk-photo-studio' }: StudioAdminBookingPanelProps) {
+export function StudioAdminBookingPanel({ onClose, defaultTenantId = 'aj-ai-studio' }: StudioAdminBookingPanelProps) {
   const [tenantId, setTenantId] = useState<string>(defaultTenantId);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [userRole, setUserRole] = useState<string>('STUDIO_ADMIN');
@@ -404,7 +404,7 @@ export function StudioAdminBookingPanel({ onClose, defaultTenantId = 'akk-photo-
                 onChange={(e) => setTenantId(e.target.value)}
                 className="w-full bg-[#071423] border border-[#1E3A4F] rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-[#38BDF8]"
               >
-                <option value="akk-photo-studio">AKK Photo Studio (Pilot Tenant)</option>
+                <option value="aj-ai-studio">AJ AI Studio (Master Tenant)</option>
                 <option value="neutral-studio-tenant">Neutral Partner Studio</option>
               </select>
             </div>
@@ -419,7 +419,9 @@ export function StudioAdminBookingPanel({ onClose, defaultTenantId = 'akk-photo-
                 className="w-full bg-[#071423] border border-[#1E3A4F] rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-[#38BDF8]"
                 required
               />
-              <p className="text-[11px] text-slate-500 mt-1">Use the configured local Admin credential.</p>
+              <p className="text-[11px] text-slate-400 mt-1">
+                Use the configured local Admin credential. Default key: <code className="text-[#38BDF8] bg-[#071423] px-1.5 py-0.5 rounded border border-[#1E3A4F]">dev-admin-secret</code>
+              </p>
             </div>
 
             <button
@@ -453,14 +455,18 @@ export function StudioAdminBookingPanel({ onClose, defaultTenantId = 'akk-photo-
             </button>
           )}
 
-          <div className="p-2 bg-[#38BDF8]/10 rounded-lg border border-[#38BDF8]/30">
-            <Shield className="w-5 h-5 text-[#38BDF8]" />
+          <div className="w-9 h-9 p-1 bg-[#071423] rounded-lg border border-[#38BDF8]/40 flex items-center justify-center shrink-0">
+            <img
+              src="/assets/aj-studio-logo.png"
+              alt="AJ AI Studio Logo"
+              className="w-full h-full object-contain filter drop-shadow-[0_0_4px_rgba(217,119,6,0.3)]"
+            />
           </div>
           <div>
             <div className="flex items-center space-x-2">
               <h1 className="text-base font-bold text-slate-100">Booking Operations Desk</h1>
               <span className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase bg-sky-500/10 text-sky-400 border border-sky-500/30">
-                {tenantId === 'akk-photo-studio' ? 'AKK Photo Studio' : 'Neutral Tenant'}
+                {tenantId === 'aj-ai-studio' ? 'AJ AI Studio' : 'Neutral Tenant'}
               </span>
               {renderConnectionBadge()}
             </div>
@@ -480,7 +486,7 @@ export function StudioAdminBookingPanel({ onClose, defaultTenantId = 'akk-photo-
             className="bg-[#071423] border border-[#1E3A4F] text-xs text-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-[#38BDF8]"
             title="Switch Tenant for Multi-Tenant Isolation Testing"
           >
-            <option value="akk-photo-studio">AKK Photo Studio</option>
+            <option value="aj-ai-studio">AJ AI Studio</option>
             <option value="neutral-studio-tenant">Neutral Second Tenant</option>
           </select>
 
@@ -594,7 +600,7 @@ export function StudioAdminBookingPanel({ onClose, defaultTenantId = 'akk-photo-
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search reference (#AKK-BK...), customer name, phone, email, or Telegram handle..."
+                placeholder="Search reference (#AJ-BK...), customer name, phone, email, or Telegram handle..."
                 className="w-full bg-[#071423] border border-[#1E3A4F] rounded-lg pl-9 pr-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#38BDF8]"
               />
               {searchQuery && (
@@ -696,177 +702,276 @@ export function StudioAdminBookingPanel({ onClose, defaultTenantId = 'akk-photo-
         {/* LIST / TABLE VIEW */}
         {/* ------------------------------------------------------------------- */}
         {viewMode === 'list' && (
-          <div className="bg-[#0B1B2B] border border-[#1E3A4F] rounded-xl overflow-hidden shadow-lg">
-            {isLoading ? (
-              <div className="p-12 text-center text-slate-400 space-y-3">
-                <RefreshCw className="w-6 h-6 animate-spin text-[#38BDF8] mx-auto" />
-                <p className="text-xs">Loading studio booking records...</p>
-              </div>
-            ) : apiError ? (
-              <div className="p-12 text-center space-y-3">
-                <AlertTriangle className="w-8 h-8 text-rose-400 mx-auto" />
-                <h3 className="text-sm font-bold text-rose-300">API Connection Error</h3>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto">{apiError}</p>
-                <button
-                  onClick={loadData}
-                  className="px-4 py-2 bg-[#38BDF8] text-[#071423] font-bold rounded-lg text-xs"
-                >
-                  Retry API Request
-                </button>
-              </div>
-            ) : bookings.length === 0 ? (
-              <div className="p-12 text-center space-y-2">
-                <FileText className="w-8 h-8 text-slate-500 mx-auto" />
-                <h3 className="text-sm font-bold text-slate-300">No Bookings Found</h3>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  No bookings match the selected tenant or search parameters. Try adjusting filters or submitting a test booking.
-                </p>
-              </div>
-            ) : (
-              <>
-                {/* Desktop Table View */}
-                <div className="hidden md:block overflow-x-auto">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="bg-[#071423] border-b border-[#1E3A4F] text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                        <th className="py-3 px-4">Reference &amp; Date</th>
-                        <th className="py-3 px-4">Customer</th>
-                        <th className="py-3 px-4">Package &amp; Space</th>
-                        <th className="py-3 px-4">Schedule</th>
-                        <th className="py-3 px-4">Financials</th>
-                        <th className="py-3 px-4">Payment</th>
-                        <th className="py-3 px-4">Status</th>
-                        <th className="py-3 px-4 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#1E3A4F]">
-                      {bookings.map((b) => (
-                        <tr
-                          key={b.id}
-                          className="hover:bg-[#1E3A4F]/30 transition-colors group cursor-pointer"
-                          onClick={() => openBookingDetails(b)}
-                        >
-                          <td className="py-3 px-4 font-mono font-bold text-[#38BDF8]">
-                            <div>{b.bookingReference}</div>
-                            <div className="text-[10px] text-slate-500 font-normal">
-                              Submitted: {new Date(b.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </div>
-                          </td>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            {/* Left 8-Cols: Main Booking Table */}
+            <div className="lg:col-span-8 bg-[#0B1B2B] border border-[#1E3A4F] rounded-xl overflow-hidden shadow-lg">
+              {isLoading ? (
+                <div className="p-12 text-center text-slate-400 space-y-3">
+                  <RefreshCw className="w-6 h-6 animate-spin text-[#38BDF8] mx-auto" />
+                  <p className="text-xs">Loading studio booking records...</p>
+                </div>
+              ) : apiError ? (
+                <div className="p-12 text-center space-y-3">
+                  <AlertTriangle className="w-8 h-8 text-rose-400 mx-auto" />
+                  <h3 className="text-sm font-bold text-rose-300">API Connection Error</h3>
+                  <p className="text-xs text-slate-400 max-w-sm mx-auto">{apiError}</p>
+                  <button
+                    onClick={loadData}
+                    className="px-4 py-2 bg-[#38BDF8] text-[#071423] font-bold rounded-lg text-xs"
+                  >
+                    Retry API Request
+                  </button>
+                </div>
+              ) : bookings.length === 0 ? (
+                <div className="p-12 text-center space-y-2">
+                  <FileText className="w-8 h-8 text-slate-500 mx-auto" />
+                  <h3 className="text-sm font-bold text-slate-300">No Bookings Found</h3>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                    No bookings match the selected tenant or search parameters. Try adjusting filters or submitting a test booking.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-[#071423] border-b border-[#1E3A4F] text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                          <th className="py-3 px-4">Reference &amp; Date</th>
+                          <th className="py-3 px-4">Customer</th>
+                          <th className="py-3 px-4">Package &amp; Space</th>
+                          <th className="py-3 px-4">Schedule</th>
+                          <th className="py-3 px-4">Financials</th>
+                          <th className="py-3 px-4">Payment</th>
+                          <th className="py-3 px-4">Status</th>
+                          <th className="py-3 px-4 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#1E3A4F]">
+                        {bookings.map((b) => (
+                          <tr
+                            key={b.id}
+                            className="hover:bg-[#1E3A4F]/30 transition-colors group cursor-pointer"
+                            onClick={() => openBookingDetails(b)}
+                          >
+                            <td className="py-3 px-4 font-mono font-bold text-[#38BDF8]">
+                              <div>{b.bookingReference}</div>
+                              <div className="text-[10px] text-slate-500 font-normal">
+                                Submitted: {new Date(b.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </div>
+                            </td>
 
-                          <td className="py-3 px-4">
+                            <td className="py-3 px-4">
+                              <div className="font-semibold text-slate-100">{b.customerName}</div>
+                              <div className="text-[11px] text-slate-400">{b.customerPhone}</div>
+                              {b.telegramHandle && (
+                                <div className="text-[10px] text-sky-400">{b.telegramHandle}</div>
+                              )}
+                            </td>
+
+                            <td className="py-3 px-4">
+                              <div className="font-medium text-slate-200">{b.packageSnapshot.name}</div>
+                              <div className="text-[11px] text-[#38BDF8]">{b.spaceSnapshot.name}</div>
+                            </td>
+
+                            <td className="py-3 px-4">
+                              <div className="font-medium text-slate-200">{b.startDate}</div>
+                              <div className="text-[11px] text-slate-400">{b.timeSlot}</div>
+                            </td>
+
+                            <td className="py-3 px-4">
+                              <div className="font-semibold text-slate-100">{b.totalAmount.toLocaleString()} MMK</div>
+                              <div className="text-[10px] text-slate-400">
+                                Deposit: {b.depositAmount.toLocaleString()} MMK
+                              </div>
+                              {b.verifiedPaidAmount > 0 && (
+                                <div className="text-[10px] text-emerald-400 font-semibold">
+                                  Paid: {b.verifiedPaidAmount.toLocaleString()} MMK
+                                </div>
+                              )}
+                            </td>
+
+                            <td className="py-3 px-4">{getPaymentBadge(b.paymentStatus)}</td>
+
+                            <td className="py-3 px-4">{getStatusBadge(b.bookingStatus)}</td>
+
+                            <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                              <button
+                                onClick={() => openBookingDetails(b)}
+                                className="px-2.5 py-1 bg-[#1E3A4F] hover:bg-[#38BDF8] hover:text-[#071423] text-slate-200 rounded text-[11px] font-semibold transition-colors flex items-center space-x-1 ml-auto cursor-pointer"
+                              >
+                                <Eye className="w-3 h-3" />
+                                <span>Review</span>
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Mobile Card List View */}
+                  <div className="md:hidden divide-y divide-[#1E3A4F]">
+                    {bookings.map((b) => (
+                      <div
+                        key={b.id}
+                        onClick={() => openBookingDetails(b)}
+                        className="p-4 space-y-2.5 hover:bg-[#1E3A4F]/30 cursor-pointer"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono font-bold text-sm text-[#38BDF8]">{b.bookingReference}</span>
+                          {getStatusBadge(b.bookingStatus)}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <span className="text-[10px] text-slate-500 uppercase block">Customer</span>
                             <div className="font-semibold text-slate-100">{b.customerName}</div>
                             <div className="text-[11px] text-slate-400">{b.customerPhone}</div>
-                            {b.telegramHandle && (
-                              <div className="text-[10px] text-sky-400">{b.telegramHandle}</div>
-                            )}
-                          </td>
+                          </div>
 
-                          <td className="py-3 px-4">
-                            <div className="font-medium text-slate-200">{b.packageSnapshot.name}</div>
+                          <div>
+                            <span className="text-[10px] text-slate-500 uppercase block">Schedule &amp; Space</span>
+                            <div className="font-semibold text-slate-200">{b.startDate} @ {b.timeSlot}</div>
                             <div className="text-[11px] text-[#38BDF8]">{b.spaceSnapshot.name}</div>
-                          </td>
+                          </div>
+                        </div>
 
-                          <td className="py-3 px-4">
-                            <div className="font-medium text-slate-200">{b.startDate}</div>
-                            <div className="text-[11px] text-slate-400">{b.timeSlot}</div>
-                          </td>
+                        <div className="flex items-center justify-between pt-1 border-t border-[#1E3A4F]/60 text-xs">
+                          <div>
+                            <span className="text-slate-400">Total: </span>
+                            <span className="font-bold text-slate-100">{b.totalAmount.toLocaleString()} MMK</span>
+                          </div>
+                          <div>{getPaymentBadge(b.paymentStatus)}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
-                          <td className="py-3 px-4">
-                            <div className="font-semibold text-slate-100">{b.totalAmount.toLocaleString()} MMK</div>
-                            <div className="text-[10px] text-slate-400">
-                              Deposit: {b.depositAmount.toLocaleString()} MMK
-                            </div>
-                            {b.verifiedPaidAmount > 0 && (
-                              <div className="text-[10px] text-emerald-400 font-semibold">
-                                Paid: {b.verifiedPaidAmount.toLocaleString()} MMK
-                              </div>
-                            )}
-                          </td>
+                  {/* Pagination Bar */}
+                  <div className="bg-[#071423] border-t border-[#1E3A4F] px-4 py-3 flex items-center justify-between text-xs text-slate-400">
+                    <div>
+                      Showing <span className="text-slate-200 font-semibold">{bookings.length}</span> of{' '}
+                      <span className="text-slate-200 font-semibold">{totalCount}</span> bookings
+                    </div>
 
-                          <td className="py-3 px-4">{getPaymentBadge(b.paymentStatus)}</td>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        disabled={page <= 1}
+                        className="px-2.5 py-1 bg-[#1E3A4F] border border-[#334155] rounded text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#1E3A4F]/80"
+                      >
+                        Prev
+                      </button>
+                      <span>Page {page} of {totalPages}</span>
+                      <button
+                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                        disabled={page >= totalPages}
+                        className="px-2.5 py-1 bg-[#1E3A4F] border border-[#334155] rounded text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#1E3A4F]/80"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
 
-                          <td className="py-3 px-4">{getStatusBadge(b.bookingStatus)}</td>
-
-                          <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
-                            <button
-                              onClick={() => openBookingDetails(b)}
-                              className="px-2.5 py-1 bg-[#1E3A4F] hover:bg-[#38BDF8] hover:text-[#071423] text-slate-200 rounded text-[11px] font-semibold transition-colors flex items-center space-x-1 ml-auto"
-                            >
-                              <Eye className="w-3 h-3" />
-                              <span>Review</span>
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+            {/* Right 4-Cols: Live Studio Operations Desk Widget Stream */}
+            <div className="lg:col-span-4 space-y-4">
+              {/* Today's Shoot Schedule Feed */}
+              <div className="bg-[#0B1B2B] border border-[#1E3A4F] rounded-xl p-4 space-y-3 shadow-lg">
+                <div className="flex items-center justify-between border-b border-[#1E3A4F] pb-2.5">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-4 h-4 text-[#38BDF8]" />
+                    <h3 className="text-xs font-bold text-slate-100 uppercase tracking-wider">Today's Studio Schedule</h3>
+                  </div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    18 NOV 2026
+                  </span>
                 </div>
 
-                {/* Mobile Card List View */}
-                <div className="md:hidden divide-y divide-[#1E3A4F]">
-                  {bookings.map((b) => (
+                <div className="space-y-2.5">
+                  {bookings.filter(b => b.startDate === '18 NOV 2026' || b.bookingStatus === 'AWAITING_PAYMENT_REVIEW').length === 0 ? (
+                    <div className="text-center py-6 text-slate-400 text-xs">
+                      No active sessions scheduled for today
+                    </div>
+                  ) : (
+                    bookings.map((bk) => (
+                      <div
+                        key={`today-${bk.id}`}
+                        onClick={() => openBookingDetails(bk)}
+                        className="p-3 bg-[#071423] border border-[#1E3A4F] hover:border-[#38BDF8] rounded-lg transition-all cursor-pointer space-y-1.5"
+                      >
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-bold text-[#38BDF8]">{bk.timeSlot}</span>
+                          <span className="text-[10px] font-semibold text-slate-300 bg-[#1E3A4F] px-2 py-0.5 rounded">
+                            {bk.spaceSnapshot.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-semibold text-slate-100 truncate">{bk.customerName}</span>
+                          {getStatusBadge(bk.bookingStatus)}
+                        </div>
+                        <div className="flex items-center justify-between text-[11px] text-slate-400">
+                          <span>{bk.packageSnapshot.name}</span>
+                          <span className="font-mono text-emerald-400 font-semibold">{bk.totalAmount.toLocaleString()} MMK</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Pending Payment Review Alert Stream */}
+              {bookings.some(b => b.bookingStatus === 'AWAITING_PAYMENT_REVIEW') && (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 space-y-3">
+                  <div className="flex items-center space-x-2 text-amber-300 text-xs font-bold uppercase tracking-wider">
+                    <AlertTriangle className="w-4 h-4 text-amber-400" />
+                    <span>Desk Review Action Required</span>
+                  </div>
+                  <p className="text-xs text-amber-200/80 leading-relaxed">
+                    Mobile banking deposit slips are waiting for studio desk verification.
+                  </p>
+                  {bookings.filter(b => b.bookingStatus === 'AWAITING_PAYMENT_REVIEW').map((revBk) => (
                     <div
-                      key={b.id}
-                      onClick={() => openBookingDetails(b)}
-                      className="p-4 space-y-2.5 hover:bg-[#1E3A4F]/30 cursor-pointer"
+                      key={`rev-${revBk.id}`}
+                      onClick={() => openBookingDetails(revBk)}
+                      className="p-2.5 bg-[#0B1B2B] border border-amber-500/40 rounded-lg hover:border-amber-400 cursor-pointer flex items-center justify-between text-xs transition-colors"
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono font-bold text-sm text-[#38BDF8]">{b.bookingReference}</span>
-                        {getStatusBadge(b.bookingStatus)}
+                      <div>
+                        <div className="font-mono font-bold text-[#38BDF8]">{revBk.bookingReference}</div>
+                        <div className="text-slate-300 font-medium">{revBk.customerName} ({revBk.paymentMethod})</div>
                       </div>
-
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                          <span className="text-[10px] text-slate-500 uppercase block">Customer</span>
-                          <div className="font-semibold text-slate-100">{b.customerName}</div>
-                          <div className="text-[11px] text-slate-400">{b.customerPhone}</div>
-                        </div>
-
-                        <div>
-                          <span className="text-[10px] text-slate-500 uppercase block">Schedule &amp; Space</span>
-                          <div className="font-semibold text-slate-200">{b.startDate} @ {b.timeSlot}</div>
-                          <div className="text-[11px] text-[#38BDF8]">{b.spaceSnapshot.name}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-1 border-t border-[#1E3A4F]/60 text-xs">
-                        <div>
-                          <span className="text-slate-400">Total: </span>
-                          <span className="font-bold text-slate-100">{b.totalAmount.toLocaleString()} MMK</span>
-                        </div>
-                        <div>{getPaymentBadge(b.paymentStatus)}</div>
-                      </div>
+                      <span className="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold rounded text-[11px]">
+                        Review Slip →
+                      </span>
                     </div>
                   ))}
                 </div>
+              )}
 
-                {/* Pagination Bar */}
-                <div className="bg-[#071423] border-t border-[#1E3A4F] px-4 py-3 flex items-center justify-between text-xs text-slate-400">
-                  <div>
-                    Showing <span className="text-slate-200 font-semibold">{bookings.length}</span> of{' '}
-                    <span className="text-slate-200 font-semibold">{totalCount}</span> bookings
+              {/* Studio Telemetry & Revenue Progress Meter */}
+              <div className="bg-[#0B1B2B] border border-[#1E3A4F] rounded-xl p-4 space-y-3 shadow-lg">
+                <div className="flex items-center space-x-2 text-xs font-bold text-slate-100 uppercase tracking-wider border-b border-[#1E3A4F] pb-2">
+                  <Activity className="w-4 h-4 text-[#38BDF8]" />
+                  <span>Studio Operations Telemetry</span>
+                </div>
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between text-slate-300">
+                    <span>Target Occupancy (Bays):</span>
+                    <span className="font-bold text-[#38BDF8]">66% Active</span>
                   </div>
-
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      disabled={page <= 1}
-                      className="px-2.5 py-1 bg-[#1E3A4F] border border-[#334155] rounded text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#1E3A4F]/80"
-                    >
-                      Prev
-                    </button>
-                    <span>Page {page} of {totalPages}</span>
-                    <button
-                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={page >= totalPages}
-                      className="px-2.5 py-1 bg-[#1E3A4F] border border-[#334155] rounded text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#1E3A4F]/80"
-                    >
-                      Next
-                    </button>
+                  <div className="w-full bg-[#071423] h-2 rounded-full overflow-hidden border border-[#1E3A4F]">
+                    <div className="bg-[#38BDF8] h-full w-[66%] rounded-full shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
+                  </div>
+                  <div className="flex justify-between text-[11px] text-slate-400 pt-1">
+                    <span>Verified Deposit Revenue:</span>
+                    <span className="font-bold text-emerald-400">{(summary?.verifiedRevenueMMK ?? 0).toLocaleString()} MMK</span>
                   </div>
                 </div>
-              </>
-            )}
+              </div>
+            </div>
           </div>
         )}
 

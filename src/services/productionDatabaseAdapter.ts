@@ -281,7 +281,7 @@ export class ProductionDatabaseAdapter {
             id: studioId,
             legacyStudioId: legacyId,
             slug: studioSlug,
-            displayName: project.studio?.name || 'AKK Photo Studio',
+            displayName: project.studio?.name || 'AJ AI Studio',
             status: 'APPROVED',
           });
         }

@@ -73,37 +73,37 @@ export interface TenantConfig {
   archiveRepositoryLabel?: string;
 }
 
-export const akkPilotTenant: TenantConfig = {
-  id: 'proj-akk-studio-01',
-  slug: 'akk-photo-studio-yangon',
-  displayName: 'AKK Photo Studio',
-  legalName: 'AKK Photo Studio & Atelier',
-  ownerName: 'U Aung Kyaw',
+export const defaultStudioTenant: TenantConfig = {
+  id: 'proj-aj-studio-01',
+  slug: 'aj-ai-studio-yangon',
+  displayName: 'AJ AI Studio',
+  legalName: 'AJ AI Studio POS & Atelier',
+  ownerName: 'AJ AI Studio Master',
   phone: '+95 9 792 108 421',
-  email: 'onboarding@akkphotostudio.mm',
+  email: 'contact@ajaistudio.com',
   address: 'No. 42 Strand Road, Botahtaung Township, Yangon',
   city: 'Yangon',
   country: 'Myanmar',
-  registrationNumber: 'REG: AKK-MM-2026-YGN-091',
+  registrationNumber: 'REG: AJ-AI-STUDIO-2026',
   taxIdentifier: 'TIN-98442109-MM',
-  telegramBotUsername: 'AKK_Nocturne_Studio_Bot',
-  telegramBotDisplayName: 'AKK Photo Studio Dispatch Bot',
-  telegramContact: '@akkphotostudio',
+  telegramBotUsername: 'AJ_AI_Studio_Bot',
+  telegramBotDisplayName: 'AJ AI Studio Dispatch Bot',
+  telegramContact: '@ajaistudio',
   telegramNotificationHeading: 'RESERVATION DETAILS (SIMULATION)',
   telegramMessageFooter: 'Note: Slip details extracted via AI OCR. Final booking confirmation requires studio ledger review.',
-  publicPassUrlBase: 'https://akkphotostudio.com/pass',
-  publicVaultUrlBase: 'https://akkphotostudio.com/vault',
-  supportContactHandle: '@akkphotostudio',
-  websiteUrl: 'https://akkphotostudio.com',
-  invoicePrefix: 'INV-AKK',
-  receiptPrefix: 'RCP-AKK',
-  receiptHeader: 'AKK PHOTO STUDIO // OFFICIAL INVOICE',
-  invoiceTitle: 'AKK PHOTO STUDIO & ATELIER',
+  publicPassUrlBase: 'https://ajaistudio.com/pass',
+  publicVaultUrlBase: 'https://ajaistudio.com/vault',
+  supportContactHandle: '@ajaistudio',
+  websiteUrl: 'https://ajaistudio.com',
+  invoicePrefix: 'INV-AJ',
+  receiptPrefix: 'RCP-AJ',
+  receiptHeader: 'AJ AI STUDIO POS // OFFICIAL INVOICE',
+  invoiceTitle: 'AJ AI STUDIO POS & ATELIER',
   invoiceSubtitle: 'YANGON PRODUCTION HOUSE // NO. 42 STRAND ROAD',
   invoiceFooterNote:
     'All optical equipment, prime lenses, and Profoto AirTTL monolights are factory calibrated (Delta-E < 0.8) and handed over in mint working condition. Includes 30-day lossless Vault cloud retention.',
   authorizedSignatureTitle: 'Studio Director & Master Colorist',
-  remittanceAccount: '09 792 108 421 (AKK PHOTO STUDIO)',
+  remittanceAccount: '09 792 108 421 (AJ AI STUDIO POS)',
   currency: 'MMK',
   paymentMethods: [
     {
@@ -111,8 +111,8 @@ export const akkPilotTenant: TenantConfig = {
       provider: 'KBZPay',
       name: 'KBZPay Direct Scan',
       accountNumber: '09 792 108 421',
-      accountName: 'AKK PHOTO STUDIO (U AUNG KYAW)',
-      badge: 'AKK KPay',
+      accountName: 'AJ AI STUDIO POS',
+      badge: 'AJ KPay',
       instructions: 'Scan with KBZPay QuickPay App',
     },
     {
@@ -120,8 +120,8 @@ export const akkPilotTenant: TenantConfig = {
       provider: 'WavePay',
       name: 'WavePay Remittance',
       accountNumber: '09 792 108 421',
-      accountName: 'AKK PHOTO STUDIO (U AUNG KYAW)',
-      badge: 'AKK Wave',
+      accountName: 'AJ AI STUDIO POS',
+      badge: 'AJ Wave',
       instructions: 'Scan with WavePay QR Scanner',
     },
     {
@@ -129,8 +129,8 @@ export const akkPilotTenant: TenantConfig = {
       provider: 'AYA Pay',
       name: 'AYA Pay Direct Transfer',
       accountNumber: '0092 1002 8847 2190',
-      accountName: 'AKK PHOTO STUDIO (U AUNG KYAW)',
-      badge: 'AKK AYA Pay',
+      accountName: 'AJ AI STUDIO POS',
+      badge: 'AJ AYA Pay',
       instructions: 'Scan with AYA Pay App or AYA Direct Pay',
     },
   ],
@@ -140,18 +140,20 @@ export const akkPilotTenant: TenantConfig = {
     { id: 'bay-c3', name: 'Portrait & Editorial Bay', type: 'Indoor', capacity: 8 },
   ],
   isPilotTenant: true,
-  calendarProdId: '-//AKK Photo Studio//Nocturne Atelier//EN',
-  calendarUidDomain: 'akkphotostudio.com',
-  calendarSummary: 'AKK Photo Studio',
+  calendarProdId: '-//AJ AI Studio//Nocturne Atelier//EN',
+  calendarUidDomain: 'ajaistudio.com',
+  calendarSummary: 'AJ AI Studio',
   calendarDescription: 'Atelier Portrait Session with Studio Crew',
   calendarLocation: 'No. 42 Strand Road, Botahtaung Township, Yangon',
-  passDownloadFilename: 'AKK_Studio_Pass',
-  qrFallbackCodePrefix: 'AKK-BAY-PASS',
-  archiveManifestTitle: 'AKK Photo Studio - Master Archive Manifest',
-  archiveExportFilenamePrefix: 'AKK',
-  archiveAssetFilenamePrefix: 'AKK_RAW',
+  passDownloadFilename: 'AJ_Studio_Pass',
+  qrFallbackCodePrefix: 'AJ-BAY-PASS',
+  archiveManifestTitle: 'AJ AI Studio - Master Archive Manifest',
+  archiveExportFilenamePrefix: 'AJ',
+  archiveAssetFilenamePrefix: 'AJ_RAW',
   archiveRepositoryLabel: 'Atelier Client Repository',
 };
+
+export const akkPilotTenant: TenantConfig = defaultStudioTenant;
 
 export const neutralTestTenant: TenantConfig = {
   id: 'proj-lumina-studio-02',
@@ -222,14 +224,11 @@ export const neutralTestTenant: TenantConfig = {
   archiveRepositoryLabel: 'Lumina Client Repository',
 };
 
-export const activeTenantConfig: TenantConfig = akkPilotTenant;
+export const activeTenantConfig: TenantConfig = defaultStudioTenant;
 
 export function getTenantConfig(tenantId?: string): TenantConfig {
-  if (!tenantId || tenantId === akkPilotTenant.id || tenantId === akkPilotTenant.slug) {
-    return akkPilotTenant;
-  }
   if (tenantId === neutralTestTenant.id || tenantId === neutralTestTenant.slug) {
     return neutralTestTenant;
   }
-  return akkPilotTenant;
+  return defaultStudioTenant;
 }

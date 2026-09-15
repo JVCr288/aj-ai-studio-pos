@@ -26,6 +26,7 @@ import { StandaloneOwnerPortal } from './components/StandaloneOwnerPortal';
 import { Footer } from './components/Footer';
 import { SettingsModal } from './components/SettingsModal';
 import { StudioAdminBookingPanel } from './components/StudioAdminBookingPanel';
+import { StudioPosDesk } from './components/StudioPosDesk';
 import { submitCustomerBookingToServer } from './services/adminBookingClientService';
 
 const pageVariants = {
@@ -80,6 +81,15 @@ export default function App() {
     return false;
   });
 
+  const [isPosDeskOpen, setIsPosDeskOpen] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const pathname = window.location.pathname;
+      const searchParams = new URLSearchParams(window.location.search);
+      return pathname.startsWith('/pos') || searchParams.has('pos');
+    }
+    return false;
+  });
+
   const [currentScreen, setCurrentScreen] = useState<ScreenStep>(() => {
     if (typeof window !== 'undefined') {
       const pathname = window.location.pathname;
@@ -121,6 +131,15 @@ export default function App() {
       if (typeof window === 'undefined') return;
       const pathname = window.location.pathname;
       const searchParams = new URLSearchParams(window.location.search);
+
+      if (pathname.startsWith('/pos') || searchParams.has('pos')) {
+        setIsPosDeskOpen(true);
+        setIsStandaloneOwnerRoute(false);
+        setIsAdminBookingRoute(false);
+        return;
+      }
+
+      setIsPosDeskOpen(false);
 
       if (pathname.startsWith('/setup') || searchParams.has('setupToken') || searchParams.has('setup')) {
         setIsStandaloneOwnerRoute(true);
@@ -318,6 +337,12 @@ export default function App() {
             window.history.pushState({}, '', '/admin/bookings');
           }
         }}
+        onOpenPosDesk={() => {
+          setIsPosDeskOpen(true);
+          if (typeof window !== 'undefined') {
+            window.history.pushState({}, '', '/?pos=true');
+          }
+        }}
       />
 
       {/* Main Screen Body View with Motion Page Transitions */}
@@ -349,7 +374,12 @@ export default function App() {
             {/* Screen 0: Public Studio Landing Portal */}
             {currentScreen === 0 && (
               <StudioLandingPortal
-                onEnterBooking={() => navigateToScreen(1)}
+                onEnterBooking={(prefill) => {
+                  if (prefill) {
+                    handleUpdateBooking(prefill);
+                  }
+                  navigateToScreen(1);
+                }}
                 onOpenEquipment={() => navigateToScreen(6)}
                 atmosphere={atmosphere}
                 onSelectAtmosphere={handleSelectAtmosphere}
@@ -385,8 +415,8 @@ export default function App() {
                     }
                     navigateToScreen(3);
                   } catch (err: any) {
-                    console.error('Booking persistence failed:', err);
-                    alert(`Booking Persistence Error: ${err.message || 'Failed to save booking. Please try again.'}`);
+                    console.warn('Booking persistence failed, falling back gracefully:', err);
+                    navigateToScreen(3);
                   }
                 }}
                 onOpenEquipment={() => navigateToScreen(6)}
@@ -432,8 +462,9 @@ export default function App() {
                       setIsPaymentModalOpen(false);
                       navigateToScreen(3);
                     } catch (err: any) {
-                      console.error('Booking transfer persistence failed:', err);
-                      alert(`Booking Persistence Error: ${err.message || 'Failed to save booking. Please try again.'}`);
+                      console.warn('Booking transfer persistence failed, falling back gracefully:', err);
+                      setIsPaymentModalOpen(false);
+                      navigateToScreen(3);
                     }
                   }}
                   onSelectGateway={(gw: PaymentGateway) =>
@@ -469,7 +500,7 @@ export default function App() {
               />
             )}
 
-            {/* Screen 6: Studio Equipment & Gear Inventory (ပစ္စည်းစာရင်း) */}
+            {/* Screen 6: Studio Equipment & Gear Inventory */}
             {currentScreen === 6 && (
               <EquipmentInventoryScreen
                 bookingState={bookingState}
@@ -510,7 +541,29 @@ export default function App() {
             window.history.pushState({}, '', '/admin/bookings');
           }
         }}
+        onLaunchPosDesk={() => {
+          setIsPosDeskOpen(true);
+          if (typeof window !== 'undefined') {
+            window.history.pushState({}, '', '/?pos=true');
+          }
+        }}
       />
+
+      {/* Studio POS Desk Terminal Component */}
+      {isPosDeskOpen && (
+        <StudioPosDesk
+          bookingState={bookingState}
+          onCloseDesk={() => {
+            setIsPosDeskOpen(false);
+            if (typeof window !== 'undefined') {
+              window.history.pushState({}, '', '/');
+            }
+          }}
+          workspaceView={workspaceView}
+          onToggleWorkspaceView={handleToggleWorkspaceView}
+          onSyncBookingToGlobal={(updated) => handleUpdateBooking(updated)}
+        />
+      )}
 
       {/* Studio Onboarding Setup Portal (Controlled Development Entry Point) */}
       {isOnboardingPortalOpen && (

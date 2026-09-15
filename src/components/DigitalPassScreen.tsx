@@ -27,8 +27,8 @@ interface DigitalPassScreenProps {
   onProceedToVault: () => void;
 }
 
-const OFFLINE_PASS_CACHE_KEY = 'akk_offline_pass_cache';
-const OFFLINE_MODE_PREF_KEY = 'akk_offline_mode_active';
+const OFFLINE_PASS_CACHE_KEY = 'aj_offline_pass_cache';
+const OFFLINE_MODE_PREF_KEY = 'aj_offline_mode_active';
 
 export const DigitalPassScreen: React.FC<DigitalPassScreenProps> = ({
   bookingState,

@@ -138,9 +138,9 @@ async function runTests() {
   assert(activeStepVal === 5, `Expected migrated activeStep to be capped at 5, got ${activeStepVal}`);
   assert(migrated.packages && migrated.packages.length === 4, 'Migrated draft must retain placeholder packages');
 
-  const legacyProject = getDefaultOnboardingProject('proj-akk-studio-01');
-  assert(legacyProject.studio.name === 'AKK Photo Studio & Atelier', 'Legacy proj-akk-studio-01 data preserved');
-  console.log('✅ Test 9: Existing legacy draft migration & compatibility preserved without contaminating fresh projects.');
+  const legacyProject = getDefaultOnboardingProject('proj-aj-studio-01');
+  assert(legacyProject.studio.name === 'AJ AI Studio POS & Atelier', 'Default proj-aj-studio-01 data preserved');
+  console.log('✅ Test 9: Existing default draft migration & compatibility preserved without contaminating fresh projects.');
 
   // 10. Main Studio UI remains hidden during onboarding
   const standalonePortalPath = path.resolve(process.cwd(), 'src/components/StandaloneOwnerPortal.tsx');

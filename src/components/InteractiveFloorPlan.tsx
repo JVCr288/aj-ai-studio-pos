@@ -40,7 +40,7 @@ export interface StudioZoneDetails {
   id: string;
   code: string;
   name: string;
-  myanmarName: string;
+  categoryDescription: string;
   type: 'stage' | 'amenity' | 'tech';
   dimensions: string;
   areaSqFt: number;
@@ -58,7 +58,7 @@ export const STUDIO_ZONES: Record<string, StudioZoneDetails> = {
     id: 'alpha-01',
     code: 'BAY ALPHA-01',
     name: 'Fine-Art Portrait Cyclorama',
-    myanmarName: 'အဓိက ပုံတူ ရိုက်ကူးရေးစင်မြင့် (ခုံးနံရံပါ)',
+    categoryDescription: 'High-Key Portrait & Infinity Cyclorama',
     type: 'stage',
     dimensions: '35 ft × 34 ft',
     areaSqFt: 1190,
@@ -79,7 +79,7 @@ export const STUDIO_ZONES: Record<string, StudioZoneDetails> = {
     id: 'beta-02',
     code: 'BAY BETA-02',
     name: 'Commercial & Advertising Stage',
-    myanmarName: 'ကြော်ငြာနှင့် ထုတ်ကုန် ရိုက်ကူးရေးစင်မြင့်',
+    categoryDescription: 'Commercial Advertising & Product Rigging Stage',
     type: 'stage',
     dimensions: '30 ft × 32 ft',
     areaSqFt: 960,
@@ -100,7 +100,7 @@ export const STUDIO_ZONES: Record<string, StudioZoneDetails> = {
     id: 'omega-03',
     code: 'BAY OMEGA-03',
     name: 'Editorial High-Fashion Atelier',
-    myanmarName: 'ဖက်ရှင်နှင့် မဂ္ဂဇင်း ရိုက်ကူးရေး ပြေးလမ်းစင်မြင့်',
+    categoryDescription: 'Runway High-Fashion & Editorial Drapes',
     type: 'stage',
     dimensions: '40 ft × 35 ft',
     areaSqFt: 1400,
@@ -121,7 +121,7 @@ export const STUDIO_ZONES: Record<string, StudioZoneDetails> = {
     id: 'lounge',
     code: 'LOUNGE',
     name: 'Client Hospitality & Briefing Lounge',
-    myanmarName: 'ဧည့်ကြိုနှင့် အနားယူခန်းမ',
+    categoryDescription: 'Guest Reception & Client Hospitality Suite',
     type: 'amenity',
     dimensions: '26 ft × 22 ft',
     areaSqFt: 572,
@@ -141,7 +141,7 @@ export const STUDIO_ZONES: Record<string, StudioZoneDetails> = {
     id: 'wardrobe',
     code: 'WARDROBE',
     name: 'Styling, Makeup & Vanity Suite',
-    myanmarName: 'မိတ်ကပ်နှင့် အဝတ်အစား လဲခန်း',
+    categoryDescription: 'Hair, Styling & Daylight Vanity Suite',
     type: 'amenity',
     dimensions: '22 ft × 20 ft',
     areaSqFt: 440,
@@ -161,7 +161,7 @@ export const STUDIO_ZONES: Record<string, StudioZoneDetails> = {
     id: 'vault',
     code: 'VAULT',
     name: 'Equipment Vault & Tether Command',
-    myanmarName: 'ကင်မရာနှင့် အလင်းပစ္စည်းများ ထိန်းချုပ်ခန်း',
+    categoryDescription: 'Hardware Vault & Live Tether Station',
     type: 'tech',
     dimensions: '18 ft × 16 ft',
     areaSqFt: 288,
@@ -255,7 +255,7 @@ export const InteractiveFloorPlan: React.FC<InteractiveFloorPlanProps> = ({
               </span>
             </div>
             <p className="font-ui text-xs text-[#94A3B8] mt-0.5">
-              စတူဒီယို အခင်းအကျင်း &amp; အလင်းပေးစင်မြင့်များ ပြမြေပုံ • Yangon Flagship
+              Interactive Studio Architectural Layout &amp; Lighting Stages • Yangon Flagship
             </p>
           </div>
         </div>
@@ -1242,7 +1242,7 @@ export const InteractiveFloorPlan: React.FC<InteractiveFloorPlanProps> = ({
               {activeZone.name}
             </h4>
             <p className="font-ui text-xs text-[#94A3B8] mt-0.5">
-              {activeZone.myanmarName}
+              {activeZone.categoryDescription}
             </p>
           </div>
 

@@ -302,7 +302,7 @@ app.post('/api/verify-slip', ocrRateLimiter, async (req: Request, res: Response)
       // Adversarial Defense Prompting:
       // Instruct model that all image text is untrusted document content,
       // never follow embedded commands, and never decide payment settlement.
-      const prompt = `You are a specialized optical character recognition (OCR) data extraction tool for AKK Photo Studio in Myanmar.
+      const prompt = `You are a specialized optical character recognition (OCR) data extraction tool for AJ AI Studio in Myanmar.
 Your sole job is to extract printed text fields from mobile banking/wallet payment slips (KBZPay, WavePay, AYA Pay, CB Bank, KBZ mBanking, or AYA mBanking).
 
 CRITICAL SECURITY & EXTRACTION RULES:
@@ -501,7 +501,7 @@ Context:
       timestamp: formattedDate,
       payer_name: 'Elena Rostova (Mock Data)',
       confidence: 0.0, // Never claim high confidence for mock
-      raw_text: `[SIMULATED OCR DRAFT]\nRef: ${simulatedTrx}\nAmount: ${simulatedAmount.toLocaleString()} MMK\nBeneficiary: AKK PHOTO STUDIO\nNotice: Mock simulation mode. Not verified with bank.`,
+      raw_text: `[SIMULATED OCR DRAFT]\nRef: ${simulatedTrx}\nAmount: ${simulatedAmount.toLocaleString()} MMK\nBeneficiary: AJ AI STUDIO POS\nNotice: Mock simulation mode. Not verified with bank.`,
       warnings: ['DEVELOPMENT SIMULATION — NOT PAYMENT VERIFICATION. Configure GEMINI_API_KEY for live OCR extraction.'],
       error: null,
     });
@@ -641,12 +641,12 @@ const verifyOwnerSessionMiddleware = (req: Request, res: Response, next: NextFun
 app.post('/api/admin/setup-links', verifyAdminAuth, async (req: Request, res: Response) => {
   try {
     const { projectId, tenantId, expiresInHours, studioDisplayName } = req.body;
-    const targetProject = projectId || 'proj-akk-studio-01';
-    const targetTenant = tenantId || 'akk-photo-studio';
+    const targetProject = projectId || 'proj-aj-studio-01';
+    const targetTenant = tenantId || 'aj-ai-studio';
 
     const linkInfo = await createSetupLink(targetProject, targetTenant, {
       expiresInHours: expiresInHours ? parseInt(expiresInHours, 10) : 168,
-      studioDisplayName: studioDisplayName || 'AKK Photo Studio & Atelier',
+      studioDisplayName: studioDisplayName || 'AJ AI Studio POS & Atelier',
     });
 
     return res.json({
@@ -895,7 +895,7 @@ app.get('/api/owner/status', setupRateLimiter, verifyOwnerSessionMiddleware, asy
 // Developer Review Submission Fetcher
 app.get('/api/admin/onboarding/submissions', verifyAdminAuth, async (req: Request, res: Response) => {
   try {
-    const projectId = (req.query.projectId as string) || 'proj-akk-studio-01';
+    const projectId = (req.query.projectId as string) || 'proj-aj-studio-01';
     const submissions = await getOnboardingSubmissions(projectId);
     return res.json({ success: true, projectId, submissions });
   } catch (err: any) {
@@ -966,7 +966,7 @@ const verifyStudioAdminMiddleware = (req: Request, res: Response, next: NextFunc
   const expectedKey = process.env.ADMIN_API_KEY || (process.env.NODE_ENV !== 'production' ? 'dev-admin-secret' : null);
 
   if (expectedKey && adminKey && (adminKey === expectedKey || adminKey === `Bearer ${expectedKey}`)) {
-    const requestedTenant = (req.headers['x-tenant-id'] as string) || (req.query.tenantId as string) || 'akk-photo-studio';
+    const requestedTenant = (req.headers['x-tenant-id'] as string) || (req.query.tenantId as string) || 'aj-ai-studio';
     res.locals.tenantId = requestedTenant;
     res.locals.adminSession = {
       sessionToken: 'hdr_key',
@@ -987,9 +987,9 @@ const verifyStudioAdminMiddleware = (req: Request, res: Response, next: NextFunc
 app.post('/api/admin/login', (req: Request, res: Response) => {
   res.setHeader('Cache-Control', 'no-store, private');
   const { tenantId, adminKey } = req.body || {};
-  const targetTenant = tenantId || 'akk-photo-studio';
+  const targetTenant = tenantId || 'aj-ai-studio';
 
-  const validTenants = ['akk-photo-studio', 'neutral-studio-tenant', 'nocturne'];
+  const validTenants = ['aj-ai-studio', 'neutral-studio-tenant', 'nocturne'];
   if (!targetTenant || typeof targetTenant !== 'string' || !validTenants.includes(targetTenant)) {
     return res.status(400).json({
       success: false,
@@ -1040,7 +1040,7 @@ app.post('/api/admin/login', (req: Request, res: Response) => {
   const expiresAt = new Date(now.getTime() + 24 * 3600 * 1000);
 
   const userRole: 'PLATFORM_ADMIN' | 'STUDIO_ADMIN' | 'VIEWER' = 'STUDIO_ADMIN';
-  const userName = 'AKK Studio Admin';
+  const userName = 'AJ AI Studio Admin';
 
   const session: AdminSessionRecord = {
     sessionToken,

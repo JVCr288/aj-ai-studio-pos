@@ -7,6 +7,7 @@ import {
   Minimize2,
   Settings,
   Shield,
+  Store,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -18,6 +19,7 @@ interface NavbarProps {
   onToggleWorkspaceView?: () => void;
   onOpenSettings?: () => void;
   onOpenAdminBookings?: () => void;
+  onOpenPosDesk?: () => void;
   isAdminAuthenticated?: boolean;
 }
 
@@ -30,6 +32,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onToggleWorkspaceView,
   onOpenSettings,
   onOpenAdminBookings,
+  onOpenPosDesk,
   isAdminAuthenticated = false,
 }) => {
   const [timecode, setTimecode] = useState<string>('');
@@ -56,12 +59,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, [isConfirmingReset]);
 
   const steps: { step: ScreenStep; label: string; subLabel: string }[] = [
-    { step: 1, label: 'Booking', subLabel: 'ဘိုကင်' },
-    { step: 2, label: 'Payment', subLabel: 'ငွေပေးချေမှု' },
-    { step: 3, label: 'Verify', subLabel: 'စလစ်စစ်ဆေးမှု' },
-    { step: 4, label: 'Pass', subLabel: 'ဝင်ခွင့်ကတ်' },
-    { step: 5, label: 'Vault', subLabel: 'ဓာတ်ပုံများ' },
-    { step: 6, label: 'Store & Gear', subLabel: 'ပစ္စည်းနှင့်အရောင်း' },
+    { step: 1, label: 'Booking', subLabel: 'Reservation' },
+    { step: 2, label: 'Payment', subLabel: 'Deposit' },
+    { step: 3, label: 'Verify', subLabel: 'Slip OCR' },
+    { step: 4, label: 'Pass', subLabel: 'Bay Pass' },
+    { step: 5, label: 'Vault', subLabel: 'Archive' },
+    { step: 6, label: 'Store & Gear', subLabel: 'Inventory' },
   ];
 
   return (
@@ -85,8 +88,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             }
           }}
         >
-          <div className="w-8 h-8 rounded-lg bg-[#102538] border border-[#1E3A4F] group-hover:border-[#38BDF8] flex items-center justify-center relative overflow-hidden transition-colors shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-[#38BDF8] animate-pulse" />
+          <div className="w-8 h-8 rounded-lg bg-[#071423] border border-[#1E3A4F] group-hover:border-[#38BDF8] flex items-center justify-center relative overflow-hidden transition-colors shadow-sm p-0.5">
+            <img
+              src="/assets/aj-studio-logo.png"
+              alt="AJ AI Studio Logo"
+              className="w-full h-full object-contain filter drop-shadow-[0_0_4px_rgba(217,119,6,0.3)]"
+            />
           </div>
           <div>
             <div className="flex items-center space-x-2">
@@ -99,7 +106,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </span>
             </div>
             <div className="flex items-center gap-1.5 text-[10.5px] text-[#64748B] font-ui">
-              <span className="text-[#94A3B8]">Active Studio: <strong className="text-[#F1F5F9] font-medium">AKK Photo Studio</strong> · Pilot Tenant</span>
+              <span className="text-[#94A3B8]">Studio Platform: <strong className="text-[#F1F5F9] font-medium">AJ AI Studio POS</strong> · Master Edition</span>
               <span className="text-[#1E3A4F]">•</span>
               <span className="text-[#34D399] font-medium text-[10px]">Online</span>
             </div>
@@ -215,6 +222,21 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <Shield className="w-3.5 h-3.5 text-[#38BDF8]" />
                 <span className="hidden sm:inline text-xs font-semibold">Booking Desk</span>
+              </button>
+            )}
+
+            {/* Studio POS Desk Terminal Button */}
+            {currentScreen > 0 && onOpenPosDesk && (
+              <button
+                type="button"
+                id="navbar-pos-desk-btn"
+                onClick={onOpenPosDesk}
+                className="interactive-control px-2.5 py-1.5 workstation-focus border border-[#34D399]/40 hover:border-[#34D399] bg-[#34D399]/10 text-[#34D399]"
+                title="AJ AI Studio Point of Sale (POS Desk)"
+                aria-label="POS Desk"
+              >
+                <Store className="w-3.5 h-3.5 text-[#34D399]" />
+                <span className="hidden sm:inline text-xs font-semibold">POS Desk</span>
               </button>
             )}
           </div>

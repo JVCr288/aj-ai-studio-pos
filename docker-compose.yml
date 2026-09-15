@@ -7,17 +7,17 @@ version: '3.8'
 services:
   postgres_dev:
     image: postgres:16-alpine
-    container_name: akk_nocturne_dev_db
+    container_name: aj_studio_dev_db
     environment:
-      POSTGRES_DB: akk_nocturne_dev
-      POSTGRES_USER: akk_dev
-      POSTGRES_PASSWORD: akk_dev_password
+      POSTGRES_DB: aj_studio_dev
+      POSTGRES_USER: aj_dev
+      POSTGRES_PASSWORD: aj_dev_password
     ports:
       - "5432:5432"
     volumes:
       - pgdata_dev:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U akk_dev -d akk_nocturne_dev"]
+      test: ["CMD-SHELL", "pg_isready -U aj_dev -d aj_studio_dev"]
       interval: 5s
       timeout: 5s
       retries: 5

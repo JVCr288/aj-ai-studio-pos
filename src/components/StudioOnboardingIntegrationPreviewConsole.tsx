@@ -42,7 +42,7 @@ interface StudioOnboardingIntegrationPreviewConsoleProps {
 
 export const StudioOnboardingIntegrationPreviewConsole: React.FC<
   StudioOnboardingIntegrationPreviewConsoleProps
-> = ({ projectId = 'proj-akk-studio-01', onClose }) => {
+> = ({ projectId = 'proj-aj-studio-01', onClose }) => {
   const [project, setProject] = useState<StudioOnboardingProject | null>(null);
   const [plan, setPlan] = useState<ProductionIntegrationPlan | null>(null);
   const [lastReceipt, setLastReceipt] = useState<IntegrationReceipt | null>(null);

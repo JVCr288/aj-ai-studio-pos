@@ -35,10 +35,10 @@ export const StandaloneOwnerPortal: React.FC<StandaloneOwnerPortalProps> = ({
       const queryProj = new URLSearchParams(window.location.search).get('projectId');
       if (queryProj) return queryProj;
     }
-    return 'proj-akk-studio-01';
+    return 'proj-aj-studio-01';
   });
-  const [tenantId, setTenantId] = useState<string>('akk-photo-studio');
-  const [studioDisplayName, setStudioDisplayName] = useState<string>('AKK Photo Studio & Atelier');
+  const [tenantId, setTenantId] = useState<string>('aj-ai-studio');
+  const [studioDisplayName, setStudioDisplayName] = useState<string>('AJ AI Studio POS & Atelier');
   const [ownerSession, setOwnerSession] = useState<OwnerSession | null>(() => {
     if (typeof window !== 'undefined' && window.sessionStorage) {
       const saved = sessionStorage.getItem('aj_owner_session');

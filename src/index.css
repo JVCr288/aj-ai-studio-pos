@@ -1484,4 +1484,86 @@
   max-width: 1720px;
 }
 
+/* ==========================================================================
+   GLASS PLATE BUTTONS & TYPOGRAPHY SEPARATION UTILITIES
+   ========================================================================== */
+
+/* Distinct Font Pairing Classes */
+.font-action-button {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.font-presentation-body {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* Glass Plate Buttons System */
+.btn-glass-plate {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #F1F5F9;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.35), 0 4px 16px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.btn-glass-plate:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 100%);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.2), 0 8px 24px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-glass-plate:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Sky Accent Glass Plate */
+.btn-glass-plate-sky {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.28) 0%, rgba(2, 132, 199, 0.14) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  color: #38BDF8;
+  box-shadow: inset 0 1px 0 0 rgba(186, 230, 253, 0.45), 0 4px 18px rgba(56, 189, 248, 0.25);
+}
+
+.btn-glass-plate-sky:hover {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.42) 0%, rgba(2, 132, 199, 0.24) 100%);
+  border-color: #38BDF8;
+  color: #FFFFFF;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.6), 0 0 28px rgba(56, 189, 248, 0.5), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Primary Cyan Filled Glass Plate */
+.btn-glass-plate-primary {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.90) 0%, rgba(2, 132, 199, 0.85) 100%);
+  border: 1px solid rgba(186, 230, 253, 0.6);
+  color: #030F1E;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7), 0 6px 20px rgba(56, 189, 248, 0.35);
+}
+
+.btn-glass-plate-primary:hover {
+  background: linear-gradient(180deg, rgba(125, 211, 252, 0.95) 0%, rgba(14, 165, 233, 0.90) 100%);
+  border-color: #FFFFFF;
+  color: #021224;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.9), 0 0 32px rgba(56, 189, 248, 0.6), 0 10px 28px rgba(0, 0, 0, 0.4);
+}
+
 

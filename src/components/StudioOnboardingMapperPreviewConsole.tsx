@@ -43,7 +43,7 @@ interface StudioOnboardingMapperPreviewConsoleProps {
 
 export const StudioOnboardingMapperPreviewConsole: React.FC<
   StudioOnboardingMapperPreviewConsoleProps
-> = ({ projectId = 'proj-akk-studio-01', onClose }) => {
+> = ({ projectId = 'proj-aj-studio-01', onClose }) => {
   const [project, setProject] = useState<StudioOnboardingProject | null>(null);
   const [mapperResult, setMapperResult] = useState<ProductionConfigurationResult | null>(null);
   const [plan, setPlan] = useState<ProductionIntegrationPlan | null>(null);

@@ -157,13 +157,13 @@ export const BiometricVaultLock: React.FC<BiometricVaultLockProps> = ({
       </div>
 
       {/* Primary Action Trigger Buttons */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6 max-w-md mx-auto">
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6 max-w-lg mx-auto">
         <button
           id="biometric-authenticate-btn"
           type="button"
           onClick={handleStartScan}
           disabled={isScanning}
-          className="w-full sm:w-auto h-12 px-8 rounded-xl bg-[#38BDF8] hover:bg-[#0EA5E9] active:scale-[0.99] text-[#030F1E] font-ui font-semibold text-sm tracking-normal flex items-center justify-center space-x-2 transition-all cursor-pointer disabled:opacity-60 shadow-lg shadow-[#38BDF8]/20"
+          className="w-full sm:flex-1 h-12 px-6 rounded-xl bg-gradient-to-r from-[#38BDF8] to-[#0284C7] hover:from-[#0EA5E9] hover:to-[#0369A1] active:scale-[0.99] text-[#030F1E] font-ui font-bold text-sm tracking-normal flex items-center justify-center space-x-2 transition-all cursor-pointer disabled:opacity-60 shadow-lg shadow-[#38BDF8]/20"
         >
           {isScanning ? (
             <>
@@ -179,13 +179,25 @@ export const BiometricVaultLock: React.FC<BiometricVaultLockProps> = ({
         </button>
 
         <button
+          id="biometric-disable-btn"
           type="button"
           onClick={onDisableToggle}
-          className="w-full sm:w-auto h-12 px-4 rounded-xl bg-[#101C2C] hover:bg-[#102538] border border-[#1E3A4F] text-[#7E8F9F] hover:text-[#F1F5F9] font-ui text-xs flex items-center justify-center space-x-2 transition-colors cursor-pointer"
-          title="Turn off biometric lock protection and reveal deliverables"
+          className="w-full sm:w-auto h-12 px-5 rounded-xl bg-[#1E293B] hover:bg-[#334155] border-2 border-amber-500/60 hover:border-amber-400 text-amber-300 hover:text-amber-200 font-ui font-semibold text-xs flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-lg"
+          title="Turn off biometric lock protection and reveal deliverables directly"
         >
-          <Unlock className="w-3.5 h-3.5" />
-          <span>Disable Local Gate</span>
+          <Unlock className="w-4 h-4 text-amber-400" />
+          <span>Disable Local Gate (Quick Access)</span>
+        </button>
+      </div>
+
+      {/* Quick Bypass / Skip Link */}
+      <div className="mt-4 text-center">
+        <button
+          type="button"
+          onClick={onDisableToggle}
+          className="text-xs text-[#94A3B8] hover:text-[#38BDF8] underline underline-offset-4 transition-colors cursor-pointer inline-flex items-center gap-1.5"
+        >
+          <span>💡 Click here to bypass biometric authentication and view deliverables directly</span>
         </button>
       </div>
 
@@ -240,7 +252,7 @@ export const BiometricVaultLock: React.FC<BiometricVaultLockProps> = ({
             <p className="pl-3 font-mono">publicKey: {'{'}</p>
             <p className="pl-6 font-mono text-[#F1F5F9]">challenge: Uint8Array(32),</p>
             <p className="pl-6 font-mono text-[#F1F5F9]">userVerification: "preferred",</p>
-            <p className="pl-6 font-mono text-[#F1F5F9]">rpId: "{typeof window !== 'undefined' ? window.location.hostname : 'akk-studio'}"</p>
+            <p className="pl-6 font-mono text-[#F1F5F9]">rpId: "{typeof window !== 'undefined' ? window.location.hostname : 'aj-studio'}"</p>
             <p className="pl-3 font-mono">{'}'}</p>
             <p className="text-[#34D399] font-bold font-mono">{'}'})</p>
           </div>

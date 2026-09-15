@@ -295,7 +295,7 @@ var onboardingProjects = pgTable(
   "onboarding_projects",
   {
     id: text("id").primaryKey(),
-    // e.g. 'proj-akk-studio-01'
+    // e.g. 'proj-aj-studio-01'
     tenantId: text("tenant_id").notNull(),
     schemaId: text("schema_id").notNull().default("photo-studio-v1"),
     schemaVersion: text("schema_version").notNull().default("1.0"),
@@ -396,7 +396,7 @@ var customerBookings = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     bookingReference: varchar("booking_reference", { length: 100 }).notNull(),
-    tenantId: text("tenant_id").notNull().default("akk-photo-studio"),
+    tenantId: text("tenant_id").notNull().default("aj-ai-studio"),
     studioId: uuid("studio_id").references(() => productionStudios.id, { onDelete: "set null" }),
     idempotencyKey: varchar("idempotency_key", { length: 255 }).notNull().unique(),
     customerName: text("customer_name").notNull(),
@@ -690,28 +690,28 @@ var getCleanOnboardingProject = (projectId) => {
     }
   };
 };
-var getLegacyAkkOnboardingProject = (projectId = "proj-akk-studio-01") => {
+var getDefaultStudioOnboardingProject = (projectId = "proj-aj-studio-01") => {
   const now = (/* @__PURE__ */ new Date()).toISOString();
   return {
     schemaVersion: "1.0",
     project: {
       projectId,
-      projectSlug: "akk-photo-studio-yangon",
-      displayName: "AKK Photo Studio & Atelier",
+      projectSlug: "aj-ai-studio-yangon",
+      displayName: "AJ AI Studio POS & Atelier",
       clientType: "STUDIO_OWNER",
       status: "DRAFT",
       createdAt: now,
       updatedAt: now
     },
     studio: {
-      name: "AKK Photo Studio & Atelier",
-      primaryContactName: "AKK Studio Manager",
+      name: "AJ AI Studio POS & Atelier",
+      primaryContactName: "AJ Studio Manager",
       logoAssetId: "asset-logo-01",
       address: "No. 42 Strand Road, Botahtaung Township, Yangon, Myanmar",
       googleMapsUrl: "https://maps.google.com/?q=No.+42+Strand+Road+Yangon",
       phone: "09 792 108 421",
-      email: "onboarding@akkphotostudio.mm",
-      telegramContact: "@akkphotostudio",
+      email: "contact@ajaistudio.com",
+      telegramContact: "@ajaistudio",
       openingHours: "09:00 - 21:00 MMT Daily",
       closedDays: []
     },
@@ -800,7 +800,7 @@ var getLegacyAkkOnboardingProject = (projectId = "proj-akk-studio-01") => {
           paymentMethodId: "pm-kbzpay",
           provider: "KBZPAY",
           enabled: true,
-          accountName: "AKK Photo Studio",
+          accountName: "AJ AI Studio POS",
           accountIdentifier: "09 792 108 421",
           qrAssetId: "asset-qr-kbzpay",
           notes: "Instant QR transfer available"
@@ -809,14 +809,14 @@ var getLegacyAkkOnboardingProject = (projectId = "proj-akk-studio-01") => {
           paymentMethodId: "pm-wavepay",
           provider: "WAVEPAY",
           enabled: true,
-          accountName: "AKK Photo Studio",
+          accountName: "AJ AI Studio POS",
           accountIdentifier: "09 792 108 421"
         },
         {
           paymentMethodId: "pm-ayapay",
           provider: "AYA_PAY",
           enabled: true,
-          accountName: "AKK Photo Studio",
+          accountName: "AJ AI Studio POS",
           accountIdentifier: "0092 1002 8847 2190"
         },
         {
@@ -841,11 +841,11 @@ var getLegacyAkkOnboardingProject = (projectId = "proj-akk-studio-01") => {
     },
     invoiceProfile: {
       useStudioProfile: true,
-      studioName: "AKK PHOTO STUDIO & ATELIER",
+      studioName: "AJ AI STUDIO POS & ATELIER",
       address: "No. 42 Strand Road, Botahtaung, Yangon",
       phone: "09 792 108 421",
       logoAssetId: "asset-logo-01",
-      businessInfo: "REG: AKK-MM-2026-YGN-091",
+      businessInfo: "REG: AJ-AI-STUDIO-2026",
       taxInfo: "Commercial Tax Exempt (0%)",
       footerMessage: "All equipment is calibrated before handover. Includes 30-day lossless Vault cloud retention."
     },
@@ -855,8 +855,8 @@ var getLegacyAkkOnboardingProject = (projectId = "proj-akk-studio-01") => {
         projectId,
         category: "STUDIO_LOGO",
         provider: "DEV_LOCAL",
-        storageRef: "/assets/akk_logo.svg",
-        originalFilename: "akk_studio_logo_dark.svg",
+        storageRef: "/assets/studio_logo.svg",
+        originalFilename: "studio_logo_dark.svg",
         mimeType: "image/svg+xml",
         fileSizeBytes: 12400,
         uploadStatus: "READY",
@@ -877,9 +877,9 @@ var getLegacyAkkOnboardingProject = (projectId = "proj-akk-studio-01") => {
     }
   };
 };
-var getDefaultOnboardingProject = (projectId = "proj-akk-studio-01") => {
-  if (projectId === "proj-akk-studio-01") {
-    return getLegacyAkkOnboardingProject(projectId);
+var getDefaultOnboardingProject = (projectId = "proj-aj-studio-01") => {
+  if (projectId === "proj-aj-studio-01") {
+    return getDefaultStudioOnboardingProject(projectId);
   }
   return getCleanOnboardingProject(projectId);
 };
@@ -1372,10 +1372,10 @@ function seedPilotBookings() {
   if (bookingStore.size > 0) return;
   const now = (/* @__PURE__ */ new Date()).toISOString();
   const pilot1 = {
-    id: "bk-akk-001",
-    bookingReference: "#AKK-BK-2026-8801",
-    tenantId: "akk-photo-studio",
-    idempotencyKey: "idemp-seed-akk-001",
+    id: "bk-aj-001",
+    bookingReference: "#AJ-BK-2026-8801",
+    tenantId: "aj-ai-studio",
+    idempotencyKey: "idemp-seed-aj-001",
     customerName: "Elena Rostova",
     customerPhone: "+95 9 792 108 421",
     customerEmail: "elena@fashionatelier.mm",
@@ -1413,10 +1413,10 @@ function seedPilotBookings() {
     updatedAt: now
   };
   const pilot2 = {
-    id: "bk-akk-002",
-    bookingReference: "#AKK-BK-2026-8802",
-    tenantId: "akk-photo-studio",
-    idempotencyKey: "idemp-seed-akk-002",
+    id: "bk-aj-002",
+    bookingReference: "#AJ-BK-2026-8802",
+    tenantId: "aj-ai-studio",
+    idempotencyKey: "idemp-seed-aj-002",
     customerName: "Kyaw Zayar",
     customerPhone: "+95 9 450 112 334",
     customerEmail: "kyaw.zayar@agency.mm",
@@ -1458,9 +1458,9 @@ function seedPilotBookings() {
   bookingStore.set(pilot2.id, pilot2);
   bookingEventsStore.set(pilot1.id, [
     {
-      id: "evt-akk-001-1",
+      id: "evt-aj-001-1",
       bookingId: pilot1.id,
-      tenantId: "akk-photo-studio",
+      tenantId: "aj-ai-studio",
       eventType: "SUBMITTED",
       toStatus: "AWAITING_PAYMENT_REVIEW",
       actorId: "customer",
@@ -1471,9 +1471,9 @@ function seedPilotBookings() {
   ]);
   bookingEventsStore.set(pilot2.id, [
     {
-      id: "evt-akk-002-1",
+      id: "evt-aj-002-1",
       bookingId: pilot2.id,
-      tenantId: "akk-photo-studio",
+      tenantId: "aj-ai-studio",
       eventType: "SUBMITTED",
       toStatus: "AWAITING_PAYMENT_REVIEW",
       actorId: "customer",
@@ -1482,9 +1482,9 @@ function seedPilotBookings() {
       createdAt: now
     },
     {
-      id: "evt-akk-002-2",
+      id: "evt-aj-002-2",
       bookingId: pilot2.id,
-      tenantId: "akk-photo-studio",
+      tenantId: "aj-ai-studio",
       eventType: "PAYMENT_VERIFIED",
       fromStatus: "AWAITING_PAYMENT_REVIEW",
       toStatus: "CONFIRMED",
@@ -1507,7 +1507,7 @@ var ServerBookingService = class {
    * Create customer booking with idempotency key and double-booking conflict protection.
    */
   async createCustomerBooking(payload) {
-    const tenantId = payload.tenantId || "akk-photo-studio";
+    const tenantId = payload.tenantId || "aj-ai-studio";
     const idempotencyKey = payload.idempotencyKey || `idemp-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
     for (const bk of Array.from(bookingStore.values())) {
       if (bk.idempotencyKey === idempotencyKey && bk.tenantId === tenantId) {
@@ -1523,7 +1523,7 @@ var ServerBookingService = class {
       }
     }
     const now = (/* @__PURE__ */ new Date()).toISOString();
-    const prefix = tenantId.includes("akk") ? "AKK" : "STUDIO";
+    const prefix = tenantId.includes("neutral") ? "STUDIO" : "AJ";
     const bookingRef = `#${prefix}-BK-${(/* @__PURE__ */ new Date()).getFullYear()}-${Math.floor(1e3 + Math.random() * 9e3)}`;
     const bookingId = `bk-${tenantId}-${Date.now()}`;
     const totalAmount = payload.totalAmount ?? payload.selectedPackage?.price ?? 2e5;
@@ -2098,7 +2098,7 @@ app.post("/api/verify-slip", ocrRateLimiter, async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (apiKey && apiKey.trim() !== "" && !apiKey.includes("MY_GEMINI_API_KEY")) {
       const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
-      const prompt = `You are a specialized optical character recognition (OCR) data extraction tool for AKK Photo Studio in Myanmar.
+      const prompt = `You are a specialized optical character recognition (OCR) data extraction tool for AJ AI Studio in Myanmar.
 Your sole job is to extract printed text fields from mobile banking/wallet payment slips (KBZPay, WavePay, AYA Pay, CB Bank, KBZ mBanking, or AYA mBanking).
 
 CRITICAL SECURITY & EXTRACTION RULES:
@@ -2268,7 +2268,7 @@ Context:
       raw_text: `[SIMULATED OCR DRAFT]
 Ref: ${simulatedTrx}
 Amount: ${simulatedAmount.toLocaleString()} MMK
-Beneficiary: AKK PHOTO STUDIO
+Beneficiary: AJ AI STUDIO POS
 Notice: Mock simulation mode. Not verified with bank.`,
       warnings: ["DEVELOPMENT SIMULATION \u2014 NOT PAYMENT VERIFICATION. Configure GEMINI_API_KEY for live OCR extraction."],
       error: null
@@ -2370,11 +2370,11 @@ var verifyOwnerSessionMiddleware = (req, res, next) => {
 app.post("/api/admin/setup-links", verifyAdminAuth, async (req, res) => {
   try {
     const { projectId, tenantId, expiresInHours, studioDisplayName } = req.body;
-    const targetProject = projectId || "proj-akk-studio-01";
-    const targetTenant = tenantId || "akk-photo-studio";
+    const targetProject = projectId || "proj-aj-studio-01";
+    const targetTenant = tenantId || "aj-ai-studio";
     const linkInfo = await createSetupLink(targetProject, targetTenant, {
       expiresInHours: expiresInHours ? parseInt(expiresInHours, 10) : 168,
-      studioDisplayName: studioDisplayName || "AKK Photo Studio & Atelier"
+      studioDisplayName: studioDisplayName || "AJ AI Studio POS & Atelier"
     });
     return res.json({
       success: true,
@@ -2579,7 +2579,7 @@ app.get("/api/owner/status", setupRateLimiter, verifyOwnerSessionMiddleware, asy
 });
 app.get("/api/admin/onboarding/submissions", verifyAdminAuth, async (req, res) => {
   try {
-    const projectId = req.query.projectId || "proj-akk-studio-01";
+    const projectId = req.query.projectId || "proj-aj-studio-01";
     const submissions = await getOnboardingSubmissions(projectId);
     return res.json({ success: true, projectId, submissions });
   } catch (err) {
@@ -2621,7 +2621,7 @@ var verifyStudioAdminMiddleware = (req, res, next) => {
   const adminKey = req.headers["x-admin-key"] || req.headers["authorization"];
   const expectedKey = process.env.ADMIN_API_KEY || (process.env.NODE_ENV !== "production" ? "dev-admin-secret" : null);
   if (expectedKey && adminKey && (adminKey === expectedKey || adminKey === `Bearer ${expectedKey}`)) {
-    const requestedTenant = req.headers["x-tenant-id"] || req.query.tenantId || "akk-photo-studio";
+    const requestedTenant = req.headers["x-tenant-id"] || req.query.tenantId || "aj-ai-studio";
     res.locals.tenantId = requestedTenant;
     res.locals.adminSession = {
       sessionToken: "hdr_key",
@@ -2639,8 +2639,8 @@ var verifyStudioAdminMiddleware = (req, res, next) => {
 app.post("/api/admin/login", (req, res) => {
   res.setHeader("Cache-Control", "no-store, private");
   const { tenantId, adminKey } = req.body || {};
-  const targetTenant = tenantId || "akk-photo-studio";
-  const validTenants = ["akk-photo-studio", "neutral-studio-tenant", "nocturne"];
+  const targetTenant = tenantId || "aj-ai-studio";
+  const validTenants = ["aj-ai-studio", "neutral-studio-tenant", "nocturne"];
   if (!targetTenant || typeof targetTenant !== "string" || !validTenants.includes(targetTenant)) {
     return res.status(400).json({
       success: false,
@@ -2685,7 +2685,7 @@ app.post("/api/admin/login", (req, res) => {
   const now = /* @__PURE__ */ new Date();
   const expiresAt = new Date(now.getTime() + 24 * 3600 * 1e3);
   const userRole = "STUDIO_ADMIN";
-  const userName = "AKK Studio Admin";
+  const userName = "AJ AI Studio Admin";
   const session = {
     sessionToken,
     tenantId: targetTenant,

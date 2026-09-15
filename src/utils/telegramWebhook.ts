@@ -223,10 +223,10 @@ export async function sendTelegramBookingWebhook(
 
   // Cache in localStorage history for transparency and auditing
   try {
-    const existing = localStorage.getItem('akk_telegram_webhook_logs');
+    const existing = localStorage.getItem('aj_telegram_webhook_logs') || localStorage.getItem('akk_telegram_webhook_logs');
     const logs = existing ? JSON.parse(existing) : [];
     logs.unshift(result);
-    localStorage.setItem('akk_telegram_webhook_logs', JSON.stringify(logs.slice(0, 10)));
+    localStorage.setItem('aj_telegram_webhook_logs', JSON.stringify(logs.slice(0, 10)));
   } catch {
     // ignore storage limits
   }

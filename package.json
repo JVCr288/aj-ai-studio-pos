@@ -1,5 +1,5 @@
 {
-  "name": "react-example",
+  "name": "aj-ai-studio-pos",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -12,7 +12,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "test": "tsx src/tests/onboardingForm.test.ts && tsx src/tests/tenantWiring.test.ts && tsx src/tests/phaseB1Persistence.test.ts && tsx src/tests/httpIntegration.test.ts && tsx src/tests/runtimeRouting.test.ts && tsx src/tests/adminBookingPanel.test.ts",
+    "test": "tsx src/tests/onboardingForm.test.ts && tsx src/tests/tenantWiring.test.ts && tsx src/tests/phaseB1Persistence.test.ts && tsx src/tests/httpIntegration.test.ts && tsx src/tests/runtimeRouting.test.ts && tsx src/tests/adminBookingPanel.test.ts && tsx src/tests/posDesk.test.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/db/migrate.ts",
     "db:studio": "drizzle-kit studio"

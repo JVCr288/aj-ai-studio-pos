@@ -496,7 +496,7 @@ export const ArchiveVaultScreen: React.FC<ArchiveVaultScreenProps> = ({
               }`}
             >
               <Receipt className="w-3.5 h-3.5" />
-              <span>Client Invoice Generator (ပြေစာ)</span>
+              <span>Client Invoice Generator</span>
               <span className={`text-[9px] px-1.5 py-0.5 rounded uppercase font-ui font-bold ${
                 activeTab === 'invoice' ? 'bg-black/20 text-[#071423]' : 'bg-[#38BDF8]/15 text-[#38BDF8]'
               }`}>

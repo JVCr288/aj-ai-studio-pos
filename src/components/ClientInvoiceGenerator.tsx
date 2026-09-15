@@ -45,7 +45,7 @@ interface ClientInvoiceGeneratorProps {
   tenantConfig?: TenantConfig;
 }
 
-const STORAGE_KEY = 'akk_studio_equipment_inventory_v1';
+const STORAGE_KEY = 'aj_studio_equipment_inventory_v1';
 
 export const ClientInvoiceGenerator: React.FC<ClientInvoiceGeneratorProps> = ({
   bookingState,
@@ -230,7 +230,7 @@ export const ClientInvoiceGenerator: React.FC<ClientInvoiceGeneratorProps> = ({
       lines.push({
         id: 'pkg-studio-session',
         description: `${bookingState.selectedPackage.name} Session Fee`,
-        myanmarDescription: 'စတူဒီယို သီးသန့် ဓာတ်ပုံရိုက်ကူးမှု အခကြေးငွေ',
+        myanmarDescription: 'Studio Private Photography Production Session Fee',
         category: 'Studio Session',
         assetCode: bookingState.manifestId || `${activeTenant.invoicePrefix || 'INV'}-BAY-A1`,
         quantity: 1,
@@ -250,7 +250,7 @@ export const ClientInvoiceGenerator: React.FC<ClientInvoiceGeneratorProps> = ({
         id: eq.id,
         equipmentId: eq.id,
         description: eq.name,
-        myanmarDescription: eq.myanmarName,
+        myanmarDescription: eq.specs[0] || 'Professional Studio Gear',
         category: eq.category.toUpperCase().replace('_', ' '),
         assetCode: eq.assetCode,
         serialNumber: eq.serialNumber,

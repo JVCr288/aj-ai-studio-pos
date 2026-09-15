@@ -309,7 +309,7 @@ export const integrationOperationRecords = pgTable(
 export const onboardingProjects = pgTable(
   'onboarding_projects',
   {
-    id: text('id').primaryKey(), // e.g. 'proj-akk-studio-01'
+    id: text('id').primaryKey(), // e.g. 'proj-aj-studio-01'
     tenantId: text('tenant_id').notNull(),
     schemaId: text('schema_id').notNull().default('photo-studio-v1'),
     schemaVersion: text('schema_version').notNull().default('1.0'),
@@ -432,7 +432,7 @@ export const customerBookings = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     bookingReference: varchar('booking_reference', { length: 100 }).notNull(),
-    tenantId: text('tenant_id').notNull().default('akk-photo-studio'),
+    tenantId: text('tenant_id').notNull().default('aj-ai-studio'),
     studioId: uuid('studio_id').references(() => productionStudios.id, { onDelete: 'set null' }),
     idempotencyKey: varchar('idempotency_key', { length: 255 }).notNull().unique(),
     customerName: text('customer_name').notNull(),

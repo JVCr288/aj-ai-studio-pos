@@ -47,7 +47,7 @@ interface EquipmentInventoryScreenProps {
   workspaceView?: WorkspaceView;
 }
 
-const STORAGE_KEY = 'akk_studio_equipment_inventory_v1';
+const STORAGE_KEY = 'aj_studio_equipment_inventory_v1';
 
 export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> = ({
   bookingState,
@@ -95,7 +95,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
     name: '',
     myanmarName: '',
     category: 'lighting' as EquipmentCategory,
-    assetCode: `AKK-EQ-${Math.floor(100 + Math.random() * 900)}`,
+    assetCode: `AJ-EQ-${Math.floor(100 + Math.random() * 900)}`,
     serialNumber: `SN-${Math.floor(100000 + Math.random() * 900000)}`,
     status: 'available' as EquipmentStatus,
     allocatedBay: 'EQUIPMENT VAULT A',
@@ -218,7 +218,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
       name: '',
       myanmarName: '',
       category: 'lighting',
-      assetCode: `AKK-EQ-${Math.floor(100 + Math.random() * 900)}`,
+      assetCode: `AJ-EQ-${Math.floor(100 + Math.random() * 900)}`,
       serialNumber: `SN-${Math.floor(100000 + Math.random() * 900000)}`,
       status: 'available',
       allocatedBay: 'EQUIPMENT VAULT A',
@@ -337,7 +337,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
                 className="px-3.5 py-2 rounded-lg text-[#7E8F9F] hover:text-[#F1F5F9] flex items-center space-x-2 transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#38BDF8]"
               >
                 <Package className="w-4 h-4 text-[#7E8F9F]" />
-                <span>စတူဒီယိုသုံး ပစ္စည်းများ (STUDIO GEAR)</span>
+                <span>Studio Equipment &amp; Gear</span>
               </button>
               <button
                 type="button"
@@ -345,17 +345,31 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
                 className="px-3.5 py-2 rounded-lg bg-[#38BDF8] text-[#071423] font-bold flex items-center space-x-2 shadow-sm transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#38BDF8]"
               >
                 <ShoppingBag className="w-4 h-4" />
-                <span>Client ရောင်းချသော ပစ္စည်းများ (CLIENT RETAIL SHOP)</span>
+                <span>Client Retail Boutique</span>
               </button>
             </div>
 
-            <button
-              type="button"
-              onClick={onNavigateToBooking}
-              className="flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-[#102538] hover:bg-[#1E3A4F] text-[#94A3B8] hover:text-[#F1F5F9] border border-[#1E3A4F] font-mono text-xs transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#38BDF8]"
-            >
-              <span>← BOOKING SUITE</span>
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.history.pushState({}, '', '/?pos=true');
+                    window.dispatchEvent(new PopStateEvent('popstate'));
+                  }
+                }}
+                className="flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-[#34D399]/20 hover:bg-[#34D399] text-[#34D399] hover:text-[#071423] border border-[#34D399]/40 font-mono text-xs font-bold transition-all cursor-pointer shadow-sm"
+              >
+                <span>⚡ OPEN POS DESK</span>
+              </button>
+              <button
+                type="button"
+                onClick={onNavigateToBooking}
+                className="flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-[#102538] hover:bg-[#1E3A4F] text-[#94A3B8] hover:text-[#F1F5F9] border border-[#1E3A4F] font-mono text-xs transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#38BDF8]"
+              >
+                <span>← BOOKING SUITE</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -392,7 +406,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
             className="px-3.5 py-2 rounded-lg bg-[#38BDF8] text-[#071423] font-bold flex items-center space-x-2 shadow-sm transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#38BDF8]"
           >
             <Package className="w-4 h-4" />
-            <span>စတူဒီယိုသုံး ပစ္စည်းများ (STUDIO GEAR)</span>
+            <span>Studio Equipment &amp; Gear</span>
           </button>
           <button
             type="button"
@@ -400,13 +414,27 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
             className="px-3.5 py-2 rounded-lg text-[#7E8F9F] hover:text-[#F1F5F9] hover:bg-[#102538] flex items-center space-x-2 transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#38BDF8]"
           >
             <ShoppingBag className="w-4 h-4 text-[#38BDF8]" />
-            <span>Client ရောင်းချသော ပစ္စည်းများ (CLIENT RETAIL SHOP)</span>
+            <span>Client Retail Boutique</span>
           </button>
         </div>
 
-        <div className="flex items-center space-x-2 text-xs font-ui text-[#7E8F9F]">
-          <span className="hidden sm:inline">View Mode:</span>
-          <span className="text-[#38BDF8] font-semibold">Studio Gear &amp; Lighting Registry</span>
+        <div className="flex items-center space-x-3 text-xs font-ui">
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/?pos=true');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }
+            }}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#34D399]/20 hover:bg-[#34D399] text-[#34D399] hover:text-[#071423] border border-[#34D399]/40 font-mono text-xs font-bold transition-all cursor-pointer shadow-sm"
+          >
+            <span>⚡ OPEN POS DESK</span>
+          </button>
+          <div className="hidden sm:flex items-center space-x-1 text-[#7E8F9F]">
+            <span>View:</span>
+            <span className="text-[#38BDF8] font-semibold">Gear Registry</span>
+          </div>
         </div>
       </div>
 
@@ -418,7 +446,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
               Module 06 • Atelier Hardware
             </span>
             <span>•</span>
-            <span className="text-[#7E8F9F]">စတူဒီယို ပစ္စည်းစာရင်း</span>
+            <span className="text-[#7E8F9F]">Studio Equipment Inventory</span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-ui font-bold text-[#F1F5F9] tracking-tight flex items-center gap-3">
@@ -429,7 +457,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
           </h1>
           <p className="text-sm text-[#7E8F9F] mt-1 max-w-2xl font-normal">
             Live equipment registry, lighting gear allocation, lens optics, and
-            calibration logs for AKK Photo Studio.
+            calibration logs for AJ AI Studio.
           </p>
         </div>
 
@@ -470,7 +498,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
           }`}
         >
           <div className="flex items-center justify-between text-[#7E8F9F] text-xs mb-1">
-            <span>စုစုပေါင်း (Total)</span>
+            <span>Total Assets</span>
             <Package className="w-3.5 h-3.5 text-[#7E8F9F]" />
           </div>
           <div className="text-2xl font-ui font-bold text-[#F1F5F9] tabular-nums">
@@ -494,7 +522,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
           }`}
         >
           <div className="flex items-center justify-between text-[#34D399] text-xs mb-1">
-            <span>အဆင်သင့် (Available)</span>
+            <span>Available</span>
             <CheckCircle2 className="w-3.5 h-3.5" />
           </div>
           <div className="text-2xl font-ui font-bold text-[#34D399] tabular-nums">
@@ -518,7 +546,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
           }`}
         >
           <div className="flex items-center justify-between text-[#38BDF8] text-xs mb-1">
-            <span>သုံးနေဆဲ (In Bays)</span>
+            <span>In Studio Bays</span>
             <Clock className="w-3.5 h-3.5" />
           </div>
           <div className="text-2xl font-ui font-bold text-[#38BDF8] tabular-nums">
@@ -566,7 +594,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
           }`}
         >
           <div className="flex items-center justify-between text-[#FBBF24] text-xs mb-1">
-            <span>စစ်ဆေးဆဲ (Maint)</span>
+            <span>Maintenance</span>
             <Wrench className="w-3.5 h-3.5" />
           </div>
           <div className="text-2xl font-ui font-bold text-[#FBBF24] tabular-nums">
@@ -589,7 +617,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="ပစ္စည်းအမည်၊ ကုတ်နံပါတ် (AKK-...)၊ မော်ဒယ် သို့မဟုတ် Bay ရှာရန်..."
+              placeholder="Search gear by name, asset code (AJ-...), model or bay..."
               className="w-full pl-10 pr-10 py-2.5 bg-[#030F1E] border border-[#1E3A4F] focus:border-[#38BDF8] rounded-xl text-sm text-[#F1F5F9] placeholder:text-[#7E8F9F] font-ui outline-none transition-colors focus:ring-1 focus:ring-[#38BDF8]"
             />
             {searchQuery && (
@@ -611,10 +639,10 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="bg-[#030F1E] border border-[#1E3A4F] text-[#F1F5F9] py-2 px-3 rounded-xl outline-none focus:border-[#38BDF8] cursor-pointer focus:ring-1 focus:ring-[#38BDF8]"
             >
-              <option value="all">အားလုံး (All Statuses)</option>
-              <option value="available">အဆင်သင့်ရှိ (Available)</option>
-              <option value="in_use">ရိုက်ကူးရေးတွင်သုံးနေ (In Use)</option>
-              <option value="maintenance">စစ်ဆေးပြင်ဆင်ဆဲ (Maintenance)</option>
+              <option value="all">All Statuses</option>
+              <option value="available">Available</option>
+              <option value="in_use">In Use</option>
+              <option value="maintenance">Maintenance</option>
             </select>
 
             {/* Reset Filter Button */}
@@ -651,7 +679,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
                 : 'bg-[#102538] text-[#7E8F9F] hover:text-[#F1F5F9] hover:bg-[#1E3A4F] border border-[#1E3A4F]'
             }`}
           >
-            အားလုံး (All {equipmentList.length})
+            All Items ({equipmentList.length})
           </button>
 
           {EQUIPMENT_CATEGORIES.map((cat) => {
@@ -727,7 +755,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
         <div className="bg-[#0B1B2B] border border-[#1E3A4F] rounded-2xl p-12 text-center text-[#7E8F9F] font-ui">
           <AlertTriangle className="w-10 h-10 text-[#FBBF24] mx-auto mb-3 opacity-80" />
           <h3 className="text-lg font-ui font-bold text-[#F1F5F9] mb-1">
-            ပစ္စည်း မတွေ့ရှိပါ (No Equipment Found)
+            No Equipment Found
           </h3>
           <p className="text-xs text-[#7E8F9F] max-w-md mx-auto mb-4">
             No studio equipment matched &quot;{searchQuery}&quot; with the
@@ -841,9 +869,9 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
                       <h4 className="font-ui font-bold text-base text-[#F1F5F9] group-hover:text-[#38BDF8] transition-colors leading-snug">
                         {item.name}
                       </h4>
-                      {item.myanmarName && (
+                      {item.specs[0] && (
                         <p className="text-xs text-[#7E8F9F] mt-0.5">
-                          {item.myanmarName}
+                          {item.specs[0]}
                         </p>
                       )}
                     </div>
@@ -933,7 +961,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
           <ShieldCheck className="w-5 h-5 text-[#34D399] shrink-0 mt-0.5" />
           <div>
             <div className="font-ui font-bold text-[#F1F5F9] text-sm">
-              AKK Atelier Hardware Standard &amp; Calibration
+              AJ Atelier Hardware Standard &amp; Calibration
             </div>
             <p className="text-[#7E8F9F] text-xs mt-0.5">
               All strobe units undergo 5600K daylight color temperature meter
@@ -986,9 +1014,9 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
             <h2 className="text-xl sm:text-2xl font-ui font-bold text-[#F1F5F9] mb-1">
               {selectedItemForDetail.name}
             </h2>
-            {selectedItemForDetail.myanmarName && (
+            {selectedItemForDetail.specs[0] && (
               <p className="text-sm text-[#7E8F9F] mb-4 font-ui">
-                {selectedItemForDetail.myanmarName}
+                {selectedItemForDetail.specs[0]}
               </p>
             )}
 
@@ -1115,7 +1143,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
       )}
 
       {/* =========================================================================
-          MODAL 2: ADD NEW EQUIPMENT FORM MODAL (ပစ္စည်းအသစ် ထည့်သွင်းခြင်း)
+          MODAL 2: ADD NEW EQUIPMENT FORM MODAL
          ========================================================================= */}
       {isAddModalOpen && (
         <div
@@ -1142,11 +1170,11 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
             </div>
 
             <h2 className="text-xl font-ui font-bold text-[#F1F5F9] mb-1">
-              ပစ္စည်းအသစ် ထည့်သွင်းခြင်း (Add New Equipment)
+              Add New Equipment
             </h2>
             <p className="text-xs text-[#7E8F9F] mb-5 font-light font-ui">
               Register new studio hardware, lighting strobes, cameras, or optics
-              into the active AKK Photo Studio inventory system.
+              into the active AJ AI Studio inventory system.
             </p>
 
             <form onSubmit={handleCreateEquipment} className="space-y-4 font-ui text-xs">
@@ -1170,7 +1198,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
 
                 <div>
                   <label className="block text-[#94A3B8] font-semibold mb-1">
-                    မြန်မာအမည် (Myanmar Title)
+                    Secondary Title / Notes
                   </label>
                   <input
                     type="text"
@@ -1181,7 +1209,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
                         myanmarName: e.target.value,
                       })
                     }
-                    placeholder="e.g. ပရိုဖိုတို အလင်းဆိုင်း"
+                    placeholder="e.g. Dual Softbox Kit"
                     className="w-full px-3 py-2 bg-[#030F1E] border border-[#1E3A4F] focus:border-[#38BDF8] rounded-xl text-[#F1F5F9] placeholder:text-[#7E8F9F] outline-none focus:ring-1 focus:ring-[#38BDF8]"
                   />
                 </div>
@@ -1205,7 +1233,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
                   >
                     {EQUIPMENT_CATEGORIES.map((cat) => (
                       <option key={cat.id} value={cat.id}>
-                        {cat.name} ({cat.myanmarName})
+                        {cat.name}
                       </option>
                     ))}
                   </select>
@@ -1225,9 +1253,9 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
                     }
                     className="w-full px-3 py-2 bg-[#030F1E] border border-[#1E3A4F] focus:border-[#38BDF8] rounded-xl text-[#F1F5F9] outline-none cursor-pointer focus:ring-1 focus:ring-[#38BDF8]"
                   >
-                    <option value="available">အဆင်သင့်ရှိ (Available)</option>
-                    <option value="in_use">ရိုက်ကူးရေးတွင်သုံးဆဲ (In Use)</option>
-                    <option value="maintenance">စစ်ဆေးပြင်ဆင်ဆဲ (Maintenance)</option>
+                    <option value="available">Available</option>
+                    <option value="in_use">In Use</option>
+                    <option value="maintenance">Maintenance</option>
                   </select>
                 </div>
               </div>
