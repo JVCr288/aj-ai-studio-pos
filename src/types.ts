@@ -197,7 +197,10 @@ export type ClientProductCategory =
   | 'photo_albums'
   | 'storage_media'
   | 'film_supplies'
-  | 'studio_merch';
+  | 'studio_merch'
+  | 'apparel'
+  | 'baby_accessories'
+  | 'digital_products';
 
 export type ProductAvailability = 'in_stock' | 'pre_order' | 'made_to_order' | 'out_of_stock';
 
