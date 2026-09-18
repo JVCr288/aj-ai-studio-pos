@@ -109,7 +109,13 @@ export default function App() {
   });
 
   const [direction, setDirection] = useState<number>(1);
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      return sp.get('step') === '2' || sp.has('payment');
+    }
+    return false;
+  });
   const [atmosphere, setAtmosphere] = useState<AtmosphereTheme>(() => getInitialAtmosphere());
   const [workspaceView, setWorkspaceView] = useState<WorkspaceView>(() =>
     getInitialWorkspaceView()
