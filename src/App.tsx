@@ -16,18 +16,43 @@ import { BookingScreen } from './components/BookingScreen';
 import { PaymentModal } from './components/PaymentModal';
 import { VerificationScreen } from './components/VerificationScreen';
 import { DigitalPassScreen } from './components/DigitalPassScreen';
-import { ArchiveVaultScreen } from './components/ArchiveVaultScreen';
-import { EquipmentInventoryScreen } from './components/EquipmentInventoryScreen';
-import { StudioOnboardingScreen } from './components/StudioOnboardingScreen';
-import { StudioOnboardingReviewConsole } from './components/StudioOnboardingReviewConsole';
-import { StudioOnboardingMapperPreviewConsole } from './components/StudioOnboardingMapperPreviewConsole';
 import { StudioLandingPortal } from './components/StudioLandingPortal';
-import { StandaloneOwnerPortal } from './components/StandaloneOwnerPortal';
 import { Footer } from './components/Footer';
 import { SettingsModal } from './components/SettingsModal';
-import { StudioAdminBookingPanel } from './components/StudioAdminBookingPanel';
-import { StudioPosDesk } from './components/StudioPosDesk';
 import { submitCustomerBookingToServer } from './services/adminBookingClientService';
+
+// Code-split heavy admin, POS, catalog, and onboarding modules
+const StandaloneOwnerPortal = React.lazy(() =>
+  import('./components/StandaloneOwnerPortal').then((m) => ({ default: m.StandaloneOwnerPortal }))
+);
+const StudioAdminBookingPanel = React.lazy(() =>
+  import('./components/StudioAdminBookingPanel').then((m) => ({ default: m.StudioAdminBookingPanel }))
+);
+const StudioPosDesk = React.lazy(() =>
+  import('./components/StudioPosDesk').then((m) => ({ default: m.StudioPosDesk }))
+);
+const StudioOnboardingScreen = React.lazy(() =>
+  import('./components/StudioOnboardingScreen').then((m) => ({ default: m.StudioOnboardingScreen }))
+);
+const StudioOnboardingReviewConsole = React.lazy(() =>
+  import('./components/StudioOnboardingReviewConsole').then((m) => ({ default: m.StudioOnboardingReviewConsole }))
+);
+const StudioOnboardingMapperPreviewConsole = React.lazy(() =>
+  import('./components/StudioOnboardingMapperPreviewConsole').then((m) => ({ default: m.StudioOnboardingMapperPreviewConsole }))
+);
+const ArchiveVaultScreen = React.lazy(() =>
+  import('./components/ArchiveVaultScreen').then((m) => ({ default: m.ArchiveVaultScreen }))
+);
+const EquipmentInventoryScreen = React.lazy(() =>
+  import('./components/EquipmentInventoryScreen').then((m) => ({ default: m.EquipmentInventoryScreen }))
+);
+
+const ScreenSuspenseFallback = () => (
+  <div className="flex-1 flex flex-col items-center justify-center min-h-[40vh] p-8 text-center text-slate-400">
+    <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mb-4" />
+    <span className="text-xs uppercase tracking-widest font-mono text-cyan-400/80">Loading Module...</span>
+  </div>
+);
 
 const pageVariants = {
   enter: (direction: number) => ({
@@ -292,15 +317,17 @@ export default function App() {
   // ---------------------------------------------------------------------------
   if (isStandaloneOwnerRoute) {
     return (
-      <StandaloneOwnerPortal
-        rawToken={setupToken}
-        onExitStandalone={() => {
-          setIsStandaloneOwnerRoute(false);
-          if (typeof window !== 'undefined') {
-            window.history.pushState({}, '', '/');
-          }
-        }}
-      />
+      <React.Suspense fallback={<ScreenSuspenseFallback />}>
+        <StandaloneOwnerPortal
+          rawToken={setupToken}
+          onExitStandalone={() => {
+            setIsStandaloneOwnerRoute(false);
+            if (typeof window !== 'undefined') {
+              window.history.pushState({}, '', '/');
+            }
+          }}
+        />
+      </React.Suspense>
     );
   }
 
@@ -354,14 +381,16 @@ export default function App() {
       {/* Main Screen Body View with Motion Page Transitions */}
       <main className="flex-1 flex flex-col w-full relative">
         {isAdminBookingRoute ? (
-          <StudioAdminBookingPanel
-            onClose={() => {
-              setIsAdminBookingRoute(false);
-              if (typeof window !== 'undefined') {
-                window.history.pushState({}, '', '/');
-              }
-            }}
-          />
+          <React.Suspense fallback={<ScreenSuspenseFallback />}>
+            <StudioAdminBookingPanel
+              onClose={() => {
+                setIsAdminBookingRoute(false);
+                if (typeof window !== 'undefined') {
+                  window.history.pushState({}, '', '/');
+                }
+              }}
+            />
+          </React.Suspense>
         ) : (
           <AnimatePresence mode="wait" initial={false} custom={direction}>
             <motion.div
@@ -500,19 +529,23 @@ export default function App() {
 
             {/* Screen 5: Client Deliverables Archive Vault */}
             {currentScreen === 5 && (
-              <ArchiveVaultScreen
-                bookingState={bookingState}
-                workspaceView={workspaceView}
-              />
+              <React.Suspense fallback={<ScreenSuspenseFallback />}>
+                <ArchiveVaultScreen
+                  bookingState={bookingState}
+                  workspaceView={workspaceView}
+                />
+              </React.Suspense>
             )}
 
             {/* Screen 6: Studio Equipment & Gear Inventory */}
             {currentScreen === 6 && (
-              <EquipmentInventoryScreen
-                bookingState={bookingState}
-                onNavigateToBooking={() => navigateToScreen(1)}
-                workspaceView={workspaceView}
-              />
+              <React.Suspense fallback={<ScreenSuspenseFallback />}>
+                <EquipmentInventoryScreen
+                  bookingState={bookingState}
+                  onNavigateToBooking={() => navigateToScreen(1)}
+                  workspaceView={workspaceView}
+                />
+              </React.Suspense>
             )}
           </motion.div>
         </AnimatePresence>
@@ -557,44 +590,52 @@ export default function App() {
 
       {/* Studio POS Desk Terminal Component */}
       {isPosDeskOpen && (
-        <StudioPosDesk
-          bookingState={bookingState}
-          onCloseDesk={() => {
-            setIsPosDeskOpen(false);
-            if (typeof window !== 'undefined') {
-              window.history.pushState({}, '', '/');
-            }
-          }}
-          workspaceView={workspaceView}
-          onToggleWorkspaceView={handleToggleWorkspaceView}
-          onSyncBookingToGlobal={(updated) => handleUpdateBooking(updated)}
-        />
+        <React.Suspense fallback={<ScreenSuspenseFallback />}>
+          <StudioPosDesk
+            bookingState={bookingState}
+            onCloseDesk={() => {
+              setIsPosDeskOpen(false);
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/');
+              }
+            }}
+            workspaceView={workspaceView}
+            onToggleWorkspaceView={handleToggleWorkspaceView}
+            onSyncBookingToGlobal={(updated) => handleUpdateBooking(updated)}
+          />
+        </React.Suspense>
       )}
 
       {/* Studio Onboarding Setup Portal (Controlled Development Entry Point) */}
       {isOnboardingPortalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-[#030F1E]/95 backdrop-blur-md p-4 sm:p-6 flex justify-center items-start pt-12">
-          <StudioOnboardingScreen
-            onClosePortal={() => setIsOnboardingPortalOpen(false)}
-          />
+          <React.Suspense fallback={<ScreenSuspenseFallback />}>
+            <StudioOnboardingScreen
+              onClosePortal={() => setIsOnboardingPortalOpen(false)}
+            />
+          </React.Suspense>
         </div>
       )}
 
       {/* Developer Review Console (Controlled Development / Admin Entry Point) */}
       {isDeveloperReviewOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-[#030F1E]/95 backdrop-blur-md p-4 sm:p-6 flex justify-center items-start pt-12">
-          <StudioOnboardingReviewConsole
-            onClose={() => setIsDeveloperReviewOpen(false)}
-          />
+          <React.Suspense fallback={<ScreenSuspenseFallback />}>
+            <StudioOnboardingReviewConsole
+              onClose={() => setIsDeveloperReviewOpen(false)}
+            />
+          </React.Suspense>
         </div>
       )}
 
       {/* Integration & Mapper Preview Console (Controlled Development / Admin Entry Point) */}
       {isMapperPreviewOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-[#030F1E]/95 backdrop-blur-md p-4 sm:p-6 flex justify-center items-start pt-12">
-          <StudioOnboardingMapperPreviewConsole
-            onClose={() => setIsMapperPreviewOpen(false)}
-          />
+          <React.Suspense fallback={<ScreenSuspenseFallback />}>
+            <StudioOnboardingMapperPreviewConsole
+              onClose={() => setIsMapperPreviewOpen(false)}
+            />
+          </React.Suspense>
         </div>
       )}
     </div>

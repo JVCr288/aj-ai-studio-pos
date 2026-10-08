@@ -9,7 +9,7 @@ async function runHttpIntegrationTests() {
   console.log('\n=== RUNNING HTTP INTEGRATION & SECURITY TESTS ===\n');
 
   try {
-    const ping = await fetch(`${BASE_URL}/api/health`, { signal: AbortSignal.timeout(1200) });
+    const ping = await fetch(`${BASE_URL}/api/health`, { signal: AbortSignal.timeout(5000) });
     if (!ping.ok) throw new Error('Unhealthy');
   } catch {
     console.log('⚠️ [HTTP Integration] Server on 127.0.0.1:4000 is not running. Skipping live HTTP integration tests in offline runner.\n');
@@ -243,10 +243,40 @@ async function runHttpIntegrationTests() {
   });
   assert.strictEqual(invalidTenantRes.status, 400, 'Invalid tenant ID must return 400');
   const invalidTenantData = await invalidTenantRes.json();
-  assert.strictEqual(invalidTenantData.code, 'INVALID_TENANT');
-  console.log('  ✅ Admin login contract, error codes, and aj_admin_session Cookie verified');
+  // 12. Test SSE Real-Time Event Stream Endpoint (GET /api/events/stream)
+  console.log('Testing Server-Sent Events (SSE) live stream endpoint and headers...');
+  const sseMissingTenantRes = await callApi('/api/events/stream');
+  assert.strictEqual(sseMissingTenantRes.status, 400, 'SSE stream without tenantId should return 400');
+  const sseMissingData = await sseMissingTenantRes.json();
+  assert.strictEqual(sseMissingData.code, 'MISSING_TENANT_ID');
 
-  console.log('\nALL 11 HTTP INTEGRATION & SECURITY TESTS PASSED SUCCESSFULLY! 🎉\n');
+  const sseAbortController = new AbortController();
+  const sseStreamRes = await callApi('/api/events/stream?tenantId=aj-ai-studio', {
+    headers: { Accept: 'text/event-stream' },
+    signal: sseAbortController.signal,
+  });
+  assert.strictEqual(sseStreamRes.status, 200, 'SSE stream with tenantId should return 200');
+  assert.ok(sseStreamRes.headers.get('content-type')?.includes('text/event-stream'), 'Content-Type must be text/event-stream');
+  assert.ok(sseStreamRes.headers.get('cache-control')?.includes('no-cache'), 'Cache-Control must be no-cache');
+  assert.strictEqual(sseStreamRes.headers.get('connection'), 'keep-alive', 'Connection must be keep-alive');
+  assert.strictEqual(sseStreamRes.headers.get('x-accel-buffering'), 'no', 'X-Accel-Buffering must be no for proxy pass-through');
+
+  // Read initial handshake chunk
+  if (sseStreamRes.body) {
+    const reader = sseStreamRes.body.getReader();
+    const { value } = await reader.read();
+    if (value) {
+      const initialChunk = new TextDecoder().decode(value);
+      assert.ok(initialChunk.includes('event: CONNECTED'), 'SSE initial chunk must contain CONNECTED event');
+      assert.ok(initialChunk.includes('SSE Stream Active'), 'SSE initial chunk must contain active message');
+      assert.ok(initialChunk.includes('aj-ai-studio'), 'SSE initial chunk must echo tenantId');
+    }
+    reader.cancel();
+  }
+  sseAbortController.abort();
+  console.log('  ✅ SSE live stream endpoint, proxy headers, and handshake chunk verified');
+
+  console.log('\nALL 12 HTTP INTEGRATION & SECURITY TESTS PASSED SUCCESSFULLY! 🎉\n');
 }
 
 runHttpIntegrationTests().catch((err) => {

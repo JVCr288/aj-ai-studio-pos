@@ -138,6 +138,10 @@ export const registerSimulatedUpload = (storageKey: string, sizeBytes: number, m
 };
 
 export const verifyAssetObjectExistence = async (storageKey: string): Promise<boolean> => {
+  if (inMemoryStorageObjects.has(storageKey)) {
+    return true;
+  }
+
   const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const storageBucket = process.env.SUPABASE_ONBOARDING_BUCKET || 'onboarding-assets';
@@ -158,7 +162,7 @@ export const verifyAssetObjectExistence = async (storageKey: string): Promise<bo
     }
   }
 
-  return inMemoryStorageObjects.has(storageKey);
+  return false;
 };
 
 export const confirmAssetUpload = async (

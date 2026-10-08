@@ -203,7 +203,92 @@ async function runPosDeskTests() {
   assert.strictEqual(settledBooking?.bookingStatus, 'CONFIRMED');
   console.log('  ✅ Test 7: Linked booking status transition to CONFIRMED verified');
 
-  console.log('\nALL 7 AJ AI STUDIO POS DESK TERMINAL TESTS PASSED! 🎉\n');
+  // Test 8: Generate X-Report (Mid-shift audit snapshot)
+  console.log('Testing Mid-Shift X-Report Generation...');
+  const xReport = posService.generateXReport('TEST-TERM-01', 'Ko Aung', undefined, 'aj-ai-studio');
+  assert.strictEqual(xReport.reportType, 'X_REPORT');
+  assert.strictEqual(xReport.terminalId, 'TEST-TERM-01');
+  assert.strictEqual(xReport.status, 'OPEN');
+  assert.ok(xReport.totalTransactions >= 4, 'Must aggregate all transactions in current shift');
+  assert.ok(xReport.tenderBreakdown.cashMMK > 0, 'Must record cash tender portion');
+  assert.ok(xReport.tenderBreakdown.kbzpayMMK > 0, 'Must record digital tender portion');
+  assert.strictEqual(xReport.cashReconciliation.startingCashMMK, 100000);
+  assert.strictEqual(xReport.cashReconciliation.discrepancyType, 'BALANCED');
+  console.log('  ✅ Test 8: Mid-shift X-Report generation and tender aggregation verified');
+
+  // Test 9: Finalize Shift Closure & Z-Report (with cash shortage test)
+  console.log('Testing Shift Closure, Discrepancy & Z-Report Generation...');
+  const currentShift = posService.getActiveShift('TEST-TERM-01', 'Ko Aung');
+  const expectedCash = currentShift.startingCashMMK + currentShift.totalCashSalesMMK;
+  const countedShortCash = expectedCash - 3000; // 3,000 MMK shortage
+
+  const { shift: closedShift, zReport } = posService.closeShiftAndGenerateZReport({
+    terminalId: 'TEST-TERM-01',
+    staffName: 'Ko Aung',
+    actualCashInDrawerMMK: countedShortCash,
+    closureNotes: 'End of day register shortage (-3,000 MMK coin rounding)',
+    tenantId: 'aj-ai-studio',
+  });
+
+  assert.strictEqual(closedShift.status, 'CLOSED');
+  assert.ok(closedShift.closedAt, 'Shift must have closedAt timestamp');
+  assert.strictEqual(closedShift.cashDiscrepancyMMK, -3000);
+  assert.strictEqual(zReport.reportType, 'Z_REPORT');
+  assert.strictEqual(zReport.status, 'CLOSED');
+  assert.strictEqual(zReport.cashReconciliation.discrepancyType, 'SHORTAGE');
+  assert.strictEqual(zReport.cashReconciliation.discrepancyMMK, -3000);
+  assert.ok(zReport.closureNotes?.includes('-3,000 MMK'));
+
+  // Test opening fresh new shift
+  const freshShift = posService.openNewShift('TEST-TERM-01', 'Ko Aung', 150000);
+  assert.strictEqual(freshShift.status, 'OPEN');
+  assert.strictEqual(freshShift.startingCashMMK, 150000);
+  assert.strictEqual(freshShift.totalCashSalesMMK, 0);
+  assert.strictEqual(freshShift.totalTransactionsCount, 0);
+  console.log('  ✅ Test 9: Shift closure, cash drawer discrepancy calculation, Z-Report & new shift open verified');
+
+  // Test 10: Cash Movements (Cash Drop & Cash In Float Top-up)
+  console.log('Testing Cash Drop & Cash In Movements...');
+  // Cash Drop: 20,000 MMK for office petty cash/safe drop
+  const dropResult = posService.recordCashMovement({
+    type: 'CASH_DROP',
+    amountMMK: 20000,
+    reason: 'Midday Safe Drop to Manager Safe',
+    performedBy: 'Ko Aung',
+    terminalId: 'TEST-TERM-01',
+  });
+  assert.strictEqual(dropResult.movement.type, 'CASH_DROP');
+  assert.strictEqual(dropResult.movement.amountMMK, 20000);
+  assert.strictEqual(dropResult.shift.totalCashDropsMMK, 20000);
+  assert.strictEqual(dropResult.shift.cashInDrawerMMK, 130000); // 150,000 - 20,000
+
+  // Cash In: 10,000 MMK change fund top-up
+  const topUpResult = posService.recordCashMovement({
+    type: 'CASH_IN',
+    amountMMK: 10000,
+    reason: 'Petty cash coin replenishment',
+    performedBy: 'Ko Aung',
+    terminalId: 'TEST-TERM-01',
+  });
+  assert.strictEqual(topUpResult.movement.type, 'CASH_IN');
+  assert.strictEqual(topUpResult.shift.totalCashInMMK, 10000);
+  assert.strictEqual(topUpResult.shift.cashInDrawerMMK, 140000); // 130,000 + 10,000
+
+  // Verify X-Report incorporates Cash In and Cash Drop
+  const moveXReport = posService.generateXReport('TEST-TERM-01', 'Ko Aung', 140000, 'aj-ai-studio');
+  assert.strictEqual(moveXReport.cashReconciliation.totalCashDropsMMK, 20000);
+  assert.strictEqual(moveXReport.cashReconciliation.totalCashInMMK, 10000);
+  assert.strictEqual(moveXReport.cashReconciliation.expectedCashMMK, 140000);
+  assert.strictEqual(moveXReport.cashReconciliation.discrepancyType, 'BALANCED');
+  console.log('  ✅ Test 10: Cash Drop & Cash In movements and reconciliation math verified');
+
+  // Test 11: Shift History archive retention
+  console.log('Testing Shift History Archive...');
+  const history = posService.getShiftHistory();
+  assert.ok(Array.isArray(history), 'Shift history must return an array');
+  console.log('  ✅ Test 11: Shift history archive contract verified');
+
+  console.log('\nALL 11 AJ AI STUDIO POS DESK TERMINAL TESTS PASSED! 🎉\n');
 }
 
 runPosDeskTests().catch((err) => {

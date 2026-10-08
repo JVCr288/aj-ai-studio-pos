@@ -29,11 +29,15 @@ export const getDb = () => {
       ? { rejectUnauthorized: process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === 'true' }
       : false;
 
+    const connectTimeoutSec = process.env.DATABASE_CONNECT_TIMEOUT
+      ? parseInt(process.env.DATABASE_CONNECT_TIMEOUT, 10)
+      : 2;
+
     queryClient = postgres(connectionString, {
       max: process.env.DATABASE_MAX_CONNECTIONS ? parseInt(process.env.DATABASE_MAX_CONNECTIONS, 10) : 10,
       ssl: sslConfig,
       idle_timeout: 30,
-      connect_timeout: 5,
+      connect_timeout: connectTimeoutSec,
     });
 
     dbInstance = drizzle(queryClient, { schema });
@@ -59,10 +63,19 @@ export const db = new Proxy({} as NonNullable<ReturnType<typeof getDb>>, {
   },
 });
 
-export const checkDatabaseHealth = async (): Promise<{ configured: boolean; reachable: boolean; error?: string }> => {
+let lastHealthCheckTime = 0;
+let lastHealthCheckResult: { configured: boolean; reachable: boolean; error?: string } | null = null;
+const HEALTH_CACHE_TTL_MS = 10000; // 10-second cache to prevent consecutive connection stalling
+
+export const checkDatabaseHealth = async (forceFresh = false): Promise<{ configured: boolean; reachable: boolean; error?: string }> => {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
     return { configured: false, reachable: false };
+  }
+
+  const now = Date.now();
+  if (!forceFresh && lastHealthCheckResult && (now - lastHealthCheckTime < HEALTH_CACHE_TTL_MS)) {
+    return lastHealthCheckResult;
   }
 
   try {
@@ -74,19 +87,25 @@ export const checkDatabaseHealth = async (): Promise<{ configured: boolean; reac
 
     const client = postgres(connectionString, {
       max: 1,
-      connect_timeout: 3,
+      connect_timeout: 2,
       ssl: sslConfig,
     });
 
     await client`SELECT 1`;
     await client.end();
-    return { configured: true, reachable: true };
+    const result = { configured: true, reachable: true };
+    lastHealthCheckResult = result;
+    lastHealthCheckTime = Date.now();
+    return result;
   } catch (err: any) {
-    return {
+    const result = {
       configured: true,
       reachable: false,
       error: err.message || 'Failed to ping database',
     };
+    lastHealthCheckResult = result;
+    lastHealthCheckTime = Date.now();
+    return result;
   }
 };
 

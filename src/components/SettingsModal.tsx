@@ -14,8 +14,10 @@ import {
   Layers,
   Sparkles,
   CreditCard,
+  BookOpen,
 } from 'lucide-react';
 import { SUPPORTED_PAYMENT_GATEWAYS, getPaymentBrand } from '../utils/paymentBrands';
+import { StudioUserGuideModal } from './StudioUserGuideModal';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -31,7 +33,7 @@ interface SettingsModalProps {
   onLaunchPosDesk?: () => void;
 }
 
-type SettingsTab = 'appearance' | 'workstation' | 'security' | 'payment';
+type SettingsTab = 'appearance' | 'workstation' | 'security' | 'payment' | 'guide';
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
@@ -47,6 +49,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onLaunchPosDesk,
 }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('appearance');
+  const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -195,6 +198,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           >
             <CreditCard className="w-3.5 h-3.5" />
             <span>Payment Channels</span>
+          </button>
+
+          <button
+            type="button"
+            id="settings-tab-guide-btn"
+            onClick={() => setActiveTab('guide')}
+            className={`py-3 px-3 flex items-center space-x-2 border-b-2 font-medium transition-colors cursor-pointer ${
+              activeTab === 'guide'
+                ? 'border-[#38BDF8] text-[#38BDF8]'
+                : 'border-transparent text-[#7E8F9F] hover:text-[#F1F5F9]'
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span className="flex items-center gap-1.5">
+              <span>User Guide</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-400 font-mono">
+                EN/MM
+              </span>
+            </span>
           </button>
         </div>
 
@@ -630,6 +652,108 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
             </div>
           )}
+
+          {/* TAB 5: SYSTEM USER GUIDE & OPERATIONS MANUAL */}
+          {activeTab === 'guide' && (
+            <div className="space-y-5 animate-in fade-in duration-200">
+              {/* Banner with mascot characters */}
+              <div className="p-5 rounded-2xl bg-gradient-to-r from-sky-500/15 via-indigo-500/15 to-purple-500/15 border border-[#38BDF8]/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center space-x-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-[#030F1E] border border-sky-400/40 flex items-center justify-center text-3xl shadow-lg shrink-0">
+                    📖
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-ui text-sm font-bold text-[#F1F5F9]">
+                        AJ AI Studio Operations Manual
+                      </h3>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono font-bold">
+                        Bilingual EN / MM
+                      </span>
+                    </div>
+                    <p className="font-ui text-xs text-slate-300/80 mt-1 max-w-lg">
+                      Illustrated visual guide cards with studio characters covering POS desk, hardware, offline queue, shift handover, and staff security.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsGuideModalOpen(true)}
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-[#071423] font-bold text-xs shadow-lg shadow-sky-500/25 flex items-center justify-center space-x-2 transition-all cursor-pointer shrink-0"
+                >
+                  <span>Open Full User Guide ↗</span>
+                </button>
+              </div>
+
+              {/* Module Cards Roster */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div
+                  onClick={() => setIsGuideModalOpen(true)}
+                  className="p-3.5 rounded-xl bg-[#0B1B2B] hover:bg-[#102538] border border-[#1E3A4F] hover:border-[#38BDF8]/40 transition-all cursor-pointer flex items-start space-x-3"
+                >
+                  <span className="text-2xl shrink-0">🧑‍💼</span>
+                  <div>
+                    <div className="text-xs font-bold text-[#F1F5F9] flex items-center justify-between">
+                      <span>POS Desk &amp; Barcode</span>
+                      <span className="text-[10px] text-sky-400 font-mono">Aung Kyaw</span>
+                    </div>
+                    <p className="text-[11px] text-[#7E8F9F] mt-0.5">
+                      Fast checkout, retail SKU barcode scans, photography packages, split payments.
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => setIsGuideModalOpen(true)}
+                  className="p-3.5 rounded-xl bg-[#0B1B2B] hover:bg-[#102538] border border-[#1E3A4F] hover:border-[#38BDF8]/40 transition-all cursor-pointer flex items-start space-x-3"
+                >
+                  <span className="text-2xl shrink-0">🖨️</span>
+                  <div>
+                    <div className="text-xs font-bold text-[#F1F5F9] flex items-center justify-between">
+                      <span>Hardware &amp; Printing</span>
+                      <span className="text-[10px] text-amber-400 font-mono">Ko Zin</span>
+                    </div>
+                    <p className="text-[11px] text-[#7E8F9F] mt-0.5">
+                      Direct WebUSB ESC/POS thermal receipts and dual-pin automatic cash drawer kicks.
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => setIsGuideModalOpen(true)}
+                  className="p-3.5 rounded-xl bg-[#0B1B2B] hover:bg-[#102538] border border-[#1E3A4F] hover:border-[#38BDF8]/40 transition-all cursor-pointer flex items-start space-x-3"
+                >
+                  <span className="text-2xl shrink-0">👩‍💼</span>
+                  <div>
+                    <div className="text-xs font-bold text-[#F1F5F9] flex items-center justify-between">
+                      <span>Shift &amp; Cash Reconciliation</span>
+                      <span className="text-[10px] text-rose-400 font-mono">Daw Khin</span>
+                    </div>
+                    <p className="text-[11px] text-[#7E8F9F] mt-0.5">
+                      Cash drops, float top-up, live drawer discrepancy detection, and official Z-Reports.
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => setIsGuideModalOpen(true)}
+                  className="p-3.5 rounded-xl bg-[#0B1B2B] hover:bg-[#102538] border border-[#1E3A4F] hover:border-[#38BDF8]/40 transition-all cursor-pointer flex items-start space-x-3"
+                >
+                  <span className="text-2xl shrink-0">👩‍💻</span>
+                  <div>
+                    <div className="text-xs font-bold text-[#F1F5F9] flex items-center justify-between">
+                      <span>Staff PIN &amp; Override</span>
+                      <span className="text-[10px] text-purple-400 font-mono">Su Myat</span>
+                    </div>
+                    <p className="text-[11px] text-[#7E8F9F] mt-0.5">
+                      Fast 4-digit PIN numeric keypad, staff badge scan, and manager override popups.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Modal Footer */}
@@ -651,6 +775,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
       </div>
+
+      {/* System Interactive User Guide Modal */}
+      <StudioUserGuideModal
+        isOpen={isGuideModalOpen}
+        onClose={() => setIsGuideModalOpen(false)}
+        defaultModule="overview"
+      />
     </div>
   );
 

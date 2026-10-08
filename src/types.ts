@@ -839,16 +839,46 @@ export interface PosTransaction {
   transactionStatus: 'PAID' | 'COMPLETED' | 'REFUNDED';
   receiptNumber: string;
   cashierName: string;
+  cashierId?: string;
+  cashierRole?: PosStaffRole;
+  authorizedByManager?: string;
   terminalId: string;
   timestamp: string;
   notes?: string;
   slipVerificationStatus?: 'ocr_extracted' | 'manual_review_required' | 'unverified';
 }
 
+export type PosStaffRole = 'CASHIER' | 'LEAD_CASHIER' | 'STUDIO_MANAGER' | 'OWNER';
+
+export interface PosStaffMember {
+  id: string;
+  name: string;
+  myanmarName?: string;
+  role: PosStaffRole;
+  pin: string; // 4-digit PIN
+  badgeBarcode?: string; // e.g. "STAFF-AK-01"
+  avatarColor?: string;
+  isActive: boolean;
+}
+
+export interface PosCashMovement {
+  id: string;
+  type: 'CASH_DROP' | 'CASH_IN';
+  amountMMK: number;
+  reason: string;
+  timestamp: string;
+  performedBy: string;
+  staffId?: string;
+  staffRole?: PosStaffRole;
+  authorizedBy?: string;
+}
+
 export interface PosShiftRecord {
   shiftId: string;
   terminalId: string;
   staffName: string;
+  staffId?: string;
+  staffRole?: PosStaffRole;
   openedAt: string;
   closedAt?: string;
   startingCashMMK: number;
@@ -857,4 +887,55 @@ export interface PosShiftRecord {
   totalDigitalSalesMMK: number;
   totalTransactionsCount: number;
   status: 'OPEN' | 'CLOSED';
+  // Shift Closure & Reconciliation properties
+  actualCashInDrawerMMK?: number;
+  cashDiscrepancyMMK?: number;
+  closureNotes?: string;
+  closedBy?: string;
+  cashMovements?: PosCashMovement[];
+  totalCashDropsMMK?: number;
+  totalCashInMMK?: number;
 }
+
+export interface PosZReport {
+  reportType: 'X_REPORT' | 'Z_REPORT';
+  reportId: string;
+  generatedAt: string;
+  shiftId: string;
+  terminalId: string;
+  staffName: string;
+  tenantId: string;
+  openedAt: string;
+  closedAt?: string;
+  status: 'OPEN' | 'CLOSED';
+  // Financial Summary
+  grossSalesMMK: number;
+  netSalesMMK: number;
+  totalDiscountMMK: number;
+  totalTaxMMK: number;
+  totalTransactions: number;
+  // Tender Breakdown
+  tenderBreakdown: {
+    cashMMK: number;
+    kbzpayMMK: number;
+    wavepayMMK: number;
+    ayapayMMK: number;
+    splitTotalMMK: number;
+  };
+  // Category Breakdown
+  categoryBreakdown: Record<string, { count: number; totalMMK: number }>;
+  // Cash Drawer Reconciliation
+  cashReconciliation: {
+    startingCashMMK: number;
+    cashSalesMMK: number;
+    totalCashDropsMMK?: number;
+    totalCashInMMK?: number;
+    expectedCashMMK: number;
+    actualCountedCashMMK: number;
+    discrepancyMMK: number;
+    discrepancyType: 'BALANCED' | 'SHORTAGE' | 'OVERAGE';
+  };
+  cashMovements?: PosCashMovement[];
+  closureNotes?: string;
+}
+
