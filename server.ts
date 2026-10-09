@@ -61,7 +61,9 @@ async function startServer() {
   const app = createApp();
   const PORT = process.env.PORT || 4000;
 
-  const server = app.listen(PORT, async () => {
+  // HOST lets a VPS deployment bind to 127.0.0.1 behind the reverse proxy; Docker keeps the 0.0.0.0 default.
+  const HOST = process.env.HOST || '0.0.0.0';
+  const server = app.listen(Number(PORT), HOST, async () => {
     console.log(`[AJ Studio Desk API] Server running on http://localhost:${PORT}`);
     console.log(`[AJ Studio Desk API] Health check available at http://localhost:${PORT}/api/health`);
 
