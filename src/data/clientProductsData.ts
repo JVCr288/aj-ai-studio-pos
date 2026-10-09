@@ -167,7 +167,7 @@ export const INITIAL_CLIENT_PRODUCTS: ClientProduct[] = [
     features: [
       'ISO 400 Daylight-Balanced Color Negative',
       'Micro-Structure Optimized T-GRAIN Emulsion',
-      'Cold-stored at 4°C in AJ AI Studio Climate Vault',
+      'Cold-stored at 4°C in AJ Studio Climate Vault',
       'Expiry Date: November 2027',
     ],
     imageUrl: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=80',
@@ -256,7 +256,7 @@ export const INITIAL_CLIENT_PRODUCTS: ClientProduct[] = [
       '280gsm Heavyweight Combed Cotton Single Jersey',
       'Preshrunk Garment-Dyed Pitch Obsidian Finish',
       'Reinforced Ribbed Crewneck & Double-Stitched Hems',
-      'Custom AJ AI Studio Inner Woven Neck Label',
+      'Custom AJ Studio Inner Woven Neck Label',
     ],
     imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
   },
@@ -395,7 +395,7 @@ export const INITIAL_CLIENT_PRODUCTS: ClientProduct[] = [
   },
   {
     id: 'prod-dig-lut-pack',
-    name: 'AJ AI Studio Signature Lightroom & Capture One Presets',
+    name: 'AJ Studio Signature Lightroom & Capture One Presets',
     myanmarName: 'Signature Studio Color Profile & Presets Pack',
     category: 'digital_products',
     priceMMK: 45000,

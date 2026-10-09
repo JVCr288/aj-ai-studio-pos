@@ -10,7 +10,7 @@ healthRouter.get('/api/health', async (req: Request, res: Response) => {
 
   res.json({
     status: 'ok',
-    service: 'AJ AI Studio Platform API',
+    service: 'AJ Studio Desk API',
     version: '2.4.0',
     gemini_configured: apiKeyPresent,
     database: dbHealth,

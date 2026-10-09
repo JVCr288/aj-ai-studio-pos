@@ -41,6 +41,11 @@ export const saveOnboardingProjectDraft = async (
   tenantId: string,
   projectData: StudioOnboardingProject
 ): Promise<StudioOnboardingProject> => {
+  const targetSlug = projectData?.project?.projectSlug || tenantId;
+  if (typeof targetSlug === 'string' && (targetSlug.startsWith('demo-') || targetSlug === 'sample-studio')) {
+    throw new Error('The slug prefixes "demo-" and "sample-studio" are reserved for demonstration environments. Please choose a custom identifier.');
+  }
+
   const now = new Date().toISOString();
 
   // Load current to check stale write
@@ -146,6 +151,11 @@ export const submitOnboardingProjectSnapshot = async (
   tenantId: string,
   projectData: StudioOnboardingProject
 ): Promise<StudioOnboardingProject> => {
+  const targetSlug = projectData?.project?.projectSlug || tenantId;
+  if (typeof targetSlug === 'string' && (targetSlug.startsWith('demo-') || targetSlug === 'sample-studio')) {
+    throw new Error('The slug prefixes "demo-" and "sample-studio" are reserved for demonstration environments. Please choose a custom identifier.');
+  }
+
   const now = new Date().toISOString();
   const db = getDb();
   let newVersion = (projectData.submission?.currentSubmissionVersion || 0) + 1;

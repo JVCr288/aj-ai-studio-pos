@@ -157,7 +157,7 @@ export async function loginStudioAdmin(
         authenticated: true,
         tenantId,
         userRole: 'STUDIO_ADMIN',
-        userName: 'AJ AI Studio Admin (Local Dev)',
+        userName: 'AJ Studio Desk Admin (Local Dev)',
         csrfToken,
       };
       return localAdminSession;

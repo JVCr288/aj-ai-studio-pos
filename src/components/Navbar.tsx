@@ -21,6 +21,8 @@ interface NavbarProps {
   onOpenAdminBookings?: () => void;
   onOpenPosDesk?: () => void;
   isAdminAuthenticated?: boolean;
+  isDemo?: boolean;
+  onOpenDemo?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -34,6 +36,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenAdminBookings,
   onOpenPosDesk,
   isAdminAuthenticated = false,
+  isDemo,
+  onOpenDemo,
 }) => {
   const [timecode, setTimecode] = useState<string>('');
   const [isConfirmingReset, setIsConfirmingReset] = useState<boolean>(false);
@@ -91,22 +95,22 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="w-8 h-8 rounded-lg bg-[#071423] border border-[#1E3A4F] group-hover:border-[#38BDF8] flex items-center justify-center relative overflow-hidden transition-colors shadow-sm p-0.5">
             <img
               src="/assets/aj-studio-logo.png"
-              alt="AJ AI Studio Logo"
+              alt="AJ Studio Desk Logo"
               className="w-full h-full object-contain filter drop-shadow-[0_0_4px_rgba(217,119,6,0.3)]"
             />
           </div>
           <div>
             <div className="flex items-center space-x-2">
               <span className="font-space font-bold text-sm tracking-wide text-[#F1F5F9] group-hover:text-[#38BDF8] transition-colors">
-                AJ AI STUDIO
+                AJ STUDIO DESK
               </span>
               <span className="h-3 w-px bg-[#1E3A4F] hidden sm:inline" />
               <span className="hidden sm:inline text-xs text-[#38BDF8] font-ui font-medium">
-                Studio Operations Platform
+                Studio Booking & POS Desk
               </span>
             </div>
             <div className="flex items-center gap-1.5 text-[10.5px] text-[#64748B] font-ui">
-              <span className="text-[#94A3B8]">Studio Platform: <strong className="text-[#F1F5F9] font-medium">AJ AI Studio POS</strong> · Master Edition</span>
+              <span className="text-[#94A3B8]">Studio Platform: <strong className="text-[#F1F5F9] font-medium">AJ Studio Desk</strong> · Master Edition</span>
               <span className="text-[#1E3A4F]">•</span>
               <span className="text-[#34D399] font-medium text-[10px]">Online</span>
             </div>
@@ -232,12 +236,61 @@ export const Navbar: React.FC<NavbarProps> = ({
                 id="navbar-pos-desk-btn"
                 onClick={onOpenPosDesk}
                 className="interactive-control px-2.5 py-1.5 workstation-focus border border-[#34D399]/40 hover:border-[#34D399] bg-[#34D399]/10 text-[#34D399]"
-                title="AJ AI Studio Point of Sale (POS Desk)"
+                title="AJ Studio Desk Point of Sale (POS Desk)"
                 aria-label="POS Desk"
               >
                 <Store className="w-3.5 h-3.5 text-[#34D399]" />
                 <span className="hidden sm:inline text-xs font-semibold">POS Desk</span>
               </button>
+            )}
+
+            {/* Small Honest Demo Chip */}
+            {(isDemo ||
+              (typeof window !== 'undefined' &&
+                (Boolean(localStorage.getItem('aj_demo_session')) ||
+                  window.location.pathname.startsWith('/s/') ||
+                  window.location.pathname.startsWith('/demo')))) && (
+              <div className="relative group">
+                <button
+                  type="button"
+                  id="navbar-demo-chip-btn"
+                  onClick={
+                    onOpenDemo
+                      ? onOpenDemo
+                      : () => {
+                          if (typeof window !== 'undefined') window.location.href = '/demo';
+                        }
+                  }
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold transition-all cursor-pointer shadow-sm"
+                  title="Demo Mode"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                  <span>Demo</span>
+                </button>
+                <div className="absolute right-0 top-full mt-1.5 w-64 p-3 rounded-xl bg-[#0B1B2B] border border-amber-500/40 shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50 text-[11px] space-y-2">
+                  <p className="text-slate-200 leading-relaxed font-sans">
+                    ဒီ Demo ဆိုင်ကို ၇ ရက်အတွင်း ပြန်ဝင်ကြည့်နိုင်ပါသည်။
+                  </p>
+                  <div className="pt-2 border-t border-[#1E3A4F] flex items-center justify-between text-[10px]">
+                    <a
+                      href="https://t.me/ajaxclick"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#38BDF8] hover:underline font-semibold"
+                    >
+                      Telegram ဆက်သွယ်ရန် ↗
+                    </a>
+                    <a
+                      href="https://m.me/ajaxclick"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-amber-400 hover:underline font-semibold"
+                    >
+                      Messenger ↗
+                    </a>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 

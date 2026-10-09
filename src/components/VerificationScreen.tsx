@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { verifySlip } from '../services/slipVerificationService';
 import { getPaymentBrand } from '../utils/paymentBrands';
+import { HelpTip } from './ui/HelpTip';
 
 interface VerificationScreenProps {
   bookingState: BookingState;
@@ -466,9 +467,20 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
                   Parsed Ledger Attributes
                 </h2>
               </div>
-              <span className="font-mono-code text-[10px] text-[#7E8F9F]">
-                {extractedData.verification_status ? extractedData.verification_status.toUpperCase() : 'PENDING'}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <HelpTip
+                  tipId={
+                    !extractedData.amount_mmk
+                      ? 'slip-result-unreadable'
+                      : extractedData.amount_mmk === bookingState.depositAmount
+                      ? 'slip-result-matched'
+                      : 'slip-result-amount-mismatch'
+                  }
+                />
+                <span className="font-mono-code text-[10px] text-[#7E8F9F]">
+                  {extractedData.verification_status ? extractedData.verification_status.toUpperCase() : 'PENDING'}
+                </span>
+              </div>
             </div>
 
             {/* Parsed Fields List */}
@@ -521,9 +533,12 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
               <div className="p-2.5 bg-[#071423] rounded-lg border border-[#1E3A4F] flex flex-col gap-0.5">
                 <div className="flex items-center justify-between">
                   <span className="font-ui text-xs text-[#7E8F9F]">Transaction ID</span>
-                  <span className="font-ui text-[9px] px-1.5 py-0.5 rounded bg-[#102538] border border-[#1E3A4F] text-[#38BDF8] font-semibold">
-                    OCR Extracted
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-ui text-[9px] px-1.5 py-0.5 rounded bg-[#102538] border border-[#1E3A4F] text-[#38BDF8] font-semibold">
+                      OCR Extracted
+                    </span>
+                    <HelpTip tipId="slip-result-reused" />
+                  </div>
                 </div>
                 <span className="font-mono-code text-xs text-[#38BDF8] font-bold">
                   {extractedData.transaction_id || 'TRX-DRAFT'}
@@ -534,9 +549,12 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
               <div className="p-2.5 bg-[#102538] rounded-lg border border-[#1E3A4F] flex flex-col gap-1">
                 <div className="flex items-center justify-between">
                   <span className="font-ui text-xs text-[#7E8F9F]">Reconciliation Audit</span>
-                  <span className="font-ui text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 font-semibold">
-                    Manual Review Required
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-ui text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 font-semibold">
+                      Manual Review Required
+                    </span>
+                    <HelpTip tipId="slip-result-unreadable" />
+                  </div>
                 </div>
                 <div className="flex items-center gap-1.5 text-[#38BDF8] font-ui text-xs font-medium">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-pulse" />

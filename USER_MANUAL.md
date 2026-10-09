@@ -1,11 +1,11 @@
-# AJ AI Studio POS — System User Manual & Operational Guide
+# AJ Studio Desk — System User Manual & Operational Guide
 
 ## 📌 Executive Overview
-This guide provides a comprehensive step-by-step walkthrough of **AJ AI Studio POS** for Studio Owners, Admins, and Receptionists. The platform consists of **4 Core Workstations**:
+This guide provides a comprehensive step-by-step walkthrough of **AJ Studio Desk** for Studio Owners, Admins, and Receptionists. The platform consists of **4 Core Workstations**:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           AJ AI Studio Platform                             │
+│                             AJ Studio Desk                                  │
 ├─────────────────┬─────────────────┬─────────────────┬───────────────────────┤
 │ 1. Customer     │ 2. Operations   │ 3. POS Desk     │ 4. Owner Setup        │
 │    Portal       │    Desk         │    Terminal     │    Portal             │

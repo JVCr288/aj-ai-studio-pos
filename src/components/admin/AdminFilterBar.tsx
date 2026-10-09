@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, RefreshCw, Filter } from 'lucide-react';
+import { HelpTip } from '../ui/HelpTip';
 
 interface AdminFilterBarProps {
   searchQuery: string;
@@ -47,18 +48,33 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       {/* Select Dropdowns & Actions */}
       <div className="flex items-center flex-wrap gap-2">
         {/* Booking Status Filter */}
-        <select
-          value={statusFilter}
-          onChange={(e) => onStatusFilterChange(e.target.value)}
-          className="bg-[#030F1E] border border-[#1E3A4F] rounded-lg px-2.5 py-2 text-xs text-[#F1F5F9] focus:outline-none focus:border-[#38BDF8] font-mono cursor-pointer"
-        >
-          <option value="ALL">All Statuses</option>
-          <option value="AWAITING_PAYMENT_REVIEW">Awaiting Review</option>
-          <option value="CONFIRMED">Confirmed</option>
-          <option value="CHECKED_IN">Checked-In</option>
-          <option value="COMPLETED">Completed</option>
-          <option value="CANCELLED">Cancelled</option>
-        </select>
+        <div className="flex items-center space-x-1">
+          <select
+            value={statusFilter}
+            onChange={(e) => onStatusFilterChange(e.target.value)}
+            className="bg-[#030F1E] border border-[#1E3A4F] rounded-lg px-2.5 py-2 text-xs text-[#F1F5F9] focus:outline-none focus:border-[#38BDF8] font-mono cursor-pointer"
+          >
+            <option value="ALL">All Statuses</option>
+            <option value="AWAITING_PAYMENT_REVIEW">Awaiting Review</option>
+            <option value="CONFIRMED">Confirmed</option>
+            <option value="CHECKED_IN">Checked-In</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+          <HelpTip
+            tipId={
+              statusFilter === 'CONFIRMED'
+                ? 'booking-status-confirmed'
+                : statusFilter === 'COMPLETED'
+                ? 'booking-status-completed'
+                : statusFilter === 'CANCELLED'
+                ? 'booking-status-cancelled'
+                : statusFilter === 'CHECKED_IN'
+                ? 'booking-status-in-progress'
+                : 'booking-status-pending-review'
+            }
+          />
+        </div>
 
         {/* Payment Status Filter */}
         <select

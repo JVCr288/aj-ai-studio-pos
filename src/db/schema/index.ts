@@ -1,5 +1,6 @@
 import {
   pgTable,
+  pgSchema,
   uuid,
   text,
   varchar,
@@ -638,5 +639,40 @@ export const verifiedSlips = pgTable(
   ]
 );
 
+// ----------------------------------------------------------------------------
+// 26. DEMO SCHEMA & MARKETING VISITOR TRACKING (Part C)
+// ----------------------------------------------------------------------------
+export const demoSchema = pgSchema('demo');
 
+export const demoLeads = demoSchema.table('demo_leads', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  phone: text('phone').notNull().unique(),
+  studioName: text('studio_name').notNull(),
+  city: text('city'),
+  contactHandle: text('contact_handle'),
+  preferredChannel: text('preferred_channel'), // 'TELEGRAM' | 'MESSENGER' | 'VIBER' | 'PHONE'
+  consent: boolean('consent').notNull().default(true),
+  consentAt: timestamp('consent_at', { withTimezone: true }).defaultNow().notNull(),
+  firstSeenAt: timestamp('first_seen_at', { withTimezone: true }).defaultNow().notNull(),
+  lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).defaultNow().notNull(),
+  visitCount: integer('visit_count').notNull().default(1),
+  source: text('source'), // utm_source or ref, e.g. 'showroom'
+  userAgent: text('user_agent'), // browser + device type summary
+});
 
+export const demoActivity = demoSchema.table('demo_activity', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  leadId: uuid('lead_id').references(() => demoLeads.id, { onDelete: 'cascade' }),
+  sandboxId: text('sandbox_id').notNull(), // tenant_id e.g. demo-xxxx
+  event: text('event').notNull(), // DEMO_STARTED, ROLE_OPENED:customer|admin|cashier, BOOKING_CREATED, SLIP_CHECKED, POS_SALE, Z_REPORT, RESET, CONTACT_CLICKED
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const demoSandboxes = demoSchema.table('demo_sandboxes', {
+  sandboxId: text('sandbox_id').primaryKey(),
+  leadId: uuid('lead_id').references(() => demoLeads.id, { onDelete: 'cascade' }),
+  studioName: text('studio_name').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  lastActiveAt: timestamp('last_active_at', { withTimezone: true }).defaultNow().notNull(),
+});

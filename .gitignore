@@ -10,3 +10,6 @@ server.js
 .env*
 !.env.example
 
+
+# Showroom capture: keep web-ready .webp in git, full-size PNGs stay local
+docs/showroom-capture/*.png

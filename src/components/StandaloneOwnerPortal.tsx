@@ -38,7 +38,7 @@ export const StandaloneOwnerPortal: React.FC<StandaloneOwnerPortalProps> = ({
     return 'proj-aj-studio-01';
   });
   const [tenantId, setTenantId] = useState<string>('aj-ai-studio');
-  const [studioDisplayName, setStudioDisplayName] = useState<string>('AJ AI Studio POS & Atelier');
+  const [studioDisplayName, setStudioDisplayName] = useState<string>('AJ Studio Desk & Atelier');
   const [ownerSession, setOwnerSession] = useState<OwnerSession | null>(() => {
     if (typeof window !== 'undefined' && window.sessionStorage) {
       const saved = sessionStorage.getItem('aj_owner_session');
@@ -162,7 +162,7 @@ export const StandaloneOwnerPortal: React.FC<StandaloneOwnerPortalProps> = ({
             </div>
             <h2 className="text-lg font-bold text-slate-100">Invalid Setup Link</h2>
             <p className="text-xs text-[#94A3B8] leading-relaxed">
-              This onboarding link is invalid or does not exist. Please contact AJ AI Studio Support to receive a valid setup link.
+              This onboarding link is invalid or does not exist. Please contact AJ Studio Desk Support to receive a valid setup link.
             </p>
           </div>
         )}
@@ -174,7 +174,7 @@ export const StandaloneOwnerPortal: React.FC<StandaloneOwnerPortalProps> = ({
             </div>
             <h2 className="text-lg font-bold text-slate-100">Setup Link Expired</h2>
             <p className="text-xs text-[#94A3B8] leading-relaxed">
-              This pre-configuration setup link has expired after 7 days. Request a fresh setup token from the AJ AI Studio Developer team.
+              This pre-configuration setup link has expired after 7 days. Request a fresh setup token from the AJ Studio Desk Developer team.
             </p>
           </div>
         )}
@@ -198,7 +198,7 @@ export const StandaloneOwnerPortal: React.FC<StandaloneOwnerPortalProps> = ({
             </div>
             <h2 className="text-xl font-bold text-slate-100">Pre-Configuration Submitted</h2>
             <p className="text-xs text-[#94A3B8] leading-relaxed">
-              Your studio configuration snapshot has been submitted and is under AJ AI Studio Developer review.
+              Your studio configuration snapshot has been submitted and is under AJ Studio Desk Developer review.
             </p>
             <div className="p-4 rounded-xl bg-[#030F1E] border border-[#1E293B] text-left text-xs font-mono-code space-y-2">
               <div className="flex justify-between">
@@ -229,7 +229,7 @@ export const StandaloneOwnerPortal: React.FC<StandaloneOwnerPortalProps> = ({
 
       {/* Standalone Footer */}
       <footer className="border-t border-[#1E293B] py-4 px-6 text-center text-xs text-[#64748B] font-mono-code">
-        AJ AI Studio Platform Engine • Studio Intake Specification 1.0 • Secure Token Hash Authorization
+        AJ Studio Desk Platform Engine • Studio Intake Specification 1.0 • Secure Token Hash Authorization
       </footer>
     </div>
   );

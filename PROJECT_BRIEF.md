@@ -1,7 +1,7 @@
-# AJ AI Studio POS — Project Brief
+# AJ Studio Desk — Project Brief
 
 ## Executive Summary
-**AJ AI Studio POS** is a multi-tenant photography studio operations management platform, customer booking engine, and point-of-sale (POS) desk terminal. Built with React 19, TypeScript, Tailwind CSS, Express, Drizzle ORM, and Google Gemini AI, it provides end-to-end studio management—from public booking intake and mobile payment slip OCR verification to POS desk shift management, schedule management, and studio owner onboarding.
+**AJ Studio Desk** is a multi-tenant photography studio operations management platform, customer booking engine, and point-of-sale (POS) desk terminal. Built with React 19, TypeScript, Tailwind CSS, Express, Drizzle ORM, and Google Gemini AI, it provides end-to-end studio management—from public booking intake and mobile payment slip OCR verification to POS desk shift management, schedule management, and studio owner onboarding.
 
 ---
 
@@ -9,7 +9,7 @@
 
 ### 1. Default Master Identity
 - **Master Tenant Name:** AJ AI Studio
-- **Platform Identity:** AJ AI Studio POS & Booking Operations Platform
+- **Platform Identity:** AJ Studio Desk — Studio Booking & POS Platform
 - **Default Master Tenant ID:** `aj-ai-studio`
 
 ### 2. White-Label Policy
@@ -38,7 +38,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                            AJ AI Studio POS                                 │
+│                             AJ Studio Desk                                  │
 ├──────────────────────────────┬──────────────────────────────┬───────────────┤
 │    Customer Booking Portal   │    Studio Operations Desk    │   POS Terminal│
 │  - Glass Plate UI Buttons    │  - Tenant-Isolated Bookings  │ - Cash/Wallet │

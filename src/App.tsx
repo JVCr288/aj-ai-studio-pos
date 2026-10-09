@@ -46,6 +46,12 @@ const ArchiveVaultScreen = React.lazy(() =>
 const EquipmentInventoryScreen = React.lazy(() =>
   import('./components/EquipmentInventoryScreen').then((m) => ({ default: m.EquipmentInventoryScreen }))
 );
+const DemoPortal = React.lazy(() =>
+  import('./components/demo/DemoPortal').then((m) => ({ default: m.DemoPortal }))
+);
+const DemoLeadsView = React.lazy(() =>
+  import('./components/demo/DemoLeadsView').then((m) => ({ default: m.DemoLeadsView }))
+);
 
 const ScreenSuspenseFallback = () => (
   <div className="flex-1 flex flex-col items-center justify-center min-h-[40vh] p-8 text-center text-slate-400">
@@ -115,6 +121,22 @@ export default function App() {
     return false;
   });
 
+  const [isDemoPortalRoute, setIsDemoPortalRoute] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const pathname = window.location.pathname;
+      return pathname === '/demo' || pathname === '/demo/';
+    }
+    return false;
+  });
+
+  const [isDemoLeadsRoute, setIsDemoLeadsRoute] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const pathname = window.location.pathname;
+      return pathname === '/demo/leads' || pathname === '/demo/leads/';
+    }
+    return false;
+  });
+
   const [currentScreen, setCurrentScreen] = useState<ScreenStep>(() => {
     if (typeof window !== 'undefined') {
       const pathname = window.location.pathname;
@@ -162,6 +184,34 @@ export default function App() {
       if (typeof window === 'undefined') return;
       const pathname = window.location.pathname;
       const searchParams = new URLSearchParams(window.location.search);
+
+      if (pathname === '/demo/leads' || pathname === '/demo/leads/') {
+        setIsDemoLeadsRoute(true);
+        setIsDemoPortalRoute(false);
+        setIsStandaloneOwnerRoute(false);
+        setIsAdminBookingRoute(false);
+        setIsPosDeskOpen(false);
+        return;
+      }
+
+      if (pathname === '/demo' || pathname === '/demo/') {
+        setIsDemoPortalRoute(true);
+        setIsDemoLeadsRoute(false);
+        setIsStandaloneOwnerRoute(false);
+        setIsAdminBookingRoute(false);
+        setIsPosDeskOpen(false);
+        return;
+      }
+
+      setIsDemoPortalRoute(false);
+      setIsDemoLeadsRoute(false);
+
+      if (pathname.startsWith('/s/')) {
+        const slug = pathname.replace('/s/', '').split('/')[0].trim();
+        if (slug) {
+          setBookingState((prev) => ({ ...prev, tenantId: slug }));
+        }
+      }
 
       if (pathname.startsWith('/pos') || searchParams.has('pos')) {
         setIsPosDeskOpen(true);
@@ -312,6 +362,56 @@ export default function App() {
   };
 
   // ---------------------------------------------------------------------------
+  // ROUTE BRANCH DEMO-LEADS: Founder Lead Telemetry View (/demo/leads)
+  // ---------------------------------------------------------------------------
+  if (isDemoLeadsRoute) {
+    return (
+      <React.Suspense fallback={<ScreenSuspenseFallback />}>
+        <DemoLeadsView />
+      </React.Suspense>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // ROUTE BRANCH DEMO: Public Demo Sign-up & Role Picker Portal (/demo)
+  // ---------------------------------------------------------------------------
+  if (isDemoPortalRoute) {
+    return (
+      <React.Suspense fallback={<ScreenSuspenseFallback />}>
+        <DemoPortal
+          onSelectRole={(role, tenantId, studioName, credentials) => {
+            setBookingState((prev) => ({ ...prev, tenantId }));
+            setIsDemoPortalRoute(false);
+            if (role === 'customer') {
+              setCurrentScreen(1);
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', `/s/${tenantId}?step=booking`);
+              }
+            } else if (role === 'admin') {
+              setIsAdminBookingRoute(true);
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/admin/bookings');
+              }
+            } else if (role === 'cashier') {
+              setIsPosDeskOpen(true);
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/?pos=true');
+              }
+            }
+          }}
+          onBackToLanding={() => {
+            setIsDemoPortalRoute(false);
+            setCurrentScreen(0);
+            if (typeof window !== 'undefined') {
+              window.history.pushState({}, '', '/');
+            }
+          }}
+        />
+      </React.Suspense>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
   // ROUTE BRANCH A: Standalone Studio Owner Intake Portal (/setup or /setup/:token)
   // MAIN_STUDIO_UI_HIDDEN_FROM_OWNER=YES
   // ---------------------------------------------------------------------------
@@ -374,6 +474,12 @@ export default function App() {
           setIsPosDeskOpen(true);
           if (typeof window !== 'undefined') {
             window.history.pushState({}, '', '/?pos=true');
+          }
+        }}
+        onOpenDemo={() => {
+          setIsDemoPortalRoute(true);
+          if (typeof window !== 'undefined') {
+            window.history.pushState({}, '', '/demo');
           }
         }}
       />

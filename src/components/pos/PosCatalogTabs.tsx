@@ -16,6 +16,7 @@ import {
   Plus,
   RefreshCw,
 } from 'lucide-react';
+import { HelpTip } from '../ui/HelpTip';
 
 export type PosActiveTab = 'checkin' | 'packages' | 'addons' | 'gear' | 'retail';
 
@@ -340,44 +341,80 @@ export const PosCatalogTabs: React.FC<PosCatalogTabsProps> = ({
 
         {/* 5. RETAIL PRODUCTS TAB */}
         {activeTab === 'retail' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-            {INITIAL_CLIENT_PRODUCTS.map((prod) => (
-              <div
-                key={prod.id}
-                className="p-3.5 rounded-xl bg-[#071423] border border-[#1E3A4F] hover:border-[#38BDF8] transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between text-[10px] font-mono text-[#94A3B8]">
-                    <span className="text-[#38BDF8]">{prod.sku}</span>
-                    <span>Stock: {prod.stockCount}</span>
-                  </div>
-                  <h5 className="font-semibold text-xs text-[#F1F5F9] mt-1.5 line-clamp-1">{prod.name}</h5>
-                  <p className="text-[11px] text-[#94A3B8] mt-0.5 line-clamp-1">{prod.description}</p>
-                </div>
-
-                <div className="mt-3 pt-2 border-t border-[#1E3A4F]/60 flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-[#F1F5F9]">
-                    {prod.priceMMK.toLocaleString()} MMK
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      onAddToCart({
-                        category: 'RETAIL_PRODUCT',
-                        title: prod.name,
-                        myanmarTitle: prod.name,
-                        unitPriceMMK: prod.priceMMK,
-                        quantity: 1,
-                        referenceId: prod.id,
-                      })
-                    }
-                    className="px-2.5 py-1 rounded bg-[#102538] hover:bg-[#38BDF8] text-[#38BDF8] hover:text-[#071423] text-xs font-semibold transition-colors cursor-pointer"
-                  >
-                    + Add
-                  </button>
-                </div>
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-[#071423] border border-[#1E3A4F]">
+              <span className="text-xs font-bold text-[#F1F5F9]">Retail Inventory</span>
+              <div className="flex flex-wrap items-center gap-3 text-[11px] text-[#94A3B8]">
+                <span className="flex items-center gap-1 font-mono">
+                  <span>SKU</span>
+                  <HelpTip tipId="retail-sku" />
+                </span>
+                <span className="flex items-center gap-1 font-mono">
+                  <span>Stock</span>
+                  <HelpTip tipId="retail-stock-count" />
+                </span>
+                <span className="flex items-center gap-1 font-mono">
+                  <span>Low Stock</span>
+                  <HelpTip tipId="retail-low-stock" />
+                </span>
+                <span className="flex items-center gap-1 font-mono">
+                  <span>Lead Time</span>
+                  <HelpTip tipId="retail-lead-time" />
+                </span>
               </div>
-            ))}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              {INITIAL_CLIENT_PRODUCTS.map((prod) => (
+                <div
+                  key={prod.id}
+                  className="p-3.5 rounded-xl bg-[#071423] border border-[#1E3A4F] hover:border-[#38BDF8] transition-all flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between text-[10px] font-mono text-[#94A3B8]">
+                      <span className="text-[#38BDF8] flex items-center gap-1">
+                        <span>{prod.sku}</span>
+                        <HelpTip tipId="retail-sku" />
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className={prod.stockCount <= 5 ? 'text-amber-400 font-semibold' : ''}>
+                          Stock: {prod.stockCount}
+                        </span>
+                        {prod.stockCount <= 5 ? (
+                          <HelpTip tipId="retail-low-stock" />
+                        ) : (
+                          <HelpTip tipId="retail-stock-count" />
+                        )}
+                      </span>
+                    </div>
+                    <h5 className="font-semibold text-xs text-[#F1F5F9] mt-1.5 line-clamp-1">{prod.name}</h5>
+                    <p className="text-[11px] text-[#94A3B8] mt-0.5 line-clamp-1">{prod.description}</p>
+                  </div>
+
+                  <div className="mt-3 pt-2 border-t border-[#1E3A4F]/60 flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-[#F1F5F9]">
+                      {prod.priceMMK.toLocaleString()} MMK
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onAddToCart({
+                          category: 'RETAIL_PRODUCT',
+                          title: prod.name,
+                          myanmarTitle: prod.name,
+                          unitPriceMMK: prod.priceMMK,
+                          quantity: 1,
+                          referenceId: prod.id,
+                        })
+                      }
+                      className="px-2.5 py-1 rounded bg-[#102538] hover:bg-[#38BDF8] text-[#38BDF8] hover:text-[#071423] text-xs font-semibold transition-colors cursor-pointer"
+                    >
+                      + Add
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

@@ -4,6 +4,7 @@ import { createApp } from '../server/app.js';
 import { posStaffService } from '../services/posStaffService.js';
 
 async function runPosStaffAuthTests() {
+  process.env.NODE_ENV = 'test';
   console.log('=== RUNNING MULTI-STAFF FAST PIN SWITCH & AUDIT ROLES TESTS ===\n');
 
   // Test 1: Staff Roster Integrity

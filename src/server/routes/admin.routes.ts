@@ -21,11 +21,17 @@ adminRouter.post('/api/admin/setup-links', verifyAdminAuth, async (req: Request,
   try {
     const { projectId, tenantId, expiresInHours, studioDisplayName } = req.body;
     const targetProject = projectId || 'proj-aj-studio-01';
-    const targetTenant = tenantId || 'aj-ai-studio';
+    const targetTenant = (tenantId || 'aj-ai-studio').trim();
+
+    if (targetTenant.startsWith('demo-') || targetTenant === 'sample-studio') {
+      return res.status(400).json({
+        message: 'The slug prefixes "demo-" and "sample-studio" are reserved for demonstration environments. Please choose a custom identifier.',
+      });
+    }
 
     const linkInfo = await createSetupLink(targetProject, targetTenant, {
       expiresInHours: expiresInHours ? parseInt(expiresInHours, 10) : 168,
-      studioDisplayName: studioDisplayName || 'AJ AI Studio POS & Atelier',
+      studioDisplayName: studioDisplayName || 'AJ Studio Desk & Atelier',
     });
 
     return res.json({
@@ -164,7 +170,7 @@ adminRouter.post('/api/admin/login', adminLoginRateLimiter, async (req: Request,
   } else {
     // Demo fallback authentication allowed ONLY under isMemoryDemoAllowed() and for demo slugs
     if (isMemoryDemoAllowed() && isDemoTenantSlug(targetTenant)) {
-      if (inputSecret === 'admin123') {
+      if (inputSecret === 'admin123' || inputSecret === 'DemoAdmin2026!') {
         authenticatedUser = {
           id: `usr-demo-${targetTenant}`,
           username: targetUser,

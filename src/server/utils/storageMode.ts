@@ -21,5 +21,7 @@ export function isMemoryDemoAllowed(): boolean {
  * Checks if a slug is one of the recognized demo tenant slugs.
  */
 export function isDemoTenantSlug(slug: string): boolean {
-  return DEMO_TENANT_SLUGS.includes(slug as DemoTenantSlug);
+  if (DEMO_TENANT_SLUGS.includes(slug as DemoTenantSlug)) return true;
+  if (typeof slug === 'string' && (slug.startsWith('demo-') || slug === 'sample-studio')) return true;
+  return false;
 }

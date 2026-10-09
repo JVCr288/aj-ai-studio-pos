@@ -11,6 +11,7 @@ import {
   Receipt,
   Layers,
 } from 'lucide-react';
+import { HelpTip } from '../ui/HelpTip';
 
 interface PosCartCheckoutProps {
   tenant: TenantConfig;
@@ -265,6 +266,10 @@ export const PosCartCheckout: React.FC<PosCartCheckoutProps> = ({
         {/* Split Tender Allocation */}
         {paymentMethod === 'SPLIT' && (
           <div className="space-y-2 bg-[#030F1E] p-2.5 rounded-lg border border-[#1E3A4F] text-xs font-mono">
+            <div className="flex items-center justify-between pb-1 border-b border-[#1E3A4F]/60 text-[10px] text-slate-400">
+              <span className="font-semibold text-emerald-400">Split Payment Allocation</span>
+              <HelpTip tipId="pos-split-payment" />
+            </div>
             <div className="flex items-center justify-between">
               <span className="text-[#94A3B8]">Cash Part:</span>
               <input

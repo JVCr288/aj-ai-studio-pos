@@ -72,8 +72,8 @@ const GUIDE_SECTIONS: GuideSection[] = [
       roleMM: 'စတူဒီယို အထွေထွေ လမ်းညွှန်',
       avatar: '🤖',
       bgGradient: 'from-cyan-500/20 via-sky-500/10 to-blue-600/20',
-      taglineEN: 'Welcome to AJ AI Studio POS & Booking Architecture!',
-      taglineMM: 'AJ AI Studio POS & Booking ပလပ်ဖောင်းမှ ကြိုဆိုပါသည်!',
+      taglineEN: 'Welcome to AJ Studio Desk Architecture!',
+      taglineMM: 'AJ Studio Desk ပလပ်ဖောင်းမှ ကြိုဆိုပါသည်!',
     },
     titleEN: 'System Architecture & Quick Overview',
     titleMM: 'စနစ် ခြုံငုံသုံးသပ်ချက်နှင့် အခြေခံ မိတ်ဆက်',
@@ -459,7 +459,7 @@ export const StudioUserGuideModal: React.FC<StudioUserGuideModalProps> = ({
             <div className="truncate">
               <div className="flex items-center space-x-2">
                 <h1 className="text-base font-bold tracking-tight text-[#F1F5F9] truncate">
-                  {lang === 'MM' ? 'AJ AI Studio စနစ် အသုံးပြုနည်း လမ်းညွှန်' : 'AJ AI Studio Platform User Guide'}
+                  {lang === 'MM' ? 'AJ Studio Desk စနစ် အသုံးပြုနည်း လမ်းညွှန်' : 'AJ Studio Desk User Guide'}
                 </h1>
                 <span className="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/30 text-[10px] font-mono font-bold">
                   v2.4
@@ -685,8 +685,8 @@ export const StudioUserGuideModal: React.FC<StudioUserGuideModalProps> = ({
             <Sparkles className="w-3.5 h-3.5 text-sky-400" />
             <span>
               {lang === 'MM'
-                ? 'AJ AI Studio POS System v2.4 • အော့ဖ်လိုင်းနှင့် အွန်လိုင်း အပြည့်အဝ ထောက်ပံ့သည်'
-                : 'AJ AI Studio POS System v2.4 • Online & Offline Hybrid Enterprise Edition'}
+                ? 'AJ Studio Desk v2.4 • အော့ဖ်လိုင်းနှင့် အွန်လိုင်း အပြည့်အဝ ထောက်ပံ့သည်'
+                : 'AJ Studio Desk v2.4 • Online & Offline Hybrid Enterprise Edition'}
             </span>
           </div>
           <button

@@ -13,6 +13,11 @@ console.log('=== RUNNING PRODUCTION FOUNDATION (PHASE 1) INTEGRATION & SECURITY 
 
 async function runProductionFoundationTests() {
   process.env.DEMO_MODE = 'true';
+  if (process.env.DATABASE_URL && !process.env.DEMO_DATABASE_URL) {
+    const urlObj = new URL(process.env.DATABASE_URL);
+    const demoAppPassword = process.env.DEMO_DB_PASSWORD || 'demo_app_dev_password';
+    process.env.DEMO_DATABASE_URL = `postgres://demo_app:${demoAppPassword}@${urlObj.hostname}:${urlObj.port}${urlObj.pathname}`;
+  }
 
   const db = getDb();
   if (db) {
@@ -384,7 +389,93 @@ async function runProductionFoundationTests() {
     );
     console.log('  ✅ Test 7 Passed: Production environment fails closed when DATABASE_URL is missing.');
 
-    console.log('\n🎉 ALL 7 PRODUCTION FOUNDATION (PHASE 1) SECURITY TESTS PASSED!\n');
+    // -------------------------------------------------------------------------
+    // TEST 8: Request-Aware CORS Security Tests (Fix 2 & Gate 5)
+    // -------------------------------------------------------------------------
+    console.log('Test 8: Testing Request-Aware CORS Policy in Production...');
+    const originalNodeEnv = process.env.NODE_ENV;
+    const originalAllowedOrigins = process.env.ALLOWED_ORIGINS;
+
+    try {
+      process.env.NODE_ENV = 'production';
+      delete process.env.ALLOWED_ORIGINS;
+
+      const prodCorsApp = createApp({ demoMode: true });
+      const prodCorsServer = prodCorsApp.listen(0);
+      const prodCorsPort = (prodCorsServer.address() as AddressInfo).port;
+      const prodCorsUrl = `http://127.0.0.1:${prodCorsPort}`;
+
+      try {
+        // 8a. Same-origin browser request carrying Origin = own origin is ALLOWED
+        const sameOriginRes = await fetch(`${prodCorsUrl}/api/health`, {
+          headers: { Origin: prodCorsUrl },
+        });
+        assert.strictEqual(sameOriginRes.status, 200, 'Same-origin request carrying Origin must be allowed');
+
+        // 8b. Foreign unlisted origin (e.g. http://localhost:5173) in production is REJECTED with 403
+        const rejectedOriginRes = await fetch(`${prodCorsUrl}/api/health`, {
+          headers: { Origin: 'http://localhost:5173' },
+        });
+        assert.strictEqual(rejectedOriginRes.status, 403, 'Foreign origin in production must be rejected with 403');
+        const rejectedData = await rejectedOriginRes.json();
+        assert.strictEqual(rejectedData.error, 'Access denied by CORS policy');
+
+        // 8c. Listed origin in ALLOWED_ORIGINS is ALLOWED
+        process.env.ALLOWED_ORIGINS = 'https://partner-studio.com,https://booking.ajstudio.com';
+        const allowedOriginRes = await fetch(`${prodCorsUrl}/api/health`, {
+          headers: { Origin: 'https://partner-studio.com' },
+        });
+        assert.strictEqual(allowedOriginRes.status, 200, 'Listed origin in ALLOWED_ORIGINS must be allowed');
+        console.log('  ✅ Test 8 Passed: CORS allows same-origin and listed ALLOWED_ORIGINS, rejects localhost:5173 in production.');
+      } finally {
+        prodCorsServer.close();
+      }
+    } finally {
+      process.env.NODE_ENV = originalNodeEnv;
+      if (originalAllowedOrigins !== undefined) {
+        process.env.ALLOWED_ORIGINS = originalAllowedOrigins;
+      } else {
+        delete process.env.ALLOWED_ORIGINS;
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // TEST 9: POS Router Scoping & Route Accessibility without POS Session (Fix 4)
+    // -------------------------------------------------------------------------
+    console.log('Test 9: Testing POS router scoping and unauthenticated route accessibility...');
+    // 9a. /api/health is reachable without a POS session -> 200
+    const healthRes = await fetch(`${baseUrl}/api/health`);
+    assert.strictEqual(healthRes.status, 200, '/api/health must be reachable without POS session');
+
+    // 9b. /demo is reachable without a POS session -> 200
+    const demoRes = await fetch(`${baseUrl}/demo`);
+    assert.strictEqual(demoRes.status, 200, '/demo must be reachable without POS session');
+
+    // 9c. Every /api/pos/* route returns 401 without POS session
+    const unauthPosRoutes = [
+      { method: 'GET', path: '/api/pos/transactions' },
+      { method: 'POST', path: '/api/pos/transactions', body: { id: 'test' } },
+      { method: 'GET', path: '/api/pos/shifts' },
+      { method: 'POST', path: '/api/pos/shifts', body: { shiftId: 'test' } },
+      { method: 'POST', path: '/api/pos/staff/verify-pin', body: { pin: '1234', staffId: 'stf-01' } },
+      { method: 'POST', path: '/api/pos/staff/manager-override', body: { pin: '1111', staffId: 'stf-01' } },
+    ];
+
+    for (const r of unauthPosRoutes) {
+      const res = await fetch(`${baseUrl}${r.path}`, {
+        method: r.method,
+        headers: { 'Content-Type': 'application/json' },
+        body: r.body ? JSON.stringify(r.body) : undefined,
+      });
+      assert.strictEqual(
+        res.status,
+        401,
+        `Unauthenticated ${r.method} ${r.path} must return 401 Unauthorized, got ${res.status}`
+      );
+    }
+    console.log('  ✅ Test 9 Passed: /api/health and /demo reachable without POS session; all /api/pos/* routes return 401.');
+
+    console.log('\n🎉 ALL 9 PRODUCTION FOUNDATION (PHASE 1) SECURITY TESTS PASSED!\n');
     server.close();
     process.exit(0);
   } catch (err: any) {

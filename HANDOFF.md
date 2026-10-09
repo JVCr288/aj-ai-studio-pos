@@ -1,10 +1,10 @@
-# 🏢 AJ AI Studio Platform — POS & Operations ERP
+# 🏢 AJ Studio Desk Platform — POS & Operations ERP
 ## Complete System Handoff & Technical Documentation (စနစ်လွှဲပြောင်းမှုနှင့် နည်းပညာမှတ်တမ်း)
 
 > **ရက်စွဲ:** ၂၀၂၆ ခုနှစ်၊ အောက်တိုဘာလ ၉ ရက်  
 > **စနစ်ဗားရှင်း:** `v2.4.0` (POS Hardware & Retail Expansion)  
 > **လက်ရှိ Git Branch:** `feat/retail-category-expansion`  
-> **ပရောဂျက်အမည်:** `Aj AI Studio POS` (`aj-ai-studio-pos`)  
+> **ပရောဂျက်အမည်:** `AJ Studio Desk` (`aj-studio-desk`)  
 > **ပရောဂျက်တည်နေရာ:** `/Users/htoowai/Documents/Products/AJ Studio Desk_ERP/Aj AI Studio POS`  
 > **ပိုင်ရှင် / အဖွဲ့:** AJ AI Studio / AJAX CLICK  
 > **အဓိက နည်းပညာ:** React 19 + TypeScript 5.8 + Node.js (Express) + Drizzle ORM (PostgreSQL) + Google Gemini AI  
@@ -37,11 +37,11 @@
 
 ## ၁။ စနစ်ခြုံငုံသုံးသပ်ချက် (System Overview)
 
-`AJ AI Studio POS` သည် Professional Photography Studio များအတွက် Customer Booking လက်ခံခြင်းမှစ၍၊ ငွေလွှဲပြေစာ (KBZPay, WavePay, AYA Pay) များကို Gemini AI ဖြင့် စစ်ဆေးခြင်း၊ Studio အုပ်ချုပ်ရေးမှူးမှ အတည်ပြုခြင်း၊ POS Desk အရောင်းကောင်တာတွင် ပစ္စည်း/ဝန်ဆောင်မှုများ ရောင်းချခြင်း၊ အပူပေး Thermal Printer ဖြင့် ပြေစာထုတ်ပေးခြင်း၊ ဝန်ထမ်းအလိုက် Shift အဖွင့်/အပိတ်နှင့် ငွေစာရင်းရှင်းတမ်း (X-Report / Z-Report) များ ထုတ်ယူခြင်းတို့ကို တစ်နေရာတည်းတွင် ချိတ်ဆက်ဆောင်ရွက်ပေးသော **All-in-One Studio ERP & POS Platform** ဖြစ်သည်။
+`AJ Studio Desk` သည် Professional Photography Studio များအတွက် Customer Booking လက်ခံခြင်းမှစ၍၊ ငွေလွှဲပြေစာ (KBZPay, WavePay, AYA Pay) များကို Gemini AI ဖြင့် စစ်ဆေးခြင်း၊ Studio အုပ်ချုပ်ရေးမှူးမှ အတည်ပြုခြင်း၊ POS Desk အရောင်းကောင်တာတွင် ပစ္စည်း/ဝန်ဆောင်မှုများ ရောင်းချခြင်း၊ အပူပေး Thermal Printer ဖြင့် ပြေစာထုတ်ပေးခြင်း၊ ဝန်ထမ်းအလိုက် Shift အဖွင့်/အပိတ်နှင့် ငွေစာရင်းရှင်းတမ်း (X-Report / Z-Report) များ ထုတ်ယူခြင်းတို့ကို တစ်နေရာတည်းတွင် ချိတ်ဆက်ဆောင်ရွက်ပေးသော **All-in-One Studio ERP & POS Platform** ဖြစ်သည်။
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                              AJ AI STUDIO PLATFORM (ERP & POS)                         │
+│                              AJ STUDIO DESK PLATFORM (ERP & POS)                       │
 │                                                                                        │
 │   ┌───────────────────────────┐      ┌───────────────────────────┐                     │
 │   │  Customer Booking Portal  │ ───> │  Gemini Slip OCR (Flash)  │                     │
@@ -87,7 +87,7 @@
 ## ၃။ Folder ဖွဲ့စည်းပုံနှင့် အဓိကဖိုင်များ (Project Structure)
 
 ```
-Aj AI Studio POS/
+AJ Studio Desk/
 ├── docs/
 │   ├── briefs/
 │   │   ├── ARCHITECT_BRIEF_RETAIL_CATEGORY_EXPANSION_2026-09-18.md
@@ -304,12 +304,49 @@ npm test
 
 ---
 
-## ၈။ ရှေ့ဆက်ဆောင်ရွက်ရန် Roadmap (Next Steps & Launch Roadmap)
+---
 
-1. **Phase 1 Production Foundation (ပြီးစီး):**
-   - F1–F10 အားလုံး ဖြေရှင်းပြီးစီးခဲ့ပြီး Acceptance Gates 1–6 အားလုံး အောင်မြင်ထားသည်။ အသေးစိတ်ကို [HANDOFF_P1_PRODUCTION_FOUNDATION.md](file:///Users/htoowai/Documents/Products/AJ%20Studio%20Desk_ERP/Aj%20AI%20Studio%20POS/HANDOFF_P1_PRODUCTION_FOUNDATION.md) တွင် ကြည့်ရှုနိုင်သည်။
+## ၈။ Phase 1.5 Public Demo Architecture & Operations (အများသုံး Demo စနစ် လည်ပတ်ပုံ)
+
+### က။ Migration & Database Role Run Order (အဆင့်ဆင့် Run ရန် အစီအစဉ်)
+Public Demo စနစ်အား Production သို့မဟုတ် Staging တွင် အသစ်တပ်ဆင်ရာတွင် အောက်ပါအစီအစဉ်အတိုင်း တိကျစွာ run ရမည်ဖြစ်သည်:
+```bash
+# အဆင့် ၁: Main schema (public) migrations များ run ခြင်း (owner role)
+npm run db:migrate
+
+# အဆင့် ၂: Demo schema (demo) migrations များ run ခြင်း (owner role ဖြင့် search_path=demo ထား၍ foreign keys များကို demo သို့ re-point ပြုလုပ်ခြင်း)
+npm run db:migrate:demo
+
+# အဆင့် ၃: demo_app role အား ဖန်တီး၍ schema demo သို့ privileges ပေးပြီး public privileges များအားလုံး revoke ပြုလုပ်ခြင်း
+DATABASE_URL="postgres://..." DEMO_DB_PASSWORD="secure_password" tsx src/scripts/createDemoRole.ts
+```
+
+### ခ။ VPS Reverse Proxy & TLS Configuration (`TRUST_PROXY`)
+Production VPS တွင် Nginx သို့မဟုတ် Caddy စသော TLS reverse proxy များနောက်၌ Express server run သည့်အခါ Same-Origin CORS requests များနှင့် visitor IP limiter များ မှန်ကန်စေရန် `.env` တွင် အောက်ပါအတိုင်း သတ်မှတ်ပေးရမည်:
+```env
+TRUST_PROXY=1
+```
+ယင်းကြောင့် `X-Forwarded-Proto: https` ဖြစ်ပါက `req.protocol` သည် `https` ဖြစ်လာပြီး Browser ၏ `Origin: https://<domain>` နှင့် တိုက်ဆိုင်စစ်ဆေးမှု အောင်မြင်မည်ဖြစ်သည်။
+
+### ဂ။ Public Demo Fail-Closed & Hardened Security Guarantees
+1. **Fail-Closed DB Configuration:** `DEMO_MODE=true` ဖြစ်ပြီး `DEMO_DATABASE_URL` မရှိပါက Server မစတင်ဘဲ ရပ်တန့်မည်ဖြစ်သည် (`DATABASE_URL` သို့ silent fallback လုံးဝ မပြုလုပ်ပါ)။
+2. **Runtime Isolation Assertion:** Demo routes များ မ mount မီ `has_table_privilege(current_user, 'public.production_studios', 'SELECT') === false` နှင့် `current_schema() === 'demo'` ဟုတ်မဟုတ် စစ်ဆေးသည်။ မဟုတ်ပါက demo routes များ mount မလုပ်ဘဲ 404 ပြန်ပေးသည်။
+3. **Endpoint Security & HMAC-Signed Cookies:**
+   - `/api/demo/cleanup` နှင့် `/api/demo/reseed-sample` တို့သည် `ADMIN_API_KEY` မပါပါက `401 Unauthorized` ဖြစ်သည်။
+   - `/api/demo/reset` နှင့် `/api/demo/activity` တို့သည် visitor ၏ HMAC-signed session cookie မှသာ lead/sandbox ID ကို ရယူပြီး body မှ sandboxId ကို အယုံအကြည်မရှိ လျစ်လျူရှုသည်။
+   - `sample-studio` အား reset ပြုလုပ်ခွင့်ကို ပိတ်ပင်ထားသည် (403 Forbidden)။
+   - `/api/demo/signup` တွင် IP တစ်ခုလျှင် တစ်နာရီ ၅ ခုသာ ခွင့်ပြုထားပြီး ၆ ခုမြောက်တွင် error text မပါသော လမ်းညွှန်စာသား (Guidance) ဖြင့် တားမြစ်သည်။
+4. **In-Process Scheduler:** Sandboxes idle > 7 days cleanup နှင့် 03:00 Asia/Yangon (UTC+06:30) `sample-studio` reseed တို့သည် daily scheduler ဖြင့် တစ်ရက်လျှင် တစ်ကြိမ်သာ တိကျစွာ run သည်။
+5. **Offline Memory Isolation:** `memorySandboxes`, `memoryLeadToSandboxId`, `memorySandboxToLeadId` တို့သည် `getDb() === null` (offline test) ဖြစ်မှသာ အသုံးပြုပြီး Postgres ချိတ်ဆက်ထားချိန်တွင် PostgreSQL `demo` schema ကိုသာ ၁၀၀% အသုံးပြုသည်။
+
+---
+
+## ၉။ ရှေ့ဆက်ဆောင်ရွက်ရန် Roadmap (Next Steps & Launch Roadmap)
+
+1. **Phase 1 & Phase 1.5 Production Foundation (ပြီးစီး):**
+   - Foundation & Isolation Gate အားလုံး ဖြေရှင်းပြီးစီးခဲ့ပြီး Acceptance Gates 1–8 အားလုံး အောင်မြင်ထားသည်။
 2. **Git Commit & Deployment (Claude Action):**
-   - Verifier & Deployer ဖြစ်သော Claude မှ Phase 1 working tree အား အတည်ပြု commit ရေးသွင်းခြင်းနှင့် Deploy ပြုလုပ်ခြင်း။
+   - Verifier & Deployer ဖြစ်သော Claude မှ Phase 1.5 Fix Round 2 working tree အား အတည်ပြု commit ရေးသွင်းခြင်းနှင့် Deploy ပြုလုပ်ခြင်း။
 3. **Phase 2 (New Features) သို့ ကူးပြောင်းခြင်း:**
    - Reports, Inventory, Loyalty စသော New Feature များကို Ko Htoo ၏ လမ်းညွှန်ချက်အတိုင်း စတင်ဆောင်ရွက်ခြင်း။
 4. **Phase 3 (UI/UX Redesign):**
@@ -317,4 +354,4 @@ npm test
 
 ---
 
-*ဤမှတ်တမ်းသည် AJ AI Studio POS ၏ Phase 1 Production Foundation ပြီးမြောက်မှုနှင့် လွှဲပြောင်းရယူမည့် အင်ဂျင်နီယာ/Claude အတွက် အပြည့်စုံဆုံး လမ်းညွှန်ချက် ဖြစ်ပါသည်။*
+*ဤမှတ်တမ်းသည် AJ Studio Desk ၏ Phase 1 & 1.5 Production Foundation ပြီးမြောက်မှုနှင့် လွှဲပြောင်းရယူမည့် အင်ဂျင်နီယာ/Claude အတွက် အပြည့်စုံဆုံး လမ်းညွှန်ချက် ဖြစ်ပါသည်။*

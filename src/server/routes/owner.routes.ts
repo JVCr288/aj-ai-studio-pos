@@ -129,6 +129,13 @@ ownerRouter.put('/api/owner/draft', setupRateLimiter, verifyOwnerSessionMiddlewa
       return res.status(400).json({ error: 'INVALID_DRAFT_PAYLOAD' });
     }
 
+    const targetSlug = projectData.project.projectSlug || session.tenantId;
+    if (typeof targetSlug === 'string' && (targetSlug.startsWith('demo-') || targetSlug === 'sample-studio')) {
+      return res.status(400).json({
+        message: 'The slug prefixes "demo-" and "sample-studio" are reserved for demonstration environments. Please choose a custom identifier.',
+      });
+    }
+
     const updated = await saveOnboardingProjectDraft(
       session.projectId,
       session.tenantId,
@@ -216,6 +223,12 @@ ownerRouter.post('/api/owner/submit', setupRateLimiter, verifyOwnerSessionMiddle
   try {
     const session = res.locals.ownerSession;
     const projectData = req.body;
+    const targetSlug = projectData?.project?.projectSlug || session.tenantId;
+    if (typeof targetSlug === 'string' && (targetSlug.startsWith('demo-') || targetSlug === 'sample-studio')) {
+      return res.status(400).json({
+        message: 'The slug prefixes "demo-" and "sample-studio" are reserved for demonstration environments. Please choose a custom identifier.',
+      });
+    }
 
     const submitted = await submitOnboardingProjectSnapshot(
       session.projectId,

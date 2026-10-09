@@ -142,6 +142,7 @@ export function buildEscPosReceipt(
   bytes.push(...stringToBytes(`\nThank you for choosing ${studioName}!\n`));
   bytes.push(...stringToBytes(`Preserve Your Creative Legacy\n`));
   bytes.push(...stringToBytes(`*** VAT Included ***\n`));
+  bytes.push(...stringToBytes(`Powered by AJ Studio Desk\n`));
   bytes.push(...CMD_FEED_3);
 
   if (options.cutPaper !== false) {
@@ -267,7 +268,7 @@ export function buildEscPosZReport(
 
   // 9. Footer & Paper Cut
   bytes.push(...CMD_ALIGN_CENTER);
-  bytes.push(...stringToBytes('AJ AI STUDIO POS ENTERPRISE PLATFORM\n'));
+  bytes.push(...stringToBytes('AJ STUDIO DESK ENTERPRISE PLATFORM\n'));
   bytes.push(...stringToBytes(`Generated: ${new Date(report.generatedAt).toLocaleString()}\n`));
   bytes.push(...CMD_FEED_3);
 

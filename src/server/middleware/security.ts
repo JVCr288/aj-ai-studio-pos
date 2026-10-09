@@ -55,7 +55,6 @@ export const permissionsPolicyMiddleware = (req: Request, res: Response, next: N
   next();
 };
 
-const rawAllowedOrigins = process.env.ALLOWED_ORIGINS;
 const defaultDevOrigins = [
   'http://localhost:3010',
   'http://127.0.0.1:3010',
@@ -66,29 +65,40 @@ const defaultDevOrigins = [
   'http://localhost:4000',
   'http://127.0.0.1:4000',
 ];
-const allowedOrigins: string[] = rawAllowedOrigins
-  ? rawAllowedOrigins.split(',').map((o) => o.trim()).filter(Boolean)
-  : (process.env.NODE_ENV === 'production' ? [] : defaultDevOrigins);
 
-export const corsOptions: CorsOptions = {
-  origin: (origin, callback) => {
-    // Permit requests with no origin (e.g. same-origin SPA in production, curl, server-to-server)
-    if (!origin) {
-      return callback(null, true);
-    }
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    // Reject unauthorized cross-origin request safely
-    return callback(new Error('CORS_NOT_ALLOWED'));
-  },
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'x-csrf-token', 'x-admin-key', 'Authorization'],
-  credentials: true,
-  optionsSuccessStatus: 204,
+export const corsOptionsDelegate: cors.CorsOptionsDelegate<Request> = (req, callback) => {
+  const origin = req.header('Origin');
+  // Allow requests without Origin (e.g. server-to-server, curl, non-browser)
+  if (!origin) {
+    return callback(null, { origin: true, credentials: true });
+  }
+
+  // Request-aware same-origin check: allow when Origin matches server's own origin
+  const forwardedHost = req.get('x-forwarded-host');
+  const host = (req.app.get('trust proxy') && forwardedHost)
+    ? forwardedHost.split(',')[0].trim()
+    : req.get('host');
+  const ownOrigin = host ? `${req.protocol}://${host}` : null;
+
+  const rawAllowedOrigins = process.env.ALLOWED_ORIGINS;
+  const configuredOrigins: string[] = rawAllowedOrigins
+    ? rawAllowedOrigins.split(',').map((o) => o.trim()).filter(Boolean)
+    : (process.env.NODE_ENV === 'production' ? [] : defaultDevOrigins);
+
+  if ((ownOrigin && origin === ownOrigin) || configuredOrigins.includes(origin)) {
+    return callback(null, {
+      origin: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'x-csrf-token', 'x-admin-key', 'Authorization'],
+      credentials: true,
+      optionsSuccessStatus: 204,
+    });
+  }
+
+  return callback(new Error('CORS_NOT_ALLOWED'));
 };
 
-export const corsMiddleware = cors(corsOptions);
+export const corsMiddleware = cors(corsOptionsDelegate);
 
 export const corsErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
   if (err && err.message === 'CORS_NOT_ALLOWED') {

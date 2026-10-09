@@ -14,6 +14,7 @@ import {
   Crown,
   Sparkles,
 } from 'lucide-react';
+import { HelpTip } from '../ui/HelpTip';
 
 interface PosStaffModalProps {
   isOpen: boolean;
@@ -134,6 +135,19 @@ export const PosStaffModal: React.FC<PosStaffModalProps> = ({
     }
   };
 
+  const getRoleHelpTip = (role: PosStaffRole) => {
+    switch (role) {
+      case 'OWNER':
+        return 'staff-role-owner';
+      case 'STUDIO_MANAGER':
+        return 'staff-role-manager';
+      case 'LEAD_CASHIER':
+        return 'staff-role-lead-cashier';
+      default:
+        return 'staff-role-cashier';
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-3 select-none">
       <div className="relative w-full max-w-md bg-[#071423] border border-[#1E3A4F] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
@@ -151,7 +165,8 @@ export const PosStaffModal: React.FC<PosStaffModalProps> = ({
             </div>
             <div>
               <h2 className="text-sm font-bold text-[#F1F5F9] flex items-center gap-1.5">
-                {isLocked ? 'Terminal Locked' : 'Switch Staff Cashier'}
+                <span>{isLocked ? 'Terminal Locked' : 'Switch Staff Cashier'}</span>
+                <HelpTip tipId="staff-pin-lock" />
               </h2>
               <p className="text-[11px] text-[#94A3B8]">
                 {isLocked
@@ -217,6 +232,7 @@ export const PosStaffModal: React.FC<PosStaffModalProps> = ({
                         >
                           {st.role.replace('_', ' ')}
                         </span>
+                        <HelpTip tipId={getRoleHelpTip(st.role)} />
                       </div>
                     </div>
                   </button>

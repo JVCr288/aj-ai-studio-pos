@@ -13,11 +13,12 @@ import {
   hashSha256,
 } from '../utils/crypto.js';
 import { isMemoryDemoAllowed, isDemoTenantSlug } from '../utils/storageMode.js';
+import { recordDemoActivityBySandbox } from '../services/demoProvisioningService.js';
 
 export const posRouter = Router();
 
 // Require authenticated Studio Admin Session on all POS routes
-posRouter.use(verifyStudioAdminMiddleware);
+posRouter.use('/api/pos', verifyStudioAdminMiddleware);
 
 // In-memory server fallback store for demo mode
 const serverTransactions: PosTransaction[] = [];
@@ -237,14 +238,17 @@ posRouter.post('/api/pos/transactions', async (req: Request, res: Response) => {
       computedSubtotal += qty * price;
     }
 
-    const discount = typeof tx.discountMMK === 'number' && !isNaN(tx.discountMMK) ? Math.round(tx.discountMMK) : 0;
+    const discount = typeof tx.discountMMK === 'number' && !isNaN(tx.discountMMK)
+      ? Math.round(tx.discountMMK)
+      : (typeof (tx as any).discountMmk === 'number' ? Math.round((tx as any).discountMmk) : 0);
     const computedTotalDue = Math.max(0, computedSubtotal - discount);
+    const clientTotal = typeof tx.totalDueMMK === 'number' ? tx.totalDueMMK : (tx as any).totalDueMmk;
 
-    if (Math.round(tx.totalDueMMK) !== computedTotalDue) {
+    if (Math.round(clientTotal) !== computedTotalDue) {
       return res.status(400).json({
         success: false,
         code: 'TOTAL_DUE_MISMATCH',
-        error: `TOTAL_DUE_MISMATCH: Client totalDueMMK (${tx.totalDueMMK}) does not match server computed total (${computedTotalDue})`,
+        error: `TOTAL_DUE_MISMATCH: Client totalDueMMK (${clientTotal}) does not match server computed total (${computedTotalDue})`,
       });
     }
   }
@@ -339,6 +343,9 @@ posRouter.post('/api/pos/transactions', async (req: Request, res: Response) => {
 
   // Broadcast real-time SSE event for newly ingested transactions
   if (ingested.length > 0) {
+    if (sessionTenantId.startsWith('demo-')) {
+      recordDemoActivityBySandbox(sessionTenantId, 'POS_SALE').catch(console.warn);
+    }
     broadcastStudioEvent({
       id: `evt-pos-${Date.now()}`,
       tenantId: sessionTenantId,
@@ -475,6 +482,10 @@ posRouter.post('/api/pos/shifts', async (req: Request, res: Response) => {
       message: 'Shift Z-Report already recorded.',
       reportId: report.reportId,
     });
+  }
+
+  if (sessionTenantId.startsWith('demo-')) {
+    recordDemoActivityBySandbox(sessionTenantId, 'Z_REPORT').catch(console.warn);
   }
 
   broadcastStudioEvent({

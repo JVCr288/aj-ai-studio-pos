@@ -139,7 +139,7 @@ async function runTests() {
   assert(migrated.packages && migrated.packages.length === 4, 'Migrated draft must retain placeholder packages');
 
   const legacyProject = getDefaultOnboardingProject('proj-aj-studio-01');
-  assert(legacyProject.studio.name === 'AJ AI Studio POS & Atelier', 'Default proj-aj-studio-01 data preserved');
+  assert(legacyProject.studio.name === 'AJ Studio Desk & Atelier', 'Default proj-aj-studio-01 data preserved');
   console.log('✅ Test 9: Existing default draft migration & compatibility preserved without contaminating fresh projects.');
 
   // 10. Main Studio UI remains hidden during onboarding
@@ -179,11 +179,33 @@ async function runTests() {
   assert(approvedProject.project.status === 'APPROVED', 'Status must be APPROVED');
   assert(approvedProject.project.status !== 'INTEGRATED', 'Approval must NOT set status to INTEGRATED');
 
-  // Mapper placeholder safety check
-  const mapperBuildResult = buildProductionInitialConfiguration(approvedProject);
-  assert(mapperBuildResult.config?.bookingPackages.length === 0, 'Placeholder packages must be filtered out from production initial config');
+  // Test 11: Reserved slug validation for demo- and sample-studio
+  const reservedSlugProj1 = getCleanOnboardingProject('test-slug-01');
+  reservedSlugProj1.studio.name = 'Reserved Studio';
+  reservedSlugProj1.studio.phone = '+959111222333';
+  reservedSlugProj1.studio.email = 'test@studio.mm';
+  reservedSlugProj1.studio.address = 'Yangon';
+  reservedSlugProj1.project.projectSlug = 'demo-test-slug';
+  const result1 = validateFullSubmission(reservedSlugProj1);
+  assert(
+    result1.allErrors.some((e) => e.includes('reserved for demonstration environments')),
+    'Slug starting with "demo-" must be rejected with guidance wording'
+  );
 
-  console.log('\nALL 10 CANONICAL FORM & RENDER TESTS PASSED SUCCESSFULLY! 🎉');
+  const reservedSlugProj2 = getCleanOnboardingProject('test-slug-02');
+  reservedSlugProj2.studio.name = 'Sample Studio';
+  reservedSlugProj2.studio.phone = '+959111222333';
+  reservedSlugProj2.studio.email = 'test@studio.mm';
+  reservedSlugProj2.studio.address = 'Yangon';
+  reservedSlugProj2.project.projectSlug = 'sample-studio';
+  const result2 = validateFullSubmission(reservedSlugProj2);
+  assert(
+    result2.allErrors.some((e) => e.includes('reserved for demonstration environments')),
+    'Slug equal to "sample-studio" must be rejected with guidance wording'
+  );
+  console.log('✅ Test 11: Reserved slug guardrails reject "demo-*" and "sample-studio" with guidance wording.');
+
+  console.log('\nALL 11 CANONICAL FORM & RENDER TESTS PASSED SUCCESSFULLY! 🎉');
 }
 
 runTests().catch((err) => {

@@ -1,9 +1,9 @@
-# AJ AI Studio Platform — POS & Booking Operations
+# AJ Studio Desk — Studio Booking & POS Operations
 
 **Master Tenant:** AJ AI Studio  
 **Platform Version:** 2.4.0  
 
-AJ AI Studio POS is an enterprise-grade multi-tenant studio management platform, customer booking intake engine, POS desk terminal, and automated payment slip OCR verification system.
+AJ Studio Desk is an enterprise-grade multi-tenant studio management platform, customer booking intake engine, POS desk terminal, and automated payment slip OCR verification system.
 
 ---
 
@@ -69,7 +69,7 @@ npm run build
 ## 🏛️ Project Architecture Overview
 
 ```
-AJ AI Studio POS/
+AJ Studio Desk/
 ├── src/
 │   ├── components/       # UI Components (Landing, Admin Panel, POS Desk, Lightbox)
 │   ├── services/         # API Client & Server In-Memory Booking Services
@@ -85,4 +85,4 @@ AJ AI Studio POS/
 ---
 
 ## 🛡️ License & Ownership
-Copyright © 2026 **AJ AI Studio Platform**. All rights reserved. Built as a white-label studio management solution.
+Copyright © 2026 **AJ Studio Desk**. All rights reserved. Built as a white-label studio management solution.

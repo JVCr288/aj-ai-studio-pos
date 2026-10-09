@@ -4,6 +4,7 @@ import { createApp } from '../server/app';
 import { offlineQueueService } from '../services/offlineQueueService';
 import { PosTransaction, PosZReport } from '../types';
 
+process.env.NODE_ENV = 'test';
 console.log('=== RUNNING OFFLINE-FIRST QUEUE & SERVER SYNC INTEGRATION TESTS ===\n');
 
 // Clear existing queue before tests

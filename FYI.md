@@ -1,7 +1,7 @@
-# AJ AI Studio POS — FYI & Quick Reference Guide
+# AJ Studio Desk — FYI & Quick Reference Guide
 
 > [!NOTE]
-> This document provides essential developer information, environment settings, local dev fallback behavior, port configurations, and troubleshooting procedures for **AJ AI Studio POS**.
+> This document provides essential developer information, environment settings, local dev fallback behavior, port configurations, and troubleshooting procedures for **AJ Studio Desk**.
 
 ---
 

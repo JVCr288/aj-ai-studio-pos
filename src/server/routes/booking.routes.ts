@@ -3,6 +3,7 @@ import { bookingSubmissionRateLimiter } from '../middleware/rateLimiters.js';
 import { verifyStudioAdminMiddleware, AdminSessionRecord } from '../middleware/auth.js';
 import { broadcastStudioEvent } from '../events/sseBus.js';
 import { serverBookingService, BookingStatus } from '../../services/serverBookingService.js';
+import { recordDemoActivityBySandbox } from '../services/demoProvisioningService.js';
 
 export const bookingRouter = Router();
 
@@ -35,6 +36,10 @@ bookingRouter.post('/api/bookings', bookingSubmissionRateLimiter, async (req: Re
       },
       timestamp: new Date().toISOString(),
     });
+
+    if (booking.tenantId && booking.tenantId.startsWith('demo-')) {
+      recordDemoActivityBySandbox(booking.tenantId, 'BOOKING_CREATED').catch(console.warn);
+    }
 
     return res.status(201).json({ success: true, booking });
   } catch (err: any) {

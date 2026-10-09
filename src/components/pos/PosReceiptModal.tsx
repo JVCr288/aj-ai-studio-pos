@@ -91,7 +91,7 @@ export const PosReceiptModal: React.FC<PosReceiptModalProps> = ({
           <div className="border-t border-dashed border-gray-400 pt-3 text-center space-y-1">
             <div className="font-bold text-[11px]">THANK YOU FOR CHOOSING OUR ATELIER</div>
             <div className="text-[10px] text-gray-500">Master raw images preserved for 14 days</div>
-            <div className="text-[9px] text-gray-400 font-mono">AJ AI STUDIO POS PLATFORM v2.4</div>
+            <div className="text-[9px] text-gray-400 font-mono">POWERED BY AJ STUDIO DESK v2.4</div>
           </div>
         </div>
 

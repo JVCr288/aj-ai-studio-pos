@@ -10,6 +10,7 @@ import {
   XCircle,
   Edit3,
 } from 'lucide-react';
+import { HelpTip } from '../ui/HelpTip';
 
 interface AdminBookingDetailDrawerProps {
   isOpen: boolean;
@@ -199,8 +200,9 @@ export const AdminBookingDetailDrawer: React.FC<AdminBookingDetailDrawerProps> =
             {/* Payment Evidence & Desk Review Action */}
             <div className="bg-[#071423] border border-[#1E3A4F] rounded-lg p-4 space-y-3">
               <div className="flex items-center justify-between border-b border-[#1E3A4F] pb-2">
-                <span className="text-[10px] font-semibold text-[#38BDF8] uppercase tracking-wider">
-                  Payment Evidence Review
+                <span className="text-[10px] font-semibold text-[#38BDF8] uppercase tracking-wider flex items-center gap-1.5">
+                  <span>Payment Evidence Review</span>
+                  <HelpTip tipId="booking-payment-review" />
                 </span>
                 <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${getPaymentBadge(booking.paymentStatus)}`}>
                   {booking.paymentStatus}
@@ -257,7 +259,10 @@ export const AdminBookingDetailDrawer: React.FC<AdminBookingDetailDrawerProps> =
 
             {/* Status Action Toolbar */}
             <div className="space-y-2">
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Admin Lifecycle Actions</span>
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span>Admin Lifecycle Actions</span>
+                <HelpTip tipId="booking-status-confirmed" />
+              </span>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                 <button
                   type="button"
@@ -289,9 +294,10 @@ export const AdminBookingDetailDrawer: React.FC<AdminBookingDetailDrawerProps> =
                 <button
                   type="button"
                   onClick={() => setIsRescheduleOpen(true)}
-                  className="py-2 bg-[#1E3A4F] hover:bg-[#38BDF8] hover:text-[#071423] rounded-lg font-semibold transition-colors cursor-pointer"
+                  className="py-2 bg-[#1E3A4F] hover:bg-[#38BDF8] hover:text-[#071423] rounded-lg font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1"
                 >
-                  Reschedule
+                  <span>Reschedule</span>
+                  <HelpTip tipId="booking-reschedule" />
                 </button>
               </div>
 
@@ -319,7 +325,10 @@ export const AdminBookingDetailDrawer: React.FC<AdminBookingDetailDrawerProps> =
             {/* Private Admin Notes */}
             <div className="bg-[#071423] border border-[#1E3A4F] rounded-lg p-3.5 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-semibold text-[#38BDF8] uppercase tracking-wider">Private Studio Notes</span>
+                <span className="text-[10px] font-semibold text-[#38BDF8] uppercase tracking-wider flex items-center gap-1.5">
+                  <span>Private Studio Notes</span>
+                  <HelpTip tipId="booking-notes" />
+                </span>
                 <button
                   type="button"
                   onClick={() => setIsNotesEditing(!isNotesEditing)}
@@ -355,7 +364,10 @@ export const AdminBookingDetailDrawer: React.FC<AdminBookingDetailDrawerProps> =
 
             {/* Immutable Audit Timeline */}
             <div className="space-y-3 pt-2">
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Immutable Audit History</span>
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span>Immutable Audit History</span>
+                <HelpTip tipId="booking-audit-timeline" />
+              </span>
               <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                 {events.map((evt) => (
                   <div key={evt.id} className="bg-[#071423] border border-[#1E3A4F]/60 rounded-lg p-2.5 text-xs space-y-1">

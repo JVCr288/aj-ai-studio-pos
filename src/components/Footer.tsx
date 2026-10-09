@@ -33,7 +33,7 @@ export const Footer: React.FC<FooterProps> = ({
         <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
           <div className="flex items-center space-x-2">
             <span className="font-semibold text-[#F1F5F9] tracking-tight">
-              AJ AI Studio Platform
+              AJ Studio Desk
             </span>
             <span className="text-[#1E3A4F]">•</span>
             <span className="text-xs text-[#94A3B8]">

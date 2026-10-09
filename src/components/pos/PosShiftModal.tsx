@@ -16,6 +16,7 @@ import {
   Receipt,
   Plus,
 } from 'lucide-react';
+import { HelpTip } from '../ui/HelpTip';
 
 interface PosShiftModalProps {
   isOpen: boolean;
@@ -202,7 +203,10 @@ export const PosShiftModal: React.FC<PosShiftModalProps> = ({
             {/* Financial Summary Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               <div className="bg-[#102538]/60 border border-[#1E3A4F] rounded-xl p-3">
-                <span className="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Starting Float</span>
+                <span className="text-[10px] text-slate-400 uppercase font-semibold flex items-center justify-between mb-1">
+                  <span>Starting Float</span>
+                  <HelpTip tipId="pos-starting-float" />
+                </span>
                 <span className="font-mono font-bold text-xs text-slate-200">
                   {shiftRecord.startingCashMMK.toLocaleString()} MMK
                 </span>
@@ -281,8 +285,9 @@ export const PosShiftModal: React.FC<PosShiftModalProps> = ({
                         : `Drawer Shortage: ${liveDiscrepancyMMK.toLocaleString()} MMK`}
                     </span>
                   </div>
-                  <span className="font-mono text-[11px] uppercase font-bold">
-                    {liveDiscrepancyType}
+                  <span className="font-mono text-[11px] uppercase font-bold flex items-center gap-1">
+                    <span>{liveDiscrepancyType}</span>
+                    <HelpTip tipId="pos-discrepancy" />
                   </span>
                 </div>
 
@@ -347,6 +352,7 @@ export const PosShiftModal: React.FC<PosShiftModalProps> = ({
               >
                 <Printer className="w-3.5 h-3.5 text-sky-400" />
                 <span>Print X-Report (Audit)</span>
+                <HelpTip tipId="pos-x-report" />
               </button>
 
               {shiftRecord.status === 'OPEN' && (
@@ -359,6 +365,7 @@ export const PosShiftModal: React.FC<PosShiftModalProps> = ({
                 >
                   <FileCheck className="w-3.5 h-3.5" />
                   <span>{isClosingShift ? 'Closing...' : 'Close Shift & Print Z-Report'}</span>
+                  <HelpTip tipId="pos-z-report" />
                 </button>
               )}
             </div>
@@ -387,6 +394,7 @@ export const PosShiftModal: React.FC<PosShiftModalProps> = ({
                 >
                   <ArrowDownRight className="w-3.5 h-3.5" />
                   <span>Cash Drop (Out to Safe/Petty)</span>
+                  <HelpTip tipId="pos-cash-drop" />
                 </button>
 
                 <button
@@ -400,6 +408,7 @@ export const PosShiftModal: React.FC<PosShiftModalProps> = ({
                 >
                   <ArrowUpRight className="w-3.5 h-3.5" />
                   <span>Cash In (Float Top-up)</span>
+                  <HelpTip tipId="pos-cash-in" />
                 </button>
               </div>
 

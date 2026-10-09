@@ -6,7 +6,7 @@ import {
 import { serverBookingService } from '../services/serverBookingService';
 
 async function runPosDeskTests() {
-  console.log('\n=== RUNNING AJ AI STUDIO POS DESK TERMINAL TESTS ===\n');
+  console.log('\n=== RUNNING AJ STUDIO DESK POS DESK TERMINAL TESTS ===\n');
 
   // Test 1: Preset Overtime and Add-on Data
   console.log('Testing Overtime and Add-on Presets...');
@@ -288,7 +288,7 @@ async function runPosDeskTests() {
   assert.ok(Array.isArray(history), 'Shift history must return an array');
   console.log('  ✅ Test 11: Shift history archive contract verified');
 
-  console.log('\nALL 11 AJ AI STUDIO POS DESK TERMINAL TESTS PASSED! 🎉\n');
+  console.log('\nALL 11 AJ STUDIO DESK POS DESK TERMINAL TESTS PASSED! 🎉\n');
 }
 
 runPosDeskTests().catch((err) => {

@@ -35,12 +35,41 @@ async function startServer() {
     }
   }
 
+  // Fail-closed validation for DEMO_MODE
+  if (process.env.DEMO_MODE === 'true') {
+    if (!process.env.DEMO_DATABASE_URL || process.env.DEMO_DATABASE_URL.trim() === '') {
+      console.error('FATAL [Demo Boot]: DEMO_MODE is true but DEMO_DATABASE_URL is not configured.');
+      process.exit(1);
+    }
+    if (!process.env.DEMO_COOKIE_SECRET || process.env.DEMO_COOKIE_SECRET.trim().length < 32) {
+      console.error('FATAL [Demo Boot]: DEMO_COOKIE_SECRET must be set (at least 32 characters) in DEMO_MODE.');
+      process.exit(1);
+    }
+    if (!process.env.ADMIN_API_KEY) {
+      console.error('FATAL [Demo Boot]: ADMIN_API_KEY must be set in DEMO_MODE (protects the founder lead list and maintenance endpoints).');
+      process.exit(1);
+    }
+    const { assertDemoIsolation } = await import('./src/db/index.js');
+    const isolation = await assertDemoIsolation();
+    if (!isolation.isolated) {
+      console.error(`FATAL [Demo Boot]: Database connection isolation assertion failed: ${isolation.reason}`);
+      process.exit(1);
+    }
+    console.log('[Demo Boot]: Database isolation verified successfully (role is demo_app, search_path is demo).');
+  }
+
   const app = createApp();
   const PORT = process.env.PORT || 4000;
 
-  const server = app.listen(PORT, () => {
-    console.log(`[AJ AI Studio Platform API] Server running on http://localhost:${PORT}`);
-    console.log(`[AJ AI Studio Platform API] Health check available at http://localhost:${PORT}/api/health`);
+  const server = app.listen(PORT, async () => {
+    console.log(`[AJ Studio Desk API] Server running on http://localhost:${PORT}`);
+    console.log(`[AJ Studio Desk API] Health check available at http://localhost:${PORT}/api/health`);
+
+    if (process.env.DEMO_MODE === 'true') {
+      const { DemoScheduler } = await import('./src/server/services/demoSchedulerService.js');
+      const scheduler = new DemoScheduler();
+      scheduler.start();
+    }
   });
 
   return server;

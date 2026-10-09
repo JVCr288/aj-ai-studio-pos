@@ -3,6 +3,7 @@ import { PosStaffMember } from '../../types';
 import { posStaffService } from '../../services/posStaffService';
 import { playScannerBeep } from '../../hooks/useBarcodeScanner';
 import { ShieldCheck, ShieldAlert, X, Delete, CheckCircle2, Lock } from 'lucide-react';
+import { HelpTip } from '../ui/HelpTip';
 
 interface PosManagerOverrideModalProps {
   isOpen: boolean;
@@ -112,7 +113,8 @@ export const PosManagerOverrideModal: React.FC<PosManagerOverrideModalProps> = (
             </div>
             <div>
               <h2 className="text-sm font-bold text-[#F1F5F9] flex items-center gap-1.5">
-                Manager Authorization Required
+                <span>Manager Authorization Required</span>
+                <HelpTip tipId="pos-manager-override" />
               </h2>
               <p className="text-[11px] text-[#94A3B8]">Elevated privilege action</p>
             </div>

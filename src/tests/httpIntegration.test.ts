@@ -11,6 +11,8 @@ async function runHttpIntegrationTests() {
   try {
     const ping = await fetch(`${BASE_URL}/api/health`, { signal: AbortSignal.timeout(5000) });
     if (!ping.ok) throw new Error('Unhealthy');
+    const health = await ping.json();
+    if (health?.service !== 'AJ Studio Desk API') throw new Error('Foreign server on port 4000');
   } catch {
     console.log('⚠️ [HTTP Integration] Server on 127.0.0.1:4000 is not running. Skipping live HTTP integration tests in offline runner.\n');
     return;

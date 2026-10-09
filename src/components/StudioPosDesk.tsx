@@ -28,6 +28,7 @@ import { PosManagerOverrideModal } from './pos/PosManagerOverrideModal';
 import { StudioUserGuideModal } from './StudioUserGuideModal';
 import { PosCatalogTabs, PosActiveTab } from './pos/PosCatalogTabs';
 import { PosCartCheckout } from './pos/PosCartCheckout';
+import { HelpTip } from './ui/HelpTip';
 import {
   ShoppingBag,
   Clock,
@@ -818,34 +819,37 @@ export const StudioPosDesk: React.FC<StudioPosDeskProps> = ({
         {/* Center-Right: Scanner Active Badge & Network/Queue Status */}
         <div className="hidden md:flex items-center space-x-2">
           {/* Network & Offline Queue Status */}
-          {isOnline && pendingCount === 0 ? (
-            <div
-              className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-400"
-              title="Connected to POS Cloud API"
-            >
-              <Wifi className="w-3.5 h-3.5" />
-              <span className="hidden xl:inline">Online</span>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => syncNow()}
-              disabled={isSyncing}
-              className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-[11px] font-mono text-amber-300 transition-colors cursor-pointer disabled:opacity-60"
-              title="Click to sync offline transactions with server"
-            >
-              {isSyncing ? (
-                <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" />
-              ) : !isOnline ? (
-                <WifiOff className="w-3.5 h-3.5 text-amber-400" />
-              ) : (
-                <CloudOff className="w-3.5 h-3.5 text-amber-400" />
-              )}
-              <span>
-                {!isOnline ? 'Offline' : 'Sync'}: {pendingCount} queued
-              </span>
-            </button>
-          )}
+          <div className="flex items-center space-x-1.5">
+            {isOnline && pendingCount === 0 ? (
+              <div
+                className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-400"
+                title="Connected to POS Cloud API"
+              >
+                <Wifi className="w-3.5 h-3.5" />
+                <span className="hidden xl:inline">Online</span>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => syncNow()}
+                disabled={isSyncing}
+                className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-[11px] font-mono text-amber-300 transition-colors cursor-pointer disabled:opacity-60"
+                title="Click to sync offline transactions with server"
+              >
+                {isSyncing ? (
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                ) : !isOnline ? (
+                  <WifiOff className="w-3.5 h-3.5 text-amber-400" />
+                ) : (
+                  <CloudOff className="w-3.5 h-3.5 text-amber-400" />
+                )}
+                <span>
+                  {!isOnline ? 'Offline' : 'Sync'}: {pendingCount} queued
+                </span>
+              </button>
+            )}
+            <HelpTip tipId="pos-offline-indicator" />
+          </div>
 
           <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-mono text-emerald-400">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />

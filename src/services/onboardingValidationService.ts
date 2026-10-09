@@ -32,6 +32,11 @@ export const validateStudioInformation = (project: StudioOnboardingProject): str
   }
   if (!project.project.projectSlug || !project.project.projectSlug.trim()) {
     errors.push('Project slug identifier is required.');
+  } else if (
+    project.project.projectSlug.trim().startsWith('demo-') ||
+    project.project.projectSlug.trim() === 'sample-studio'
+  ) {
+    errors.push('The slug prefixes "demo-" and "sample-studio" are reserved for demonstration environments. Please choose a custom studio identifier.');
   }
   return errors;
 };

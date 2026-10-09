@@ -457,7 +457,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
           </h1>
           <p className="text-sm text-[#7E8F9F] mt-1 max-w-2xl font-normal">
             Live equipment registry, lighting gear allocation, lens optics, and
-            calibration logs for AJ AI Studio.
+            calibration logs for AJ Studio Desk.
           </p>
         </div>
 
@@ -1174,7 +1174,7 @@ export const EquipmentInventoryScreen: React.FC<EquipmentInventoryScreenProps> =
             </h2>
             <p className="text-xs text-[#7E8F9F] mb-5 font-light font-ui">
               Register new studio hardware, lighting strobes, cameras, or optics
-              into the active AJ AI Studio inventory system.
+              into the active AJ Studio Desk inventory system.
             </p>
 
             <form onSubmit={handleCreateEquipment} className="space-y-4 font-ui text-xs">

@@ -1,5 +1,5 @@
 /**
- * AJ AI Studio Platform Metadata & Configuration
+ * AJ Studio Desk Platform Metadata & Configuration
  * 
  * Defines global platform identity, public canonical URLs, brand attributes,
  * and shared platform container settings.
@@ -19,14 +19,14 @@ export interface PlatformConfig {
 }
 
 export const platformConfig: PlatformConfig = {
-  name: 'AJ AI Studio',
-  fullName: 'AJ AI Studio Platform',
-  tagline: 'Studio Operations & Client Data Intake Platform',
+  name: 'AJ Studio Desk',
+  fullName: 'AJ Studio Desk — Studio Booking & POS',
+  tagline: 'Studio Booking & POS Operations Desk',
   canonicalUrl: 'https://ajaxclickaistudio.com/',
   supportEmail: 'support@ajaxclickaistudio.com',
   version: '2.4.0',
-  platformOwner: 'AJ AI Studio',
-  copyright: '© 2026 AJ AI Studio. All rights reserved.',
-  heroBrand: 'AJ AI STUDIO',
-  subBrand: 'Studio Operations Platform',
+  platformOwner: 'AJ Studio Desk',
+  copyright: '© 2026 AJ Studio Desk. All rights reserved.',
+  heroBrand: 'AJ STUDIO DESK',
+  subBrand: 'Studio Booking & POS Desk',
 };

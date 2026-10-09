@@ -1,5 +1,5 @@
 {
-  "name": "aj-ai-studio-pos",
+  "name": "aj-studio-desk",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -12,12 +12,14 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "test": "tsx src/tests/onboardingForm.test.ts && tsx src/tests/tenantWiring.test.ts && tsx src/tests/phaseB1Persistence.test.ts && tsx src/tests/httpIntegration.test.ts && tsx src/tests/runtimeRouting.test.ts && tsx src/tests/adminBookingPanel.test.ts && tsx src/tests/posDesk.test.ts && tsx src/tests/realtimeHardware.test.ts && tsx src/tests/barcodeHardwareUX.test.ts && tsx src/tests/offlineQueueSync.test.ts && tsx src/tests/posStaffAuth.test.ts && tsx src/tests/productionFoundationP1.test.ts",
-    "test:db": "DATABASE_URL=\"${DATABASE_URL:-postgres://aj_dev:aj_dev_password@localhost:5432/aj_studio_dev}\" NODE_ENV=production npm run db:migrate && DATABASE_URL=\"${DATABASE_URL:-postgres://aj_dev:aj_dev_password@localhost:5432/aj_studio_dev}\" NODE_ENV=production tsx src/tests/productionFoundationP1.test.ts && DATABASE_URL=\"${DATABASE_URL:-postgres://aj_dev:aj_dev_password@localhost:5432/aj_studio_dev}\" NODE_ENV=production tsx src/tests/productionFoundationP1.db.test.ts",
+    "test": "tsx src/tests/onboardingForm.test.ts && tsx src/tests/tenantWiring.test.ts && tsx src/tests/phaseB1Persistence.test.ts && tsx src/tests/httpIntegration.test.ts && tsx src/tests/runtimeRouting.test.ts && tsx src/tests/adminBookingPanel.test.ts && tsx src/tests/posDesk.test.ts && tsx src/tests/realtimeHardware.test.ts && tsx src/tests/barcodeHardwareUX.test.ts && tsx src/tests/offlineQueueSync.test.ts && tsx src/tests/posStaffAuth.test.ts && tsx src/tests/productionFoundationP1.test.ts && tsx src/tests/demoIsolation.test.ts",
+    "test:db": "DATABASE_URL=\"${DATABASE_URL:-postgres://aj_dev:aj_dev_password@localhost:5432/aj_studio_dev}\" NODE_ENV=production npm run db:migrate && DATABASE_URL=\"${DATABASE_URL:-postgres://aj_dev:aj_dev_password@localhost:5432/aj_studio_dev}\" NODE_ENV=production tsx src/tests/productionFoundationP1.test.ts && DATABASE_URL=\"${DATABASE_URL:-postgres://aj_dev:aj_dev_password@localhost:5432/aj_studio_dev}\" NODE_ENV=production tsx src/tests/productionFoundationP1.db.test.ts && DATABASE_URL=\"${DATABASE_URL:-postgres://aj_dev:aj_dev_password@localhost:5432/aj_studio_dev}\" NODE_ENV=production tsx src/tests/demoIsolation.db.test.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/db/migrate.ts",
+    "db:migrate:demo": "tsx src/db/migrateDemo.ts",
     "db:studio": "drizzle-kit studio",
-    "admin:create": "tsx src/scripts/createAdminUser.ts"
+    "admin:create": "tsx src/scripts/createAdminUser.ts",
+    "demo:capture": "tsx src/scripts/captureScreenshots.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
@@ -38,6 +40,7 @@
     "vite": "^6.2.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",

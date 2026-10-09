@@ -18,7 +18,14 @@ import {
   Users,
   Plus,
   Key,
+  Printer,
+  DollarSign,
+  Barcode,
+  Send,
+  RefreshCw,
+  Image,
 } from 'lucide-react';
+import { HelpTip } from './ui/HelpTip';
 import { SUPPORTED_PAYMENT_GATEWAYS, getPaymentBrand } from '../utils/paymentBrands';
 import { StudioUserGuideModal } from './StudioUserGuideModal';
 
@@ -66,6 +73,54 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [staffActionMsg, setStaffActionMsg] = useState<string | null>(null);
   const [resetPinId, setResetPinId] = useState<string | null>(null);
   const [resetPinValue, setResetPinValue] = useState('');
+
+  // Hardware & Telegram state
+  const [printerWidth, setPrinterWidth] = useState<'58mm' | '80mm'>(() => {
+    return (localStorage.getItem('aj_printer_width') as '58mm' | '80mm') || '80mm';
+  });
+  const [cashDrawerAutoKick, setCashDrawerAutoKick] = useState<boolean>(() => {
+    return localStorage.getItem('aj_cash_drawer_kick') !== 'false';
+  });
+  const [telegramChatId, setTelegramChatId] = useState<string>(() => {
+    return localStorage.getItem('aj_telegram_chat_id') || '';
+  });
+  const [isDemoResetting, setIsDemoResetting] = useState(false);
+  const [demoResetMessage, setDemoResetMessage] = useState<string | null>(null);
+
+  const handlePrinterWidthChange = (val: '58mm' | '80mm') => {
+    setPrinterWidth(val);
+    localStorage.setItem('aj_printer_width', val);
+  };
+
+  const handleCashDrawerToggle = () => {
+    const nextVal = !cashDrawerAutoKick;
+    setCashDrawerAutoKick(nextVal);
+    localStorage.setItem('aj_cash_drawer_kick', String(nextVal));
+  };
+
+  const handleSaveTelegram = () => {
+    localStorage.setItem('aj_telegram_chat_id', telegramChatId);
+    alert('Telegram Chat ID saved.');
+  };
+
+  const handleResetDemoSandbox = async () => {
+    if (!window.confirm('Reset this demo studio back to fresh seed data? All custom transactions will be reseeded.')) return;
+    setIsDemoResetting(true);
+    setDemoResetMessage(null);
+    try {
+      const res = await fetch('/api/demo/reset', { method: 'POST', credentials: 'include' });
+      if (res.ok) {
+        setDemoResetMessage('Studio sandbox successfully reset! Reloading...');
+        setTimeout(() => window.location.reload(), 1200);
+      } else {
+        setDemoResetMessage('Failed to reset sandbox.');
+      }
+    } catch {
+      setDemoResetMessage('Network error during reset.');
+    } finally {
+      setIsDemoResetting(false);
+    }
+  };
 
   const loadStaff = async () => {
     setIsLoadingStaff(true);
@@ -642,7 +697,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="flex justify-between text-[#7E8F9F]">
                   <span>Studio Facility:</span>
                   <span className="text-[#F1F5F9] font-medium">
-                    AJ AI Studio POS • Flagship Edition
+                    AJ Studio Desk • Flagship Edition
                   </span>
                 </div>
                 <div className="flex justify-between text-[#7E8F9F]">
@@ -661,6 +716,144 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     {atmosphere.replace(/-/g, ' ')}
                   </span>
                 </div>
+              </div>
+
+              {/* Hardware & Peripherals Configuration */}
+              <div className="p-3.5 rounded-xl bg-[#0B1B2B] border border-[#1E3A4F] space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-[#1E3A4F]">
+                  <span className="font-bold text-[#F1F5F9] flex items-center gap-1.5">
+                    <Printer className="w-4 h-4 text-[#38BDF8]" />
+                    <span>POS Hardware &amp; Peripherals</span>
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono">WebUSB / Serial</span>
+                </div>
+
+                {/* Printer Width */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[#94A3B8]">Receipt Roll Width</span>
+                    <HelpTip tipId="settings-printer-width" />
+                  </div>
+                  <div className="flex items-center space-x-1.5 bg-[#030F1E] p-1 rounded-lg border border-[#1E3A4F]">
+                    <button
+                      type="button"
+                      onClick={() => handlePrinterWidthChange('58mm')}
+                      className={`px-2.5 py-1 rounded text-[11px] font-mono font-bold transition-all cursor-pointer ${
+                        printerWidth === '58mm'
+                          ? 'bg-[#38BDF8] text-[#071423]'
+                          : 'text-[#94A3B8] hover:text-[#F1F5F9]'
+                      }`}
+                    >
+                      58mm
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handlePrinterWidthChange('80mm')}
+                      className={`px-2.5 py-1 rounded text-[11px] font-mono font-bold transition-all cursor-pointer ${
+                        printerWidth === '80mm'
+                          ? 'bg-[#38BDF8] text-[#071423]'
+                          : 'text-[#94A3B8] hover:text-[#F1F5F9]'
+                      }`}
+                    >
+                      80mm
+                    </button>
+                  </div>
+                </div>
+
+                {/* Cash Drawer */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[#94A3B8]">Cash Drawer Auto-Kick</span>
+                    <HelpTip tipId="settings-cash-drawer" />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCashDrawerToggle}
+                    className={`px-3 py-1 rounded text-[11px] font-bold border transition-colors cursor-pointer ${
+                      cashDrawerAutoKick
+                        ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                        : 'bg-slate-700/30 text-slate-400 border-slate-600/40'
+                    }`}
+                  >
+                    {cashDrawerAutoKick ? 'Enabled' : 'Disabled'}
+                  </button>
+                </div>
+
+                {/* Barcode Scanner */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[#94A3B8]">Barcode Scanner (USB/Wedge)</span>
+                    <HelpTip tipId="settings-barcode-scanner" />
+                  </div>
+                  <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                    Listening
+                  </span>
+                </div>
+              </div>
+
+              {/* Studio Identity & Branding */}
+              <div className="p-3.5 rounded-xl bg-[#0B1B2B] border border-[#1E3A4F] space-y-2">
+                <div className="flex items-center justify-between pb-2 border-b border-[#1E3A4F]">
+                  <span className="font-bold text-[#F1F5F9] flex items-center gap-1.5">
+                    <Image className="w-4 h-4 text-[#38BDF8]" />
+                    <span>Studio Identity &amp; Branding</span>
+                    <HelpTip tipId="settings-studio-branding" />
+                  </span>
+                </div>
+                <p className="text-[#94A3B8] text-[11px] leading-relaxed">
+                  Studio display name and branding logo configured during onboarding are automatically reflected across customer booking links, receipts, and daily Z-Reports.
+                </p>
+              </div>
+
+              {/* Telegram Notifications */}
+              <div className="p-3.5 rounded-xl bg-[#0B1B2B] border border-[#1E3A4F] space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-[#1E3A4F]">
+                  <span className="font-bold text-[#F1F5F9] flex items-center gap-1.5">
+                    <Send className="w-4 h-4 text-[#38BDF8]" />
+                    <span>Telegram Notifications</span>
+                    <HelpTip tipId="settings-telegram-notifications" />
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={telegramChatId}
+                    onChange={(e) => setTelegramChatId(e.target.value)}
+                    placeholder="Enter Telegram Chat ID (e.g. -100...)"
+                    className="flex-1 px-3 py-1.5 bg-[#030F1E] border border-[#1E3A4F] rounded-lg text-[#F1F5F9] text-xs font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSaveTelegram}
+                    className="px-3 py-1.5 bg-[#38BDF8] hover:bg-[#0EA5E9] text-[#071423] font-bold text-xs rounded-lg transition-colors cursor-pointer"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+
+              {/* Demo Sandbox Reset Section */}
+              <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-bold text-amber-300 text-xs">Demo Sandbox Reset</span>
+                    <p className="text-[11px] text-amber-200/80 mt-0.5">
+                      Reseeds this demo studio back to pristine 30-day realistic sample data.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleResetDemoSandbox}
+                    disabled={isDemoResetting}
+                    className="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isDemoResetting ? 'animate-spin' : ''}`} />
+                    <span>{isDemoResetting ? 'Resetting...' : 'Reset Sandbox'}</span>
+                  </button>
+                </div>
+                {demoResetMessage && (
+                  <p className="text-[11px] text-amber-300 font-mono">{demoResetMessage}</p>
+                )}
               </div>
 
               <div className="p-3 rounded-lg border border-[#1E3A4F] text-xs text-[#7E8F9F] space-y-1">
@@ -765,7 +958,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   Payment Architecture Specification
                 </div>
                 <p className="text-xs leading-relaxed text-[#94A3B8]">
-                  • Brand logos are bundled and owned by the AJ AI Studio application core.
+                  • Brand logos are bundled and owned by the AJ Studio Desk application core.
                   <br />
                   • Studio owners are not required to upload or configure brand logos.
                   <br />
@@ -787,7 +980,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-ui text-sm font-bold text-[#F1F5F9]">
-                        AJ AI Studio Operations Manual
+                        AJ Studio Desk Operations Manual
                       </h3>
                       <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono font-bold">
                         Bilingual EN / MM
