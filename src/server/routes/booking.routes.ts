@@ -143,6 +143,9 @@ bookingRouter.post('/api/admin/bookings/:bookingId/payment-review', verifyStudio
 
     return res.json({ success: true, booking: updated });
   } catch (err: any) {
+    if (err?.message?.includes('BOOKING_NOT_FOUND')) {
+      return res.status(404).json({ error: 'BOOKING_NOT_FOUND', code: 'NOT_FOUND' });
+    }
     return res.status(500).json({ error: err?.message || 'Payment review failed' });
   }
 });
@@ -190,6 +193,9 @@ bookingRouter.patch('/api/admin/bookings/:bookingId/status', verifyStudioAdminMi
   } catch (err: any) {
     if (err?.message?.includes('OPTIMISTIC_LOCK_CONCURRENT_UPDATE')) {
       return res.status(409).json({ error: err.message, code: 'STALE_REVISION' });
+    }
+    if (err?.message?.includes('BOOKING_NOT_FOUND')) {
+      return res.status(404).json({ error: 'BOOKING_NOT_FOUND', code: 'NOT_FOUND' });
     }
     return res.status(500).json({ error: err?.message || 'Failed to update booking status' });
   }
@@ -240,6 +246,9 @@ bookingRouter.patch('/api/admin/bookings/:bookingId/schedule', verifyStudioAdmin
     if (err?.message?.includes('RESCHEDULE_CONFLICT')) {
       return res.status(409).json({ error: err.message, code: 'SLOT_CONFLICT' });
     }
+    if (err?.message?.includes('BOOKING_NOT_FOUND')) {
+      return res.status(404).json({ error: 'BOOKING_NOT_FOUND', code: 'NOT_FOUND' });
+    }
     return res.status(500).json({ error: err?.message || 'Failed to reschedule booking' });
   }
 });
@@ -265,6 +274,9 @@ bookingRouter.patch('/api/admin/bookings/:bookingId/notes', verifyStudioAdminMid
 
     return res.json({ success: true, booking: updated });
   } catch (err: any) {
+    if (err?.message?.includes('BOOKING_NOT_FOUND')) {
+      return res.status(404).json({ error: 'BOOKING_NOT_FOUND', code: 'NOT_FOUND' });
+    }
     return res.status(500).json({ error: err?.message || 'Failed to update admin notes' });
   }
 });

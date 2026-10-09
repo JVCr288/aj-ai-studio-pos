@@ -68,9 +68,11 @@ export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss(), aistudioMediaPlugin()],
     resolve: {
-      alias: {
-        '@': path.resolve(__dirname, '.'),
-      },
+      alias: [
+        { find: '@', replacement: path.resolve(__dirname, '.') },
+        { find: /^.*\/db\/index(\.js)?$/, replacement: path.resolve(__dirname, 'src/db/browser.ts') },
+        { find: 'postgres', replacement: path.resolve(__dirname, 'src/db/browser.ts') },
+      ],
     },
     server: {
       port: 3010,
