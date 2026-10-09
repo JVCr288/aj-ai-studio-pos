@@ -1,6 +1,8 @@
+-- Hand-edited for idempotency: the demo.* objects are created by both `db:migrate` (public journal)
+-- and `db:migrate:demo` (demo_drizzle journal). Plain CREATE would fail with 42P07 on the second run.
 CREATE SCHEMA IF NOT EXISTS "demo";
 --> statement-breakpoint
-CREATE TABLE "demo"."demo_activity" (
+CREATE TABLE IF NOT EXISTS "demo"."demo_activity" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"lead_id" uuid,
 	"sandbox_id" text NOT NULL,
@@ -8,7 +10,7 @@ CREATE TABLE "demo"."demo_activity" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "demo"."demo_leads" (
+CREATE TABLE IF NOT EXISTS "demo"."demo_leads" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"phone" text NOT NULL,
@@ -26,4 +28,7 @@ CREATE TABLE "demo"."demo_leads" (
 	CONSTRAINT "demo_leads_phone_unique" UNIQUE("phone")
 );
 --> statement-breakpoint
-ALTER TABLE "demo"."demo_activity" ADD CONSTRAINT "demo_activity_lead_id_demo_leads_id_fk" FOREIGN KEY ("lead_id") REFERENCES "demo"."demo_leads"("id") ON DELETE cascade ON UPDATE no action;
+DO $$ BEGIN
+  ALTER TABLE "demo"."demo_activity" ADD CONSTRAINT "demo_activity_lead_id_demo_leads_id_fk" FOREIGN KEY ("lead_id") REFERENCES "demo"."demo_leads"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
