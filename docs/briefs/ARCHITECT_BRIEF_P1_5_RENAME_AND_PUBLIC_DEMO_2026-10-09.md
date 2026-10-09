@@ -157,6 +157,16 @@ Ko Htoo's decision: AJ Studio Desk gets the same **"?" help icons with Burmese e
 ### Gate for Part D
 - Every location in the coverage list has a working "?" (tap and click both work, closes on outside tap/Esc). List the tip ids in your report, and send Ko Htoo a screenshot of 3 of them (POS desk, slip result, Settings) for wording review.
 
+---
+
+## Part E — Permanent sample studio (for the Platform's AJ Studio Desk page)
+
+- One extra tenant, `sample-studio`, on the demo deployment. It **never expires** and is reseeded every night at 03:00 Asia/Yangon with the same lived-in seed (Part B).
+- Its customer website `/s/sample-studio` is public: home, packages, booking calendar, sample-slip payment, digital pass, delivery vault, and shop. A visitor can make a booking; it disappears at the nightly reseed.
+- Its admin desk is **not** public. The admin experience is only through each visitor's own demo sandbox.
+- This powers the "Sample site" button and QR code on the platform page (`ajax-click-ai-v1-ui` brief `ARCHITECT_BRIEF_PLATFORM_STUDIO_DESK_ROOM_2026-10-09.md`).
+- Gate: `/s/sample-studio` loads on a phone without login, and a booking made there is gone after a forced reseed.
+
 ## Acceptance gates (report each separately)
 1. `npx tsc --noEmit` → 0 errors; `npm test` → all pass (update renamed-string asserts; add tests 4–6 below)
 2. Rename grep in Part A → no matches; tenant IDs unchanged (`grep -rn "'aj-ai-studio'" src` still finds the tenant key)
