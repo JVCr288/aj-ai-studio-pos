@@ -1,18 +1,22 @@
 import { Router, Request, Response } from 'express';
 import crypto from 'crypto';
-import { safeCompare } from '../utils/crypto.js';
+import { safeCompare, verifyWithScrypt, hashSha256 } from '../utils/crypto.js';
 import {
   verifyAdminAuth,
   verifyStudioAdminMiddleware,
   memoryAdminSessions,
   AdminSessionRecord,
 } from '../middleware/auth.js';
+import { adminLoginRateLimiter } from '../middleware/rateLimiters.js';
 import { createSetupLink } from '../../services/ownerTokenService.js';
 import { getOnboardingSubmissions } from '../../services/serverOnboardingService.js';
+import { getDb } from '../../db/index.js';
+import { adminUsers, adminSessions, productionStudios } from '../../db/schema/index.js';
+import { eq, or, and } from 'drizzle-orm';
 
 export const adminRouter = Router();
 
-// Admin / Dev Controlled Link Generation
+// Admin / Dev Controlled Link Generation (Platform Ops Only)
 adminRouter.post('/api/admin/setup-links', verifyAdminAuth, async (req: Request, res: Response) => {
   try {
     const { projectId, tenantId, expiresInHours, studioDisplayName } = req.body;
@@ -36,7 +40,7 @@ adminRouter.post('/api/admin/setup-links', verifyAdminAuth, async (req: Request,
   }
 });
 
-// Developer Review Submission Fetcher
+// Developer Review Submission Fetcher (Platform Ops Only)
 adminRouter.get('/api/admin/onboarding/submissions', verifyAdminAuth, async (req: Request, res: Response) => {
   try {
     const projectId = (req.query.projectId as string) || 'proj-aj-studio-01';
@@ -47,65 +51,180 @@ adminRouter.get('/api/admin/onboarding/submissions', verifyAdminAuth, async (req
   }
 });
 
-// Admin Login Endpoint
-adminRouter.post('/api/admin/login', (req: Request, res: Response) => {
-  res.setHeader('Cache-Control', 'no-store, private');
-  const { tenantId, adminKey } = req.body || {};
-  const targetTenant = tenantId || 'aj-ai-studio';
+import { isMemoryDemoAllowed, isDemoTenantSlug, DEMO_TENANT_SLUGS } from '../utils/storageMode.js';
 
-  const validTenants = ['aj-ai-studio', 'neutral-studio-tenant', 'nocturne', 'akk-photo-studio'];
-  if (!targetTenant || typeof targetTenant !== 'string' || !validTenants.includes(targetTenant)) {
+// Per-Tenant Studio Admin Login Endpoint
+adminRouter.post('/api/admin/login', adminLoginRateLimiter, async (req: Request, res: Response) => {
+  res.setHeader('Cache-Control', 'no-store, private');
+  const { tenantSlug, tenantId, username, password } = req.body || {};
+  const targetTenant = (tenantSlug || tenantId || 'aj-ai-studio').trim();
+  const targetUser = (username || 'admin').trim();
+  const inputSecret = (password || '').trim();
+
+  if (!targetTenant) {
     return res.status(400).json({
       success: false,
       code: 'INVALID_TENANT',
-      error: 'INVALID_TENANT: Specified tenant identity is unrecognized or unsupported.',
+      error: 'INVALID_TENANT: Tenant slug is required.',
     });
   }
 
-  const expectedKey = process.env.ADMIN_API_KEY || (process.env.NODE_ENV !== 'production' ? 'dev-admin-secret' : '');
-  if (!expectedKey) {
-    return res.status(500).json({
+  const db = getDb();
+
+  // 1. Verify tenant exists
+  let tenantExists = false;
+  let studioDisplayName = 'Studio Operations Desk';
+
+  if (db) {
+    try {
+      const studios = await db
+        .select()
+        .from(productionStudios)
+        .where(
+          or(
+            eq(productionStudios.slug, targetTenant),
+            eq(productionStudios.legacyStudioId, targetTenant)
+          )
+        )
+        .limit(1);
+
+      if (studios.length > 0) {
+        tenantExists = true;
+        studioDisplayName = studios[0].displayName;
+      }
+    } catch (err) {
+      console.error('[AdminLogin] Tenant query error:', err);
+      return res.status(503).json({
+        success: false,
+        code: 'STORAGE_UNAVAILABLE',
+        retryable: true,
+        error: 'STORAGE_UNAVAILABLE: Database tenant query failed.',
+      });
+    }
+  } else {
+    // Memory demo mode allows only recognized demo slugs
+    if (isMemoryDemoAllowed() && isDemoTenantSlug(targetTenant)) {
+      tenantExists = true;
+    }
+  }
+
+  if (!tenantExists) {
+    return res.status(400).json({
       success: false,
-      code: 'ADMIN_NOT_CONFIGURED',
-      error: 'ADMIN_NOT_CONFIGURED: Server administrator credential is not configured.',
+      code: 'INVALID_TENANT',
+      error: 'INVALID_TENANT: Specified studio tenant does not exist or is unrecognized.',
     });
   }
 
-  if (!adminKey || typeof adminKey !== 'string') {
+  if (!inputSecret) {
     return res.status(401).json({
       success: false,
       code: 'INVALID_CREDENTIAL',
-      error: 'INVALID_CREDENTIAL: Admin access key credential is required.',
+      error: 'INVALID_CREDENTIAL: Password is required.',
     });
   }
 
-  if (!safeCompare(adminKey, expectedKey)) {
+  // 2. Authenticate user credentials
+  let authenticatedUser: { id: string; username: string; role: AdminSessionRecord['userRole'] } | null = null;
+
+  if (db) {
+    try {
+      const users = await db
+        .select()
+        .from(adminUsers)
+        .where(
+          and(
+            eq(adminUsers.tenantId, targetTenant),
+            eq(adminUsers.username, targetUser),
+            eq(adminUsers.isActive, true)
+          )
+        )
+        .limit(1);
+
+      if (users.length > 0) {
+        const user = users[0];
+        const isMatch = await verifyWithScrypt(inputSecret, user.passwordHash);
+        if (isMatch) {
+          authenticatedUser = {
+            id: user.id,
+            username: user.username,
+            role: user.role as AdminSessionRecord['userRole'],
+          };
+        }
+      }
+    } catch (err) {
+      console.error('[AdminLogin] User query error:', err);
+      return res.status(503).json({
+        success: false,
+        code: 'STORAGE_UNAVAILABLE',
+        retryable: true,
+        error: 'STORAGE_UNAVAILABLE: Database authentication query failed.',
+      });
+    }
+  } else {
+    // Demo fallback authentication allowed ONLY under isMemoryDemoAllowed() and for demo slugs
+    if (isMemoryDemoAllowed() && isDemoTenantSlug(targetTenant)) {
+      if (inputSecret === 'admin123') {
+        authenticatedUser = {
+          id: `usr-demo-${targetTenant}`,
+          username: targetUser,
+          role: 'STUDIO_ADMIN',
+        };
+      }
+    }
+  }
+
+  if (!authenticatedUser) {
     return res.status(401).json({
       success: false,
       code: 'INVALID_CREDENTIAL',
-      error: 'INVALID_CREDENTIAL: Incorrect admin access key credential.',
+      error: 'INVALID_CREDENTIAL: Incorrect credentials for specified studio tenant.',
     });
   }
 
+  // 3. Issue persistent session
   const sessionToken = `admin_sess_${crypto.randomBytes(32).toString('hex')}`;
   const csrfToken = `admin_csrf_${crypto.randomBytes(16).toString('hex')}`;
   const now = new Date();
   const expiresAt = new Date(now.getTime() + 24 * 3600 * 1000);
 
-  const userRole: 'PLATFORM_ADMIN' | 'STUDIO_ADMIN' | 'VIEWER' = 'STUDIO_ADMIN';
-  const userName = 'AJ AI Studio Admin';
-
-  const session: AdminSessionRecord = {
+  const sessionRecord: AdminSessionRecord = {
     sessionToken,
     tenantId: targetTenant,
-    userRole,
-    userName,
+    userRole: authenticatedUser.role,
+    userName: `${targetUser} (${studioDisplayName})`,
     csrfToken,
     createdAt: now,
     expiresAt,
   };
 
-  memoryAdminSessions.set(sessionToken, session);
+  // Persist to database if available
+  if (db) {
+    try {
+      const sessionTokenHash = hashSha256(sessionToken);
+      await db.insert(adminSessions).values({
+        sessionTokenHash,
+        tenantId: targetTenant,
+        userId: authenticatedUser.id,
+        username: authenticatedUser.username,
+        role: authenticatedUser.role,
+        csrfToken,
+        expiresAt,
+        createdAt: now,
+      });
+    } catch (err) {
+      console.error('[AdminLogin] Failed to persist session row to DB:', err);
+      return res.status(503).json({
+        success: false,
+        code: 'STORAGE_UNAVAILABLE',
+        retryable: true,
+        error: 'STORAGE_UNAVAILABLE: Failed to persist admin session to database.',
+      });
+    }
+  }
+
+  // Cache in-memory
+  memoryAdminSessions.set(sessionToken, sessionRecord);
 
   const isProd = process.env.NODE_ENV === 'production';
   res.setHeader(
@@ -116,8 +235,8 @@ adminRouter.post('/api/admin/login', (req: Request, res: Response) => {
   return res.json({
     success: true,
     tenantId: targetTenant,
-    userRole,
-    userName: session.userName,
+    userRole: authenticatedUser.role,
+    userName: sessionRecord.userName,
     csrfToken,
   });
 });
@@ -135,7 +254,25 @@ adminRouter.get('/api/admin/session', verifyStudioAdminMiddleware, (req: Request
 });
 
 // Admin Logout Endpoint
-adminRouter.post('/api/admin/logout', (req: Request, res: Response) => {
-  res.setHeader('Set-Cookie', 'aj_admin_session=; Path=/; HttpOnly; Max-Age=0');
+adminRouter.post('/api/admin/logout', async (req: Request, res: Response) => {
+  const cookies = req.headers.cookie;
+  if (cookies) {
+    const match = cookies.match(/aj_admin_session=([^;]+)/);
+    if (match) {
+      const rawToken = decodeURIComponent(match[1].trim());
+      memoryAdminSessions.delete(rawToken);
+      const db = getDb();
+      if (db) {
+        try {
+          const tokenHash = hashSha256(rawToken);
+          await db.delete(adminSessions).where(eq(adminSessions.sessionTokenHash, tokenHash));
+        } catch {
+          // Safe delete fallthrough
+        }
+      }
+    }
+  }
+
+  res.setHeader('Set-Cookie', 'aj_admin_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0');
   return res.json({ success: true, message: 'Logged out of admin panel.' });
 });

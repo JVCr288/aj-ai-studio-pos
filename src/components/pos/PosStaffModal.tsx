@@ -30,24 +30,30 @@ export const PosStaffModal: React.FC<PosStaffModalProps> = ({
   activeStaff,
   onStaffAuthenticated,
 }) => {
-  const staffList = posStaffService.getAllStaff();
+  const [staffList, setStaffList] = useState<PosStaffMember[]>(posStaffService.getAllStaff());
   const [selectedStaff, setSelectedStaff] = useState<PosStaffMember>(activeStaff);
   const [pinInput, setPinInput] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [isValidating, setIsValidating] = useState<boolean>(false);
 
-  // Sync active staff on modal open
+  // Sync active staff on modal open and fetch fresh roster
   useEffect(() => {
     if (isOpen) {
       setSelectedStaff(activeStaff);
       setPinInput('');
       setErrorMessage(null);
       setIsSuccess(false);
+      setIsValidating(false);
+      posStaffService.fetchStaffList().then((list) => {
+        if (list && list.length > 0) setStaffList(list);
+      });
     }
   }, [isOpen, activeStaff]);
 
   // Handle Keypad digit press
   const handleDigit = (digit: string) => {
+    if (isValidating || isSuccess) return;
     if (pinInput.length < 4) {
       const nextPin = pinInput + digit;
       setPinInput(nextPin);
@@ -61,28 +67,39 @@ export const PosStaffModal: React.FC<PosStaffModalProps> = ({
   };
 
   const handleBackspace = () => {
+    if (isValidating || isSuccess) return;
     setPinInput((prev) => prev.slice(0, -1));
     setErrorMessage(null);
   };
 
   const handleClear = () => {
+    if (isValidating || isSuccess) return;
     setPinInput('');
     setErrorMessage(null);
   };
 
-  const verifyPin = (pin: string, staff: PosStaffMember) => {
-    const authenticated = posStaffService.authenticateByPin(pin, staff.id);
-    if (authenticated) {
-      playScannerBeep('success');
-      setIsSuccess(true);
-      setTimeout(() => {
-        onStaffAuthenticated(authenticated);
-        if (onClose) onClose();
-      }, 350);
-    } else {
+  const verifyPin = async (pin: string, staff: PosStaffMember) => {
+    setIsValidating(true);
+    try {
+      const res = await posStaffService.verifyPinAsync(pin, staff.id);
+      if (res.success && res.staff) {
+        playScannerBeep('success');
+        setIsSuccess(true);
+        setTimeout(() => {
+          onStaffAuthenticated(res.staff!);
+          if (onClose) onClose();
+        }, 350);
+      } else {
+        playScannerBeep('error');
+        setErrorMessage(res.error || 'Incorrect PIN. Please try again.');
+        setPinInput('');
+      }
+    } catch {
       playScannerBeep('error');
-      setErrorMessage('Incorrect PIN. Please try again.');
+      setErrorMessage('PIN verification failed. Please try again.');
       setPinInput('');
+    } finally {
+      setIsValidating(false);
     }
   };
 

@@ -50,3 +50,26 @@ export const bookingSubmissionRateLimiter = rateLimit({
     });
   },
 });
+
+// Admin Login Rate Limiter (Max 5 failed attempts per 15 min per IP+tenant)
+export const adminLoginRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  validate: { keyGeneratorIpFallback: false },
+  keyGenerator: (req: Request) => {
+    const tenant = (req.body?.tenantSlug || req.body?.tenantId || 'global') as string;
+    const ip = req.ip || req.socket.remoteAddress || 'unknown';
+    return `${ip}:${tenant}`;
+  },
+  handler: (req: Request, res: Response) => {
+    return res.status(429).json({
+      success: false,
+      code: 'RATE_LIMIT_EXCEEDED',
+      error: 'Too many failed login attempts. Please wait 15 minutes before retrying.',
+    });
+  },
+});
+

@@ -4,6 +4,8 @@ import { Lock, Shield, ArrowRight } from 'lucide-react';
 interface AdminLoginModalProps {
   tenantId: string;
   onTenantChange: (t: string) => void;
+  username?: string;
+  onUsernameChange?: (u: string) => void;
   loginAdminKey: string;
   onLoginAdminKeyChange: (k: string) => void;
   onSubmit: (e: React.FormEvent) => void;
@@ -13,6 +15,8 @@ interface AdminLoginModalProps {
 export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
   tenantId,
   onTenantChange,
+  username = 'admin',
+  onUsernameChange,
   loginAdminKey,
   onLoginAdminKeyChange,
   onSubmit,
@@ -47,12 +51,23 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-[#94A3B8] block mb-1.5">Admin Access Key</label>
+            <label className="text-xs font-semibold text-[#94A3B8] block mb-1.5">Username</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => onUsernameChange && onUsernameChange(e.target.value)}
+              placeholder="Username (e.g. admin)"
+              className="w-full bg-[#030F1E] border border-[#1E3A4F] rounded-xl px-3 py-2 text-xs font-mono text-[#F1F5F9] focus:outline-none focus:border-[#38BDF8]"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-[#94A3B8] block mb-1.5">Password / Admin Key</label>
             <input
               type="password"
               value={loginAdminKey}
               onChange={(e) => onLoginAdminKeyChange(e.target.value)}
-              placeholder="Enter administrator key..."
+              placeholder="Enter administrator password..."
               className="w-full bg-[#030F1E] border border-[#1E3A4F] rounded-xl px-3 py-2.5 text-xs font-mono text-[#F1F5F9] focus:outline-none focus:border-[#38BDF8]"
             />
           </div>

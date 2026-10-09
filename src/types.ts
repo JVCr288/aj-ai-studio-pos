@@ -823,22 +823,25 @@ export interface PosTransaction {
   orderReference: string;
   tenantId: string;
   bookingReference?: string;
-  customerName: string;
-  customerPhone: string;
+  customerName?: string;
+  customerPhone?: string;
   bayAllocation?: string;
-  items: PosCartLineItem[];
+  items?: PosCartLineItem[];
+  lines?: any[];
   subtotalMMK: number;
-  depositCreditedMMK: number;
+  depositCreditedMMK?: number;
   discountMMK: number;
-  taxMMK: number;
+  taxMMK?: number;
   totalDueMMK: number;
   tenderedCashMMK?: number;
   changeDueMMK?: number;
-  paymentMethod: PosPaymentMethod;
+  paymentMethod?: PosPaymentMethod;
+  payments?: any[];
   splitDetails?: PosSplitBreakdown;
-  transactionStatus: 'PAID' | 'COMPLETED' | 'REFUNDED';
-  receiptNumber: string;
-  cashierName: string;
+  transactionStatus?: 'PAID' | 'COMPLETED' | 'REFUNDED';
+  status?: string;
+  receiptNumber?: string;
+  cashierName?: string;
   cashierId?: string;
   cashierRole?: PosStaffRole;
   authorizedByManager?: string;
@@ -855,10 +858,11 @@ export interface PosStaffMember {
   name: string;
   myanmarName?: string;
   role: PosStaffRole;
-  pin: string; // 4-digit PIN
+  pin?: string;
   badgeBarcode?: string; // e.g. "STAFF-AK-01"
   avatarColor?: string;
   isActive: boolean;
+  isLocked?: boolean;
 }
 
 export interface PosCashMovement {

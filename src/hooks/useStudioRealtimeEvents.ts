@@ -93,7 +93,7 @@ export function useStudioRealtimeEvents({
     }
 
     setConnectionStatus('CONNECTING');
-    const url = `/api/events/stream?tenantId=${encodeURIComponent(tenantId)}`;
+    const url = '/api/events/stream';
     const es = new EventSource(url);
     eventSourceRef.current = es;
 

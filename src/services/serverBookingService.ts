@@ -501,6 +501,25 @@ export class ServerBookingService {
   }
 
   /**
+   * Look up booking by manifest ID or booking reference
+   */
+  public async findBookingByManifestOrRef(
+    manifestOrRef: string,
+    tenantId?: string
+  ): Promise<CustomerBookingRecord | null> {
+    if (!manifestOrRef) return null;
+    const clean = manifestOrRef.trim();
+    for (const b of bookingStore.values()) {
+      if (tenantId && b.tenantId !== tenantId) continue;
+      if (b.id === clean || b.bookingReference === clean || b.idempotencyKey === clean) {
+        return b;
+      }
+    }
+    return null;
+  }
+
+
+  /**
    * Admin review of manual payment evidence (VERIFY or REJECT).
    */
   public async reviewPaymentEvidence(

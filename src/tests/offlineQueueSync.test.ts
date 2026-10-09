@@ -1,4 +1,6 @@
 import assert from 'node:assert';
+import { AddressInfo } from 'node:net';
+import { createApp } from '../server/app';
 import { offlineQueueService } from '../services/offlineQueueService';
 import { PosTransaction, PosZReport } from '../types';
 
@@ -124,13 +126,39 @@ console.log('  ✅ Selective dequeue by ID verified');
 
 // Test 6: Server API HTTP Ingestion (/api/pos/transactions)
 console.log('Testing Server API transaction ingestion endpoint...');
-const serverHost = 'http://localhost:4000';
 
 async function runHttpTests() {
+  process.env.DEMO_MODE = 'true';
+  const app = createApp();
+  const server = app.listen(0);
+  const port = (server.address() as AddressInfo).port;
+  const serverHost = `http://127.0.0.1:${port}`;
+
   try {
-    const postRes = await fetch(`${serverHost}/api/pos/transactions`, {
+    // 0. Authenticate admin session for 'nocturne' tenant
+    const loginRes = await fetch(`${serverHost}/api/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tenantSlug: 'nocturne',
+        username: 'admin',
+        password: 'admin123',
+      }),
+    });
+    assert.strictEqual(loginRes.status, 200, 'Admin login should succeed');
+    const loginData = await loginRes.json();
+    const setCookie = loginRes.headers.get('set-cookie');
+    const sessionCookie = setCookie ? setCookie.split(';')[0] : '';
+    const csrfToken = loginData.csrfToken;
+    const authHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Cookie': sessionCookie,
+      'x-csrf-token': csrfToken,
+    };
+
+    const postRes = await fetch(`${serverHost}/api/pos/transactions`, {
+      method: 'POST',
+      headers: authHeaders,
       body: JSON.stringify(mockTx),
     });
     assert.strictEqual(postRes.status, 201, 'POST /api/pos/transactions should return 201');
@@ -140,7 +168,9 @@ async function runHttpTests() {
     console.log('  ✅ POST /api/pos/transactions single item ingest returned 201 Created');
 
     // Test 7: GET /api/pos/transactions
-    const getRes = await fetch(`${serverHost}/api/pos/transactions?tenantId=nocturne`);
+    const getRes = await fetch(`${serverHost}/api/pos/transactions`, {
+      headers: authHeaders,
+    });
     assert.strictEqual(getRes.status, 200, 'GET /api/pos/transactions should return 200');
     const getJson = await getRes.json();
     assert.strictEqual(getJson.success, true);
@@ -151,7 +181,7 @@ async function runHttpTests() {
     // Test 8: POST /api/pos/shifts
     const shiftRes = await fetch(`${serverHost}/api/pos/shifts`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders,
       body: JSON.stringify(mockZReport),
     });
     assert.strictEqual(shiftRes.status, 201, 'POST /api/pos/shifts should return 201');
@@ -164,7 +194,7 @@ async function runHttpTests() {
     const bulkTx2 = { ...mockTx, id: `tx-bulk-2-${Date.now()}`, orderReference: 'ORD-BLK-02' };
     const bulkRes = await fetch(`${serverHost}/api/pos/transactions`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders,
       body: JSON.stringify([bulkTx1, bulkTx2]),
     });
     assert.strictEqual(bulkRes.status, 201);
@@ -173,9 +203,11 @@ async function runHttpTests() {
     console.log('  ✅ Bulk batch ingestion verified (2 transactions synced simultaneously)');
 
     console.log('\n🎉 ALL 9 OFFLINE-FIRST QUEUE & SERVER SYNC TESTS PASSED!\n');
+    server.close();
     process.exit(0);
   } catch (err: any) {
     console.error('Offline server integration test failed:', err);
+    server.close();
     process.exit(1);
   }
 }

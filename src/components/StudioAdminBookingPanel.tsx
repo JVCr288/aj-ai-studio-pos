@@ -54,6 +54,7 @@ export function StudioAdminBookingPanel({
   const [userRole, setUserRole] = useState<string>('STUDIO_ADMIN');
   const [userName, setUserName] = useState<string>('Studio Operations Desk');
   const [loginAdminKey, setLoginAdminKey] = useState<string>('');
+  const [loginUsername, setLoginUsername] = useState<string>('admin');
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
 
@@ -106,7 +107,7 @@ export function StudioAdminBookingPanel({
     e.preventDefault();
     setLoginError(null);
     try {
-      const res = await loginStudioAdmin(loginAdminKey, tenantId);
+      const res = await loginStudioAdmin(loginAdminKey, tenantId, loginUsername);
       setIsAuthenticated(true);
       setUserRole(res.userRole);
       setUserName(res.userName);
@@ -389,6 +390,8 @@ export function StudioAdminBookingPanel({
         <AdminLoginModal
           tenantId={tenantId}
           onTenantChange={setTenantId}
+          username={loginUsername}
+          onUsernameChange={setLoginUsername}
           loginAdminKey={loginAdminKey}
           onLoginAdminKeyChange={setLoginAdminKey}
           onSubmit={handleLoginSubmit}

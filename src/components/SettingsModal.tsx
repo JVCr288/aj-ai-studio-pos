@@ -15,6 +15,9 @@ import {
   Sparkles,
   CreditCard,
   BookOpen,
+  Users,
+  Plus,
+  Key,
 } from 'lucide-react';
 import { SUPPORTED_PAYMENT_GATEWAYS, getPaymentBrand } from '../utils/paymentBrands';
 import { StudioUserGuideModal } from './StudioUserGuideModal';
@@ -33,7 +36,7 @@ interface SettingsModalProps {
   onLaunchPosDesk?: () => void;
 }
 
-type SettingsTab = 'appearance' | 'workstation' | 'security' | 'payment' | 'guide';
+type SettingsTab = 'appearance' | 'workstation' | 'security' | 'payment' | 'guide' | 'staff';
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
@@ -52,6 +55,111 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Staff management state
+  const [staffList, setStaffList] = useState<any[]>([]);
+  const [isLoadingStaff, setIsLoadingStaff] = useState(false);
+  const [newStaffName, setNewStaffName] = useState('');
+  const [newStaffMyanmarName, setNewStaffMyanmarName] = useState('');
+  const [newStaffRole, setNewStaffRole] = useState('CASHIER');
+  const [newStaffPin, setNewStaffPin] = useState('');
+  const [staffActionMsg, setStaffActionMsg] = useState<string | null>(null);
+  const [resetPinId, setResetPinId] = useState<string | null>(null);
+  const [resetPinValue, setResetPinValue] = useState('');
+
+  const loadStaff = async () => {
+    setIsLoadingStaff(true);
+    try {
+      const res = await fetch('/api/pos/staff', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.staff)) {
+          setStaffList(data.staff);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to load staff list:', err);
+    } finally {
+      setIsLoadingStaff(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && activeTab === 'staff') {
+      loadStaff();
+    }
+  }, [isOpen, activeTab]);
+
+  const handleCreateStaff = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newStaffName.trim() || !newStaffPin.trim()) return;
+    try {
+      const res = await fetch('/api/pos/staff', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newStaffName.trim(),
+          myanmarName: newStaffMyanmarName.trim(),
+          role: newStaffRole,
+          pin: newStaffPin.trim(),
+        }),
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setStaffActionMsg('Staff added successfully.');
+        setNewStaffName('');
+        setNewStaffMyanmarName('');
+        setNewStaffPin('');
+        loadStaff();
+      } else {
+        setStaffActionMsg(data.error || 'Failed to add staff.');
+      }
+    } catch {
+      setStaffActionMsg('Error creating staff member.');
+    }
+  };
+
+  const handleToggleStaffStatus = async (staffId: string, currentStatus: boolean) => {
+    try {
+      const res = await fetch(`/api/pos/staff/${staffId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: !currentStatus }),
+        credentials: 'include',
+      });
+      if (res.ok) {
+        setStaffActionMsg('Status updated.');
+        loadStaff();
+      }
+    } catch {
+      setStaffActionMsg('Error updating status.');
+    }
+  };
+
+  const handleResetPin = async (staffId: string) => {
+    if (!resetPinValue.trim() || resetPinValue.trim().length !== 4) {
+      setStaffActionMsg('PIN must be 4 digits.');
+      return;
+    }
+    try {
+      const res = await fetch(`/api/pos/staff/${staffId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: resetPinValue.trim() }),
+        credentials: 'include',
+      });
+      if (res.ok) {
+        setStaffActionMsg('PIN reset successfully.');
+        setResetPinId(null);
+        setResetPinValue('');
+      } else {
+        setStaffActionMsg('Failed to reset PIN.');
+      }
+    } catch {
+      setStaffActionMsg('Error resetting PIN.');
+    }
+  };
 
   useEffect(() => {
     setIsMounted(true);
@@ -217,6 +325,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 EN/MM
               </span>
             </span>
+          </button>
+
+          <button
+            type="button"
+            id="settings-tab-staff-btn"
+            onClick={() => setActiveTab('staff')}
+            className={`py-3 px-3 flex items-center space-x-2 border-b-2 font-medium transition-colors cursor-pointer ${
+              activeTab === 'staff'
+                ? 'border-[#38BDF8] text-[#38BDF8]'
+                : 'border-transparent text-[#7E8F9F] hover:text-[#F1F5F9]'
+            }`}
+          >
+            <Users className="w-3.5 h-3.5" />
+            <span>POS Staff</span>
           </button>
         </div>
 
@@ -751,6 +873,196 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </p>
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'staff' && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-ui font-bold text-sm text-[#F1F5F9]">
+                    POS Staff &amp; Terminal Access
+                  </h3>
+                  <p className="text-xs text-[#94A3B8] mt-0.5">
+                    Manage active staff rosters, configure permission roles, and reset 4-digit PINs.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={loadStaff}
+                  className="text-xs text-[#38BDF8] hover:underline"
+                >
+                  Refresh
+                </button>
+              </div>
+
+              {staffActionMsg && (
+                <div className="p-2.5 rounded-lg bg-sky-500/10 border border-sky-500/30 text-xs text-sky-300">
+                  {staffActionMsg}
+                </div>
+              )}
+
+              {/* Add New Staff Member Form */}
+              <form onSubmit={handleCreateStaff} className="p-4 rounded-xl bg-[#0B1B2B] border border-[#1E3A4F] space-y-3">
+                <div className="text-xs font-bold text-[#F1F5F9] flex items-center gap-1.5">
+                  <Plus className="w-3.5 h-3.5 text-[#38BDF8]" />
+                  <span>Add New Staff Member</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <label className="block text-[#94A3B8] mb-1">Name (English)</label>
+                    <input
+                      type="text"
+                      value={newStaffName}
+                      onChange={(e) => setNewStaffName(e.target.value)}
+                      placeholder="e.g. Aung Kyaw"
+                      required
+                      className="w-full px-3 py-1.5 bg-[#030F1E] border border-[#1E3A4F] rounded-lg text-[#F1F5F9]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[#94A3B8] mb-1">Name (Myanmar)</label>
+                    <input
+                      type="text"
+                      value={newStaffMyanmarName}
+                      onChange={(e) => setNewStaffMyanmarName(e.target.value)}
+                      placeholder="e.g. အောင်ကျော်"
+                      className="w-full px-3 py-1.5 bg-[#030F1E] border border-[#1E3A4F] rounded-lg text-[#F1F5F9]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[#94A3B8] mb-1">Role</label>
+                    <select
+                      value={newStaffRole}
+                      onChange={(e) => setNewStaffRole(e.target.value)}
+                      className="w-full px-3 py-1.5 bg-[#030F1E] border border-[#1E3A4F] rounded-lg text-[#F1F5F9]"
+                    >
+                      <option value="CASHIER">Cashier</option>
+                      <option value="LEAD_CASHIER">Lead Cashier</option>
+                      <option value="STUDIO_MANAGER">Studio Manager</option>
+                      <option value="OWNER">Owner</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[#94A3B8] mb-1">4-Digit PIN</label>
+                    <input
+                      type="password"
+                      maxLength={4}
+                      pattern="[0-9]{4}"
+                      value={newStaffPin}
+                      onChange={(e) => setNewStaffPin(e.target.value)}
+                      placeholder="4 digits"
+                      required
+                      className="w-full px-3 py-1.5 bg-[#030F1E] border border-[#1E3A4F] rounded-lg text-[#F1F5F9]"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end pt-1">
+                  <button
+                    type="submit"
+                    className="px-3 py-1.5 bg-[#38BDF8] text-[#030F1E] font-bold text-xs rounded-lg hover:bg-[#38BDF8]/90 transition-colors"
+                  >
+                    Add Staff
+                  </button>
+                </div>
+              </form>
+
+              {/* Staff List */}
+              <div className="space-y-2">
+                <div className="text-xs font-semibold text-[#94A3B8]">Current Staff Roster</div>
+                {isLoadingStaff ? (
+                  <div className="text-xs text-[#7E8F9F] py-2">Loading staff roster...</div>
+                ) : staffList.length === 0 ? (
+                  <div className="text-xs text-[#7E8F9F] py-2">No staff members configured.</div>
+                ) : (
+                  <div className="space-y-2">
+                    {staffList.map((stf) => (
+                      <div
+                        key={stf.id}
+                        className="p-3 rounded-xl bg-[#0B1B2B] border border-[#1E3A4F] flex items-center justify-between"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
+                            style={{ backgroundColor: stf.avatarColor || '#38BDF8' }}
+                          >
+                            {stf.name?.[0] || 'S'}
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-[#F1F5F9] flex items-center gap-2">
+                              <span>{stf.name}</span>
+                              {stf.myanmarName && (
+                                <span className="text-[11px] text-[#94A3B8] font-normal">
+                                  ({stf.myanmarName})
+                                </span>
+                              )}
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#1E3A4F] text-[#38BDF8] font-mono">
+                                {stf.role}
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-[#7E8F9F]">
+                              ID: {stf.id} {stf.isActive ? '• Active' : '• Deactivated'}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                          {resetPinId === stf.id ? (
+                            <div className="flex items-center space-x-1">
+                              <input
+                                type="password"
+                                maxLength={4}
+                                placeholder="New PIN"
+                                value={resetPinValue}
+                                onChange={(e) => setResetPinValue(e.target.value)}
+                                className="w-20 px-2 py-1 bg-[#030F1E] border border-[#1E3A4F] rounded text-xs text-[#F1F5F9]"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleResetPin(stf.id)}
+                                className="px-2 py-1 bg-sky-500 text-white rounded text-xs font-semibold"
+                              >
+                                Save
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setResetPinId(null);
+                                  setResetPinValue('');
+                                }}
+                                className="px-1 text-xs text-gray-400"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setResetPinId(stf.id)}
+                              className="px-2 py-1 text-xs rounded border border-[#1E3A4F] text-[#94A3B8] hover:text-[#F1F5F9] hover:border-sky-500/40 flex items-center gap-1"
+                            >
+                              <Key className="w-3 h-3" />
+                              <span>Reset PIN</span>
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => handleToggleStaffStatus(stf.id, stf.isActive)}
+                            className={`px-2 py-1 text-xs rounded border ${
+                              stf.isActive
+                                ? 'border-red-500/30 text-red-400 hover:bg-red-500/10'
+                                : 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
+                            }`}
+                          >
+                            {stf.isActive ? 'Deactivate' : 'Activate'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}

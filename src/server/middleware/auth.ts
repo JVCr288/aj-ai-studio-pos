@@ -1,6 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
-import { safeCompare, parseCookies } from '../utils/crypto.js';
+import { safeCompare, parseCookies, hashSha256 } from '../utils/crypto.js';
 import { verifyOwnerSession } from '../../services/ownerTokenService.js';
+import { getDb } from '../../db/index.js';
+import { adminSessions } from '../../db/schema/index.js';
+import { eq, and, gt } from 'drizzle-orm';
 
 export interface AdminSessionRecord {
   sessionToken: string;
@@ -14,14 +17,72 @@ export interface AdminSessionRecord {
 
 export const memoryAdminSessions = new Map<string, AdminSessionRecord>();
 
-// Admin Authorization Middleware (No secrets exposed to frontend)
+/**
+ * Resolves an admin session token against memory cache and persistent database.
+ */
+export async function resolveAdminSession(sessionToken: string): Promise<AdminSessionRecord | null> {
+  if (!sessionToken) return null;
+
+  // 1. Fast in-memory lookup
+  const cached = memoryAdminSessions.get(sessionToken);
+  if (cached) {
+    if (new Date() > cached.expiresAt) {
+      memoryAdminSessions.delete(sessionToken);
+      return null;
+    }
+    return cached;
+  }
+
+  // 2. Database lookup
+  const db = getDb();
+  if (db) {
+    try {
+      const tokenHash = hashSha256(sessionToken);
+      const rows = await db
+        .select()
+        .from(adminSessions)
+        .where(
+          and(
+            eq(adminSessions.sessionTokenHash, tokenHash),
+            gt(adminSessions.expiresAt, new Date())
+          )
+        )
+        .limit(1);
+
+      if (rows.length > 0) {
+        const row = rows[0];
+        const record: AdminSessionRecord = {
+          sessionToken,
+          tenantId: row.tenantId,
+          userRole: row.role as AdminSessionRecord['userRole'],
+          userName: row.username,
+          csrfToken: row.csrfToken,
+          createdAt: row.createdAt,
+          expiresAt: row.expiresAt,
+        };
+        memoryAdminSessions.set(sessionToken, record);
+        return record;
+      }
+    } catch (err) {
+      console.warn('[Auth] Database session resolution query failed:', err);
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Admin Authorization Middleware (Platform operations ONLY, e.g. setup-links, onboarding reviews)
+ * A key can never impersonate a studio tenant.
+ */
 export const verifyAdminAuth = (req: Request, res: Response, next: NextFunction) => {
   if (process.env.NODE_ENV === 'production' && !process.env.ADMIN_API_KEY) {
     return res.status(403).json({ error: 'ADMIN_DISABLED_IN_PRODUCTION: Production admin API is disabled by default.' });
   }
 
   const rawAdminKey = req.headers['x-admin-key'] || req.headers['authorization'];
-  const expectedKey = process.env.ADMIN_API_KEY || (process.env.NODE_ENV !== 'production' ? 'dev-admin-secret' : null);
+  // dev-admin-secret ONLY when NODE_ENV === 'development' explicitly
+  const expectedKey = process.env.ADMIN_API_KEY || (process.env.NODE_ENV === 'development' ? 'dev-admin-secret' : null);
 
   if (!expectedKey || !rawAdminKey || typeof rawAdminKey !== 'string') {
     return res.status(401).json({ error: 'UNAUTHORIZED: Admin credentials required' });
@@ -35,7 +96,9 @@ export const verifyAdminAuth = (req: Request, res: Response, next: NextFunction)
   next();
 };
 
-// Owner Session Verification Middleware with HttpOnly Cookie & CSRF Protection
+/**
+ * Owner Session Verification Middleware with HttpOnly Cookie & CSRF Protection
+ */
 export const verifyOwnerSessionMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const cookies = parseCookies(req);
   const sessionToken = cookies['owner_session'] || (req.headers['x-owner-session'] as string) || (req.headers['authorization']?.replace('Bearer ', ''));
@@ -61,25 +124,31 @@ export const verifyOwnerSessionMiddleware = (req: Request, res: Response, next: 
   next();
 };
 
-// Studio Admin Session Middleware
-export const verifyStudioAdminMiddleware = (req: Request, res: Response, next: NextFunction) => {
+/**
+ * Studio Admin Session Middleware
+ * Tenant identity comes strictly from the validated session.
+ * Header-based API key impersonation is permanently removed.
+ */
+export const verifyStudioAdminMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   res.setHeader('Cache-Control', 'no-store, private');
   const cookies = parseCookies(req);
   const sessionToken = cookies['aj_admin_session'] || (req.headers['x-admin-session'] as string);
 
-  // 1. Session Cookie Auth Path
   if (sessionToken) {
-    const session = memoryAdminSessions.get(sessionToken);
+    const session = await resolveAdminSession(sessionToken);
     if (!session || new Date() > session.expiresAt) {
       if (session) memoryAdminSessions.delete(sessionToken);
       return res.status(401).json({ error: 'EXPIRED_ADMIN_SESSION: Admin session has expired. Please log in again.' });
     }
 
-    // CSRF check for mutating HTTP methods
+    // CSRF check for mutating HTTP methods when relying on ambient cookie
     if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
-      const csrfHeader = req.headers['x-csrf-token'];
-      if (!csrfHeader || csrfHeader !== session.csrfToken) {
-        return res.status(403).json({ error: 'CSRF_VALIDATION_FAILED: Invalid CSRF token.' });
+      const hasExplicitHeader = Boolean(req.headers['x-admin-session']);
+      if (!hasExplicitHeader) {
+        const csrfHeader = req.headers['x-csrf-token'];
+        if (!csrfHeader || csrfHeader !== session.csrfToken) {
+          return res.status(403).json({ error: 'CSRF_VALIDATION_FAILED: Invalid CSRF token.' });
+        }
       }
     }
 
@@ -88,25 +157,5 @@ export const verifyStudioAdminMiddleware = (req: Request, res: Response, next: N
     return next();
   }
 
-  // 2. Dev API Key Header Fallback Path
-  const adminKey = req.headers['x-admin-key'] || req.headers['authorization'];
-  const expectedKey = process.env.ADMIN_API_KEY || (process.env.NODE_ENV !== 'production' ? 'dev-admin-secret' : null);
-  const cleanAdminKey = typeof adminKey === 'string' ? (adminKey.startsWith('Bearer ') ? adminKey.slice(7).trim() : adminKey.trim()) : '';
-
-  if (expectedKey && cleanAdminKey && safeCompare(cleanAdminKey, expectedKey)) {
-    const requestedTenant = (req.headers['x-tenant-id'] as string) || (req.query.tenantId as string) || 'aj-ai-studio';
-    res.locals.tenantId = requestedTenant;
-    res.locals.adminSession = {
-      sessionToken: 'hdr_key',
-      tenantId: requestedTenant,
-      userRole: 'PLATFORM_ADMIN',
-      userName: 'Platform Developer',
-      csrfToken: 'hdr_csrf',
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + 86400000),
-    };
-    return next();
-  }
-
-  return res.status(401).json({ error: 'UNAUTHORIZED_ADMIN: Valid admin authentication required.' });
+  return res.status(401).json({ error: 'UNAUTHORIZED_ADMIN: Valid studio admin session required.' });
 };

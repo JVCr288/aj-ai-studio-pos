@@ -1,4 +1,6 @@
 import type { Request, Response } from 'express';
+import { parseCookies } from '../utils/crypto.js';
+import { resolveAdminSession } from '../middleware/auth.js';
 
 export interface StudioDomainEvent {
   id: string;
@@ -15,12 +17,13 @@ export interface StudioDomainEvent {
   timestamp: string;
 }
 
+// Strict tenant-scoped subscriber map (No wildcard platform stream in Phase 1)
 export const sseSubscribers = new Map<string, Set<Response>>();
 
 export function broadcastStudioEvent(event: StudioDomainEvent) {
   const message = `event: studio_event\ndata: ${JSON.stringify(event)}\n\n`;
 
-  // Broadcast to specific tenant subscribers
+  // Broadcast ONLY to specific tenant subscribers
   const tenantClients = sseSubscribers.get(event.tenantId);
   if (tenantClients) {
     for (const client of tenantClients) {
@@ -31,28 +34,32 @@ export function broadcastStudioEvent(event: StudioDomainEvent) {
       }
     }
   }
-
-  // Broadcast to wildcard subscribers
-  const wildcardClients = sseSubscribers.get('*');
-  if (wildcardClients) {
-    for (const client of wildcardClients) {
-      try {
-        client.write(message);
-      } catch {
-        wildcardClients.delete(client);
-      }
-    }
-  }
 }
 
-export function handleSseStream(req: Request, res: Response) {
-  const tenantId = req.query.tenantId as string;
-  if (!tenantId) {
-    return res.status(400).json({
-      error: 'tenantId query parameter is required',
-      code: 'MISSING_TENANT_ID',
+export async function handleSseStream(req: Request, res: Response) {
+  res.setHeader('Cache-Control', 'no-store, private');
+
+  // Authenticate session from cookie or header
+  const cookies = parseCookies(req);
+  const sessionToken = cookies['aj_admin_session'] || (req.headers['x-admin-session'] as string);
+
+  if (!sessionToken) {
+    return res.status(401).json({
+      error: 'UNAUTHORIZED_SSE: Studio admin session cookie required to establish event stream.',
+      code: 'UNAUTHORIZED',
     });
   }
+
+  const session = await resolveAdminSession(sessionToken);
+  if (!session || new Date() > session.expiresAt) {
+    return res.status(401).json({
+      error: 'EXPIRED_SSE_SESSION: Admin session has expired or is invalid.',
+      code: 'UNAUTHORIZED',
+    });
+  }
+
+  // Tenant is strictly bound to the authenticated session (Ignored from query param)
+  const tenantId = session.tenantId;
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache, no-transform');

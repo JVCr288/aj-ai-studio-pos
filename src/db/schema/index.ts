@@ -499,4 +499,144 @@ export const bookingEvents = pgTable(
   }
 );
 
+// ----------------------------------------------------------------------------
+// 20. POS TRANSACTIONS (Persistent Point-of-Sale Register Records)
+// ----------------------------------------------------------------------------
+export const posTransactions = pgTable(
+  'pos_transactions',
+  {
+    id: text('id').primaryKey(), // Client UUID
+    tenantId: text('tenant_id').notNull(),
+    terminalId: text('terminal_id').notNull(),
+    staffId: text('staff_id').notNull(),
+    orderReference: text('order_reference').notNull(),
+    lines: jsonb('lines').notNull(),
+    subtotalMmk: integer('subtotal_mmk').notNull(),
+    discountMmk: integer('discount_mmk').notNull().default(0),
+    totalDueMmk: integer('total_due_mmk').notNull(),
+    payments: jsonb('payments').notNull(),
+    status: text('status').notNull().default('COMPLETED'),
+    clientCreatedAt: timestamp('client_created_at', { withTimezone: true }),
+    serverReceivedAt: timestamp('server_received_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex('pos_transactions_tenant_id_idx').on(table.tenantId, table.id),
+  ]
+);
+
+// ----------------------------------------------------------------------------
+// 21. POS SHIFTS (Shift Lifecycle, Cash Float & Z-Report Audit Snapshots)
+// ----------------------------------------------------------------------------
+export const posShifts = pgTable(
+  'pos_shifts',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    tenantId: text('tenant_id').notNull(),
+    shiftId: text('shift_id').notNull(),
+    reportId: text('report_id').notNull(),
+    terminalId: text('terminal_id').notNull(),
+    staffId: text('staff_id'),
+    staffName: text('staff_name').notNull(),
+    status: text('status').notNull().default('CLOSED'),
+    openedAt: timestamp('opened_at', { withTimezone: true }).notNull(),
+    closedAt: timestamp('closed_at', { withTimezone: true }),
+    startingFloatMmk: integer('starting_float_mmk').notNull().default(0),
+    cashSalesMmk: integer('cash_sales_mmk').notNull().default(0),
+    expectedCashMmk: integer('expected_cash_mmk').notNull().default(0),
+    actualCountedCashMmk: integer('actual_counted_cash_mmk'),
+    discrepancyMmk: integer('discrepancy_mmk').notNull().default(0),
+    discrepancyType: text('discrepancy_type'),
+    cashMovements: jsonb('cash_movements'),
+    zReportSnapshot: jsonb('z_report_snapshot'),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex('pos_shifts_tenant_report_idx').on(table.tenantId, table.reportId),
+  ]
+);
+
+// ----------------------------------------------------------------------------
+// 22. POS STAFF (Hashed PINs, Roles, and Lockout Tracking)
+// ----------------------------------------------------------------------------
+export const posStaff = pgTable(
+  'pos_staff',
+  {
+    id: text('id').primaryKey(),
+    tenantId: text('tenant_id').notNull(),
+    name: text('name').notNull(),
+    myanmarName: text('myanmar_name'),
+    role: text('role').notNull(), // 'CASHIER' | 'LEAD_CASHIER' | 'STUDIO_MANAGER' | 'OWNER'
+    pinHash: text('pin_hash').notNull(),
+    badgeBarcodeHash: text('badge_barcode_hash'),
+    avatarColor: text('avatar_color'),
+    isActive: boolean('is_active').notNull().default(true),
+    failedAttempts: integer('failed_attempts').notNull().default(0),
+    lockedUntil: timestamp('locked_until', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex('pos_staff_tenant_id_idx').on(table.tenantId, table.id),
+  ]
+);
+
+// ----------------------------------------------------------------------------
+// 23. ADMIN USERS (Per-Tenant Studio Administrator Accounts)
+// ----------------------------------------------------------------------------
+export const adminUsers = pgTable(
+  'admin_users',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    tenantId: text('tenant_id').notNull(),
+    username: text('username').notNull(),
+    passwordHash: text('password_hash').notNull(),
+    role: text('role').notNull().default('STUDIO_ADMIN'), // 'STUDIO_OWNER' | 'STUDIO_ADMIN' | 'STUDIO_STAFF' | 'VIEWER'
+    isActive: boolean('is_active').notNull().default(true),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex('admin_users_tenant_username_idx').on(table.tenantId, table.username),
+  ]
+);
+
+// ----------------------------------------------------------------------------
+// 24. ADMIN SESSIONS (Persistent Database-Backed Admin Session Storage)
+// ----------------------------------------------------------------------------
+export const adminSessions = pgTable(
+  'admin_sessions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    sessionTokenHash: text('session_token_hash').notNull().unique(),
+    tenantId: text('tenant_id').notNull(),
+    userId: text('user_id').notNull(),
+    username: text('username').notNull(),
+    role: text('role').notNull(),
+    csrfToken: text('csrf_token').notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  }
+);
+
+// ----------------------------------------------------------------------------
+// 25. VERIFIED SLIPS (Slip OCR Idempotency & Duplicate-Slip Prevention)
+// ----------------------------------------------------------------------------
+export const verifiedSlips = pgTable(
+  'verified_slips',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    tenantId: text('tenant_id').notNull(),
+    bookingId: text('booking_id').notNull(),
+    gateway: text('gateway').notNull(),
+    transactionId: text('transaction_id').notNull(),
+    amountMmk: integer('amount_mmk').notNull(),
+    transferredAt: timestamp('transferred_at', { withTimezone: true }),
+    verifiedAt: timestamp('verified_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex('verified_slips_tenant_gw_tx_idx').on(table.tenantId, table.gateway, table.transactionId),
+  ]
+);
+
+
 

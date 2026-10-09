@@ -80,8 +80,13 @@ export const createSetupLink = async (
         linkId = String(inserted.id);
       }
     } catch (err) {
+      if (process.env.NODE_ENV === 'production' && process.env.DEMO_MODE !== 'true') {
+        throw new Error('DATABASE_UNAVAILABLE: PostgreSQL database insert failed. Memory fallback is disabled in production.');
+      }
       console.warn('[OwnerTokenService] Database insert failed, falling back to memory store:', err);
     }
+  } else if (process.env.NODE_ENV === 'production' && process.env.DEMO_MODE !== 'true') {
+    throw new Error('DATABASE_UNAVAILABLE: PostgreSQL is not configured. Memory fallback is disabled in production.');
   }
 
   // Always update memory store for quick verification & offline fallback

@@ -85,15 +85,25 @@ export async function submitCustomerBookingToServer(payload: any): Promise<Custo
 
 export interface AdminLoginPayload {
   tenantId: string;
-  adminKey: string;
+  tenantSlug: string;
+  username: string;
+  password?: string;
+  adminKey?: string;
 }
 
 /**
  * Shared canonical payload builder for Admin Login request contract
  */
-export function createAdminLoginPayload(tenantId: string, adminKey: string): AdminLoginPayload {
+export function createAdminLoginPayload(
+  tenantId: string,
+  adminKey: string,
+  username = 'admin'
+): AdminLoginPayload {
   return {
     tenantId: tenantId || 'aj-ai-studio',
+    tenantSlug: tenantId || 'aj-ai-studio',
+    username: username || 'admin',
+    password: adminKey || '',
     adminKey: adminKey || '',
   };
 }
@@ -103,10 +113,11 @@ export function createAdminLoginPayload(tenantId: string, adminKey: string): Adm
  */
 export async function loginStudioAdmin(
   adminKey: string,
-  tenantId = 'aj-ai-studio'
+  tenantId = 'aj-ai-studio',
+  username = 'admin'
 ): Promise<{ tenantId: string; userRole: string; userName: string; csrfToken: string }> {
   try {
-    const payload = createAdminLoginPayload(tenantId, adminKey);
+    const payload = createAdminLoginPayload(tenantId, adminKey, username);
     const res = await fetch(`${API_BASE}/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

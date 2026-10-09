@@ -1,5 +1,7 @@
 import assert from 'node:assert';
-import { posStaffService, DEFAULT_POS_STAFF } from '../services/posStaffService';
+import { AddressInfo } from 'node:net';
+import { createApp } from '../server/app.js';
+import { posStaffService } from '../services/posStaffService.js';
 
 async function runPosStaffAuthTests() {
   console.log('=== RUNNING MULTI-STAFF FAST PIN SWITCH & AUDIT ROLES TESTS ===\n');
@@ -19,88 +21,160 @@ async function runPosStaffAuthTests() {
   assert.ok(dawKhin && dawKhin.role === 'OWNER');
   console.log('  ✅ Test 1: Staff roster and role definitions verified');
 
-  // Test 2: PIN Authentication
-  console.log('Testing 4-Digit Security PIN Authentication...');
-  const authAungKyaw = posStaffService.authenticateByPin('1234', 'stf-01');
-  assert.strictEqual(authAungKyaw?.name, 'Aung Kyaw');
+  // Start in-process server for server-side auth verification (Fixes R5)
+  process.env.DEMO_MODE = 'true';
+  const app = createApp();
+  const server = app.listen(0);
+  const port = (server.address() as AddressInfo).port;
+  const serverHost = `http://127.0.0.1:${port}`;
 
-  const failedPin = posStaffService.authenticateByPin('0000', 'stf-01');
-  assert.strictEqual(failedPin, null, 'Incorrect PIN must return null');
+  try {
+    // 0. Authenticate admin session for 'aj-ai-studio'
+    const loginRes = await fetch(`${serverHost}/api/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tenantSlug: 'aj-ai-studio',
+        username: 'admin',
+        password: 'admin123',
+      }),
+    });
+    assert.strictEqual(loginRes.status, 200, 'Admin login should succeed');
+    const loginData = await loginRes.json();
+    const setCookie = loginRes.headers.get('set-cookie');
+    const sessionCookie = setCookie ? setCookie.split(';')[0] : '';
+    const csrfToken = loginData.csrfToken;
+    const authHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Cookie': sessionCookie,
+      'x-csrf-token': csrfToken,
+    };
 
-  const globalMatch = posStaffService.authenticateByPin('9999');
-  assert.strictEqual(globalMatch?.name, 'Ko Zin', 'Global PIN search must resolve Ko Zin');
-  console.log('  ✅ Test 2: PIN authentication and failure rejection verified');
+    // Test 2: Server PIN Authentication
+    console.log('Testing 4-Digit Security PIN Server Authentication...');
+    const authAungRes = await fetch(`${serverHost}/api/pos/staff/verify-pin`, {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify({ pin: '1234', staffId: 'stf-01' }),
+    });
+    assert.strictEqual(authAungRes.status, 200);
+    const authAungData = await authAungRes.json();
+    assert.strictEqual(authAungData.staff?.name, 'Aung Kyaw');
 
-  // Test 3: Barcode Badge Scan Authentication
-  console.log('Testing Barcode Badge Scan Quick-Switch...');
-  const badgeAung = posStaffService.authenticateByBadge('STAFF-AK-01');
-  assert.strictEqual(badgeAung?.id, 'stf-01');
+    const failedPinRes = await fetch(`${serverHost}/api/pos/staff/verify-pin`, {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify({ pin: '0000', staffId: 'stf-01' }),
+    });
+    assert.strictEqual(failedPinRes.status, 401, 'Incorrect PIN must return 401');
 
-  // Case-insensitive test
-  const badgeLower = posStaffService.authenticateByBadge('staff-sm-02');
-  assert.strictEqual(badgeLower?.name, 'Su Myat');
+    const globalMatchRes = await fetch(`${serverHost}/api/pos/staff/verify-pin`, {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify({ pin: '9999' }),
+    });
+    assert.strictEqual(globalMatchRes.status, 200);
+    const globalMatchData = await globalMatchRes.json();
+    assert.strictEqual(globalMatchData.staff?.name, 'Ko Zin', 'Global PIN search must resolve Ko Zin');
+    console.log('  ✅ Test 2: Server PIN authentication and failure rejection verified');
 
-  const unknownBadge = posStaffService.authenticateByBadge('STAFF-INVALID-99');
-  assert.strictEqual(unknownBadge, null);
-  console.log('  ✅ Test 3: Barcode badge scan authentication verified');
+    // Test 3: Barcode Badge Scan Server Verification
+    console.log('Testing Barcode Badge Scan Verification...');
+    const badgeMatchRes = await fetch(`${serverHost}/api/pos/staff/verify-pin`, {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify({ pin: '1234', badgeBarcode: 'STAFF-AK-01' }),
+    });
+    assert.strictEqual(badgeMatchRes.status, 200);
+    const badgeMatchData = await badgeMatchRes.json();
+    assert.strictEqual(badgeMatchData.staff?.id, 'stf-01');
 
-  // Test 4: Role-Based Capability Guardrails
-  console.log('Testing Role Permission Matrix...');
-  // Cart Voiding: CASHIER requires override, LEAD_CASHIER / MANAGER / OWNER can void directly
-  assert.strictEqual(posStaffService.canVoidCart('CASHIER'), false);
-  assert.strictEqual(posStaffService.canVoidCart('LEAD_CASHIER'), true);
-  assert.strictEqual(posStaffService.canVoidCart('STUDIO_MANAGER'), true);
-  assert.strictEqual(posStaffService.canVoidCart('OWNER'), true);
+    const unknownBadgeRes = await fetch(`${serverHost}/api/pos/staff/verify-pin`, {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify({ pin: '1234', badgeBarcode: 'STAFF-INVALID-99' }),
+    });
+    assert.strictEqual(unknownBadgeRes.status, 401);
+    console.log('  ✅ Test 3: Server barcode badge scan authentication verified');
 
-  // Large Cash Drops (>50,000 MMK)
-  assert.strictEqual(posStaffService.canPerformLargeCashDrop('CASHIER', 30000), true);
-  assert.strictEqual(posStaffService.canPerformLargeCashDrop('CASHIER', 100000), false);
-  assert.strictEqual(posStaffService.canPerformLargeCashDrop('STUDIO_MANAGER', 100000), true);
+    // Test 4: Role-Based Capability Guardrails
+    console.log('Testing Role Permission Matrix...');
+    assert.strictEqual(posStaffService.canVoidCart('CASHIER'), false);
+    assert.strictEqual(posStaffService.canVoidCart('LEAD_CASHIER'), true);
+    assert.strictEqual(posStaffService.canVoidCart('STUDIO_MANAGER'), true);
+    assert.strictEqual(posStaffService.canVoidCart('OWNER'), true);
 
-  // Shift Close
-  assert.strictEqual(posStaffService.canCloseShift('CASHIER'), false);
-  assert.strictEqual(posStaffService.canCloseShift('LEAD_CASHIER'), true);
-  assert.strictEqual(posStaffService.canCloseShift('STUDIO_MANAGER'), true);
-  console.log('  ✅ Test 4: Role capability guardrails verified');
+    // Large Cash Drops (>50,000 MMK)
+    assert.strictEqual(posStaffService.canPerformLargeCashDrop('CASHIER', 30000), true);
+    assert.strictEqual(posStaffService.canPerformLargeCashDrop('CASHIER', 100000), false);
+    assert.strictEqual(posStaffService.canPerformLargeCashDrop('STUDIO_MANAGER', 100000), true);
 
-  // Test 5: Manager Override Verification
-  console.log('Testing Manager Override Verification...');
-  // Manager PIN (9999) succeeds
-  const mgrOverride = posStaffService.verifyManagerOverride('9999');
-  assert.strictEqual(mgrOverride.authorized, true);
-  assert.strictEqual(mgrOverride.manager?.name, 'Ko Zin');
+    // Shift Close
+    assert.strictEqual(posStaffService.canCloseShift('CASHIER'), false);
+    assert.strictEqual(posStaffService.canCloseShift('LEAD_CASHIER'), true);
+    assert.strictEqual(posStaffService.canCloseShift('STUDIO_MANAGER'), true);
+    console.log('  ✅ Test 4: Role capability guardrails verified');
 
-  // Owner PIN (8888) succeeds
-  const ownerOverride = posStaffService.verifyManagerOverride('8888');
-  assert.strictEqual(ownerOverride.authorized, true);
-  assert.strictEqual(ownerOverride.manager?.name, 'Daw Khin');
+    // Test 5: Server Manager Override Verification
+    console.log('Testing Server Manager Override Verification...');
+    // Manager PIN (9999) succeeds
+    const mgrRes = await fetch(`${serverHost}/api/pos/staff/manager-override`, {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify({ pin: '9999', action: 'VOID_CART' }),
+    });
+    assert.strictEqual(mgrRes.status, 200);
+    const mgrData = await mgrRes.json();
+    assert.strictEqual(mgrData.authorized, true);
+    assert.strictEqual(mgrData.manager?.name, 'Ko Zin');
+    assert.ok(mgrData.overrideToken, 'Override token must be issued');
 
-  // Cashier PIN (1234) rejected for elevated override
-  const cashierOverride = posStaffService.verifyManagerOverride('1234');
-  assert.strictEqual(cashierOverride.authorized, false);
-  assert.ok(cashierOverride.reason?.includes('Manager or Owner authority required'));
+    // Owner PIN (8888) succeeds
+    const ownerRes = await fetch(`${serverHost}/api/pos/staff/manager-override`, {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify({ pin: '8888', action: 'CASH_DROP' }),
+    });
+    assert.strictEqual(ownerRes.status, 200);
+    const ownerData = await ownerRes.json();
+    assert.strictEqual(ownerData.authorized, true);
+    assert.strictEqual(ownerData.manager?.name, 'Daw Khin');
 
-  // Invalid PIN rejected
-  const badOverride = posStaffService.verifyManagerOverride('0000');
-  assert.strictEqual(badOverride.authorized, false);
-  assert.strictEqual(badOverride.reason, 'Invalid PIN entered.');
-  console.log('  ✅ Test 5: Manager override verification verified');
+    // Cashier PIN (1234) rejected for elevated override
+    const cashierRes = await fetch(`${serverHost}/api/pos/staff/manager-override`, {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify({ pin: '1234', action: 'CASH_DROP' }),
+    });
+    assert.strictEqual(cashierRes.status, 401);
 
-  // Test 6: Terminal Lock & Unlock Lifecycle
-  console.log('Testing Terminal Lock & Unlock Lifecycle...');
-  posStaffService.lockTerminal();
-  assert.strictEqual(posStaffService.isTerminalLocked(), true);
+    // Invalid PIN rejected
+    const badRes = await fetch(`${serverHost}/api/pos/staff/manager-override`, {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify({ pin: '0000', action: 'CASH_DROP' }),
+    });
+    assert.strictEqual(badRes.status, 401);
+    console.log('  ✅ Test 5: Server manager override verification verified');
 
-  posStaffService.unlockTerminal(suMyat!);
-  assert.strictEqual(posStaffService.isTerminalLocked(), false);
-  assert.strictEqual(posStaffService.getActiveStaff().name, 'Su Myat');
+    // Test 6: Terminal Lock & Unlock Lifecycle
+    console.log('Testing Terminal Lock & Unlock Lifecycle...');
+    posStaffService.lockTerminal();
+    assert.strictEqual(posStaffService.isTerminalLocked(), true);
 
-  // Reset to default
-  posStaffService.setActiveStaff(aungKyaw!);
-  assert.strictEqual(posStaffService.getActiveStaff().name, 'Aung Kyaw');
-  console.log('  ✅ Test 6: Terminal lock and unlock lifecycle verified');
+    posStaffService.unlockTerminal(suMyat!);
+    assert.strictEqual(posStaffService.isTerminalLocked(), false);
+    assert.strictEqual(posStaffService.getActiveStaff().name, 'Su Myat');
 
-  console.log('\n🎉 ALL 6 MULTI-STAFF FAST PIN SWITCH & AUDIT TESTS PASSED!\n');
+    // Reset to default
+    posStaffService.setActiveStaff(aungKyaw!);
+    assert.strictEqual(posStaffService.getActiveStaff().name, 'Aung Kyaw');
+    console.log('  ✅ Test 6: Terminal lock and unlock lifecycle verified');
+
+    console.log('\n🎉 ALL 6 MULTI-STAFF FAST PIN SWITCH & AUDIT TESTS PASSED!\n');
+  } finally {
+    server.close();
+  }
 }
 
 runPosStaffAuthTests().catch((err) => {

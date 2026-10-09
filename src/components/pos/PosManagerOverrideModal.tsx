@@ -9,7 +9,7 @@ interface PosManagerOverrideModalProps {
   onClose: () => void;
   actionTitle: string;
   actionDescription: string;
-  onAuthorized: (manager: PosStaffMember) => void;
+  onAuthorized: (manager: PosStaffMember, overrideToken?: string) => void;
 }
 
 export const PosManagerOverrideModal: React.FC<PosManagerOverrideModalProps> = ({
@@ -22,16 +22,19 @@ export const PosManagerOverrideModal: React.FC<PosManagerOverrideModalProps> = (
   const [pinInput, setPinInput] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [isValidating, setIsValidating] = useState<boolean>(false);
 
   useEffect(() => {
     if (isOpen) {
       setPinInput('');
       setErrorMessage(null);
       setIsSuccess(false);
+      setIsValidating(false);
     }
   }, [isOpen]);
 
   const handleDigit = (digit: string) => {
+    if (isValidating || isSuccess) return;
     if (pinInput.length < 4) {
       const nextPin = pinInput + digit;
       setPinInput(nextPin);
@@ -44,28 +47,39 @@ export const PosManagerOverrideModal: React.FC<PosManagerOverrideModalProps> = (
   };
 
   const handleBackspace = () => {
+    if (isValidating || isSuccess) return;
     setPinInput((prev) => prev.slice(0, -1));
     setErrorMessage(null);
   };
 
   const handleClear = () => {
+    if (isValidating || isSuccess) return;
     setPinInput('');
     setErrorMessage(null);
   };
 
-  const verifyOverridePin = (pin: string) => {
-    const res = posStaffService.verifyManagerOverride(pin);
-    if (res.authorized && res.manager) {
-      playScannerBeep('success');
-      setIsSuccess(true);
-      setTimeout(() => {
-        onAuthorized(res.manager!);
-        onClose();
-      }, 350);
-    } else {
+  const verifyOverridePin = async (pin: string) => {
+    setIsValidating(true);
+    try {
+      const res = await posStaffService.verifyManagerOverrideAsync(pin, actionTitle);
+      if (res.authorized && res.manager) {
+        playScannerBeep('success');
+        setIsSuccess(true);
+        setTimeout(() => {
+          onAuthorized(res.manager!, res.overrideToken);
+          onClose();
+        }, 350);
+      } else {
+        playScannerBeep('error');
+        setErrorMessage(res.error || 'Manager authorization failed.');
+        setPinInput('');
+      }
+    } catch {
       playScannerBeep('error');
-      setErrorMessage(res.reason || 'Manager authorization failed.');
+      setErrorMessage('Manager authorization failed. Please try again.');
       setPinInput('');
+    } finally {
+      setIsValidating(false);
     }
   };
 
@@ -121,7 +135,7 @@ export const PosManagerOverrideModal: React.FC<PosManagerOverrideModalProps> = (
 
           <div className="bg-[#030F1E] p-3.5 rounded-xl border border-[#1E3A4F] text-center space-y-2">
             <span className="text-[11px] font-semibold text-[#94A3B8] uppercase tracking-wider">
-              Enter Manager / Owner PIN (Ko Zin: 9999 or Daw Khin: 8888)
+              Enter Manager / Owner PIN
             </span>
 
             {/* PIN Dots */}

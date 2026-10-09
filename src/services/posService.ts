@@ -430,6 +430,7 @@ export class PosService {
     actualCashInDrawerMMK: number;
     closureNotes?: string;
     tenantId?: string;
+    overrideToken?: string;
   }): { shift: PosShiftRecord; zReport: PosZReport } {
     const terminalId = params.terminalId || 'TERM-01';
     const staffName = params.staffName || 'Aung Kyaw';
@@ -468,9 +469,13 @@ export class PosService {
     if (isOffline) {
       offlineQueueService.enqueueShiftReport(zReport);
     } else if (typeof window !== 'undefined' && typeof fetch !== 'undefined') {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (params.overrideToken) {
+        headers['x-manager-override'] = params.overrideToken;
+      }
       fetch('/api/pos/shifts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(zReport),
       }).catch((e) => {
         console.warn('Failed to push Z-report to server, queueing offline:', e);

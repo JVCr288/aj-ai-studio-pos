@@ -128,8 +128,13 @@ export const saveOnboardingProjectDraft = async (
           .where(eq(onboardingDrafts.projectId, projectId));
       }
     } catch (err) {
+      if (process.env.NODE_ENV === 'production' && process.env.DEMO_MODE !== 'true') {
+        throw new Error('DATABASE_UNAVAILABLE: PostgreSQL draft save failed. Memory fallback is disabled in production.');
+      }
       console.warn('[ServerOnboardingService] Database draft save failed, storing in memory:', err);
     }
+  } else if (process.env.NODE_ENV === 'production' && process.env.DEMO_MODE !== 'true') {
+    throw new Error('DATABASE_UNAVAILABLE: PostgreSQL is not configured. Memory fallback is disabled in production.');
   }
 
   serverMemoryDrafts.set(projectId, updated);
@@ -188,8 +193,13 @@ export const submitOnboardingProjectSnapshot = async (
           .where(eq(onboardingProjects.id, projectId));
       });
     } catch (err) {
+      if (process.env.NODE_ENV === 'production' && process.env.DEMO_MODE !== 'true') {
+        throw new Error('DATABASE_UNAVAILABLE: PostgreSQL submission transaction failed. Memory fallback is disabled in production.');
+      }
       console.warn('[ServerOnboardingService] Database submission transaction failed, using fallback:', err);
     }
+  } else if (process.env.NODE_ENV === 'production' && process.env.DEMO_MODE !== 'true') {
+    throw new Error('DATABASE_UNAVAILABLE: PostgreSQL is not configured. Memory fallback is disabled in production.');
   }
 
   const existingSubmissions = projectData.submission?.submissions || [];

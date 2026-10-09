@@ -144,8 +144,9 @@ export const StudioPosDesk: React.FC<StudioPosDeskProps> = ({
     isOpen: boolean;
     actionTitle: string;
     actionDescription: string;
-    onAuthorized: (manager: PosStaffMember) => void;
+    onAuthorized: (manager: PosStaffMember, overrideToken?: string) => void;
   } | null>(null);
+  const [activeOverrideToken, setActiveOverrideToken] = useState<string | null>(null);
   const [isPosGuideOpen, setIsPosGuideOpen] = useState<boolean>(false);
 
   // POS Register Shift & Z-Report State
@@ -621,6 +622,7 @@ export const StudioPosDesk: React.FC<StudioPosDeskProps> = ({
         actualCashInDrawerMMK: parsed,
         closureNotes: shiftClosureNotes,
         tenantId: bookingState.tenantId,
+        overrideToken: activeOverrideToken || undefined,
       });
 
       setShiftRecord(closed);
@@ -691,7 +693,10 @@ export const StudioPosDesk: React.FC<StudioPosDeskProps> = ({
         isOpen: true,
         actionTitle: 'Authorize Large Cash Drop',
         actionDescription: `Cash drop of ${amountMMK.toLocaleString()} MMK exceeds the 50,000 MMK threshold. Manager authorization required.`,
-        onAuthorized: (manager) => {
+        onAuthorized: (manager, overrideToken) => {
+          if (overrideToken) {
+            setActiveOverrideToken(overrideToken);
+          }
           doRecordCashMovement(
             type,
             amountMMK,
@@ -1190,8 +1195,8 @@ export const StudioPosDesk: React.FC<StudioPosDeskProps> = ({
           isOpen={managerOverrideReq.isOpen}
           actionTitle={managerOverrideReq.actionTitle}
           actionDescription={managerOverrideReq.actionDescription}
-          onAuthorized={(mgr) => {
-            managerOverrideReq.onAuthorized(mgr);
+          onAuthorized={(mgr, token) => {
+            managerOverrideReq.onAuthorized(mgr, token);
             setManagerOverrideReq(null);
           }}
           onClose={() => setManagerOverrideReq(null)}
